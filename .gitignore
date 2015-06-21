@@ -1,0 +1,21 @@
+#output folders
+*/bin
+*/obj
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+
+# Office Autosaves
+~$*
+~*.tmp
+
+
+#Altium
+*.*Preview
+**/History/*.Zip
+**/*Logs*/*.LOG
+
+TestResults/*

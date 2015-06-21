@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NimbleBluetoothImpedanceManager", "NimbleBluetoothImpedanceManager\NimbleBluetoothImpedanceManager.csproj", "{4F6F473C-7900-4AD7-AB26-0B8E16D7835C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests_BluetoothCommsManager", "Tests_BluetoothCommsManager\Tests_BluetoothCommsManager.csproj", "{6E6E30A0-FB4A-45F3-80B9-8C9096895B94}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{48134D57-AA08-40FA-B1AD-5F7AECAE2DAE}"
+	ProjectSection(SolutionItems) = preProject
+		Local.testsettings = Local.testsettings
+		NimbleBluetoothImpedanceManager.vsmdi = NimbleBluetoothImpedanceManager.vsmdi
+		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = NimbleBluetoothImpedanceManager.vsmdi
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4F6F473C-7900-4AD7-AB26-0B8E16D7835C}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{4F6F473C-7900-4AD7-AB26-0B8E16D7835C}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{4F6F473C-7900-4AD7-AB26-0B8E16D7835C}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{4F6F473C-7900-4AD7-AB26-0B8E16D7835C}.Debug|x86.ActiveCfg = Debug|x86
+		{4F6F473C-7900-4AD7-AB26-0B8E16D7835C}.Debug|x86.Build.0 = Debug|x86
+		{4F6F473C-7900-4AD7-AB26-0B8E16D7835C}.Release|Any CPU.ActiveCfg = Release|x86
+		{4F6F473C-7900-4AD7-AB26-0B8E16D7835C}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{4F6F473C-7900-4AD7-AB26-0B8E16D7835C}.Release|Mixed Platforms.Build.0 = Release|x86
+		{4F6F473C-7900-4AD7-AB26-0B8E16D7835C}.Release|x86.ActiveCfg = Release|x86
+		{4F6F473C-7900-4AD7-AB26-0B8E16D7835C}.Release|x86.Build.0 = Release|x86
+		{6E6E30A0-FB4A-45F3-80B9-8C9096895B94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E6E30A0-FB4A-45F3-80B9-8C9096895B94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E6E30A0-FB4A-45F3-80B9-8C9096895B94}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{6E6E30A0-FB4A-45F3-80B9-8C9096895B94}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{6E6E30A0-FB4A-45F3-80B9-8C9096895B94}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6E6E30A0-FB4A-45F3-80B9-8C9096895B94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E6E30A0-FB4A-45F3-80B9-8C9096895B94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E6E30A0-FB4A-45F3-80B9-8C9096895B94}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{6E6E30A0-FB4A-45F3-80B9-8C9096895B94}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{6E6E30A0-FB4A-45F3-80B9-8C9096895B94}.Release|x86.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
