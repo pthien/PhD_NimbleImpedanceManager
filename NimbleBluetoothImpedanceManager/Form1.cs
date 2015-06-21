@@ -22,11 +22,37 @@ namespace NimbleBluetoothImpedanceManager
         {
             RefreshComPorts();
             nimble = new NimbleCommsManager();
+            UpdateStatusStrip();
+            nimble.ConnectedToNimble += nimble_ConnectedToNimble;
+            nimble.DisconnectedFromNimble += nimble_ConnectedToNimble;
+        }
+
+        void nimble_ConnectedToNimble(object sender, BluetoothCommsDriver.DataRecievedEventArgs e)
+        {
+            UpdateStatusStrip();
         }
 
         private void Form1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-           
+
+        }
+
+        private void UpdateStatusStrip()
+        {
+            if (nimble.Initialised)
+            {
+                lblDongleStatus.Text = string.Format("Connected to dongle on {0}", nimble.Comport);
+                if (nimble.ConnectedToRemoteDevice)
+                {
+                    lblRemoteDeviceStatus.Text = string.Format("Connected to {0}", nimble.RemoteDeviceId);
+                }
+                else
+                    lblRemoteDeviceStatus.Text = "Not connected to any nimble processors";
+            }
+            else
+                lblDongleStatus.Text = "Not connected to dongle";
+
+
         }
 
 
@@ -35,20 +61,31 @@ namespace NimbleBluetoothImpedanceManager
             cmbCOMPorts.Items.Clear();
             string[] portNames = SerialPort.GetPortNames();
             cmbCOMPorts.Items.AddRange(portNames);
+            cmbCOMPorts.Text = portNames.FirstOrDefault();
         }
 
         private void btnConnect_Click(object sender, EventArgs e)
         {
             string port = cmbCOMPorts.Text;
-            nimble.Initialise(port);
+            ConnectedToDongle(nimble.Initialise(port));
+
+            UpdateStatusStrip();
+        }
+
+        private void ConnectedToDongle(bool connected)
+        {
+            btnConnect.Enabled = !connected;
+            btnCycle.Enabled = connected;
+            btnStartScan.Enabled = connected;
         }
 
         private void btnCycle_Click(object sender, EventArgs e)
         {
-            string[] lines = txtAddresses.Text.Split(new char[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
-
-            foreach (string line in lines)
+            //string[] lines = txtAddresses.Text.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            
+            foreach (object o in cklFoundDevices.Items)
             {
+                string line = o.ToString();
                 nimble.ConnectToNimble(line);
                 nimble.StartTelemCapture();
                 System.Threading.Thread.Sleep(10000);
@@ -59,12 +96,44 @@ namespace NimbleBluetoothImpedanceManager
 
         private void btnStartScan_Click(object sender, EventArgs e)
         {
-
+            lblDevicesRefreshTime.Text = "Last refresh at " + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString();
+            var devs = nimble.DiscoverDevices();
+            cklFoundDevices.Items.Clear();
+            //txtAddresses.Text = "";
+            if (devs == null)
+                return;
+            foreach (string s in devs)
+            {
+                cklFoundDevices.Items.Add(s);
+                cklFoundDevices.SetItemCheckState(0, CheckState.Indeterminate);
+                //txtAddresses.Text = s + "\r\n";
+            }
         }
 
         private void cmbCOMPorts_MouseClick(object sender, MouseEventArgs e)
         {
             RefreshComPorts();
+        }
+
+        private void txtAddresses_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            timer1.Enabled = !timer1.Enabled;
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            string line = cklFoundDevices.Items[0].ToString();
+            nimble.ConnectToNimble(line);
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            nimble.GetNimbleName();
         }
     }
 }

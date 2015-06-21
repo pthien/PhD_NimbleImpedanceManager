@@ -177,5 +177,16 @@ namespace Tests_BluetoothCommsManager
             actual = ChunkParser.ParseChunk(chunk);
             CollectionAssert.AreEqual(expected, actual.ToArray());
         }
+
+        [TestMethod]
+        public void ParseChunk_OKDisc()
+        {
+            string chunk = "OK+DISC:20C38FEAD43C"; // TODO: Initialize to an appropriate value
+            string[] expected = { "OK+DISC:20C38FEAD43C" };
+            List<string> actual;
+            actual = ChunkParser.ParseChunk(chunk);
+            CollectionAssert.AreEqual(expected, actual.ToArray());
+        }
+        
     }
 }

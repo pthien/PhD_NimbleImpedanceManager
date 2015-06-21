@@ -35,7 +35,7 @@ namespace NimbleBluetoothImpedanceManager
         const string AT_OK = "OK";
         const string OK_DISCOVERYSTART = "OK+DISCS";
         const string OK_DISCOVERYEND = "OK+DISCE";
-        const string OK_DEVICEDISCOVERED = "OK+DISC";
+        const string OK_DEVICEDISCOVERED = "OK+DISC:";
 
 
         public delegate void ConnectionEstablishedEventHandler(object sender, DataRecievedEventArgs e);
@@ -45,7 +45,7 @@ namespace NimbleBluetoothImpedanceManager
         public event ConnectionLostEventHandler ConnectionLost;
 
         public delegate void DataReceivedEventHandler(object sender, DataRecievedEventArgs e);
-        public event DataReceivedEventHandler DataReceived;
+        public event DataReceivedEventHandler DataReceivedFromRemoteDevice;
 
         //public delegate void OKGetEventHandler(object sender, DataRecievedEventArgs e);
         //public event OKGetEventHandler OKGet;
@@ -82,6 +82,12 @@ namespace NimbleBluetoothImpedanceManager
         public bool ConnectedToRemoteDevice { get { return _connectedToRemoteDevice; } }
 
         private bool _connectedToRemoteDevice = false;
+
+        private string _RemoteDeviceID = "";
+        public string RemoteDeviceId
+        {
+            get { return _RemoteDeviceID; }
+        }
 
         public BluetoothCommsDriver()
         {
@@ -131,6 +137,22 @@ namespace NimbleBluetoothImpedanceManager
             ProcessData(MostRecentlyRecievedData);
         }
 
+
+        public void ConnectToRemoteDevice(string Address)
+        {
+            TransmitAndLog("AT+CON" + Address);
+            _RemoteDeviceID = Address;
+            if (Dongle_ConnectionEstablished_WaitHandle.WaitOne(20000))
+            {
+                logger.Info("Connected to {0}", Address);
+                
+            }
+            else
+            {
+                logger.Info("Connection to {0} timed out", Address);
+            }
+        }
+
         public void TransmitAndLog(string text)
         {
             serialPort.Write(text);
@@ -155,7 +177,6 @@ namespace NimbleBluetoothImpedanceManager
 
         private void ProcessData(string[] mostRecentlyRecievedData)
         {
-
             foreach (string s in mostRecentlyRecievedData)
             {
                 dataLoggerRX.Info(s);
@@ -193,6 +214,7 @@ namespace NimbleBluetoothImpedanceManager
                 {
                     lock (knownDevicesLock)
                     {
+                        logger.Info("discovery started");
                         buildingKnownDevices.Clear();
                     }
                 }
@@ -200,6 +222,7 @@ namespace NimbleBluetoothImpedanceManager
                 {
                     lock (knownDevicesLock)
                     {
+                        logger.Info("Discovery finished");
                         _knownDevices = buildingKnownDevices.ToArray();
                     }
                 }
@@ -207,19 +230,23 @@ namespace NimbleBluetoothImpedanceManager
                 {
                     lock (knownDevicesLock)
                     {
+                        
                         string addr = s.Split(new char[] {':'})[1];
                         buildingKnownDevices.Add(addr);
+                        _knownDevices = buildingKnownDevices.ToArray();
+                        logger.Info("device found: {0}", addr);
                         Dongle_DeviceDiscoveryComplete_WaitHandle.Set();
                     }
                 }
                 else if (s.StartsWith("OK+"))
                 {
+                    logger.Warn("handling of {0} not implemented", s);
                     //not yet implemented or not needed
                 }
                 else
                 {
-                    if (DataReceived != null)
-                        DataReceived(this, new DataRecievedEventArgs(){ RecievedData = s});
+                    if (DataReceivedFromRemoteDevice != null)
+                        DataReceivedFromRemoteDevice(this, new DataRecievedEventArgs(){ RecievedData = s});
                 }
             }
         }
@@ -227,8 +254,11 @@ namespace NimbleBluetoothImpedanceManager
         public string[] DiscoverDevices()
         {
             TransmitAndLog("AT+DISC?");
-            Dongle_DeviceDiscoveryComplete_WaitHandle.WaitOne(10000);
-            return KnownDevices;
+            if (Dongle_DeviceDiscoveryComplete_WaitHandle.WaitOne(10000))
+            {
+                return KnownDevices;
+            }
+            return null;
         }
 
         public bool IsDongleOK()
@@ -245,7 +275,5 @@ namespace NimbleBluetoothImpedanceManager
                 return false;
             }
         }
-
-
     }
 }

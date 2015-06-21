@@ -11,15 +11,16 @@ namespace NimbleBluetoothImpedanceManager
 
 
         private static Logger logger = LogManager.GetCurrentClassLogger();
-        static Regex regex_ok_start = new Regex(@"\AOK\+[A-Za-z:1-9]+(?=OK|\s|$)");
-        static Regex regex_randomAtStart = new Regex(@"[A-Za-z:1-9\s.|(){}]+(?=OK|\s|$)");
+        static Regex regex_ok_start = new Regex(@"\AOK\+[A-Za-z:0-9]+(?=OK|\s|$)");
+        static Regex regex_randomAtStart = new Regex(@"[A-Za-z:0-9\s.|(){}]+(?=OK|\s|$)");
         public static List<string> ParseChunk(string chunk)
         {
             logger.Debug("Parsing chunk: {0}", chunk);
             List<string> tokens = new List<string>();
 
+            
+            chunk = chunk.Trim(new char[]{'\r','\n','\0'});
             string originalChunck = chunk;
-            chunk = chunk.Trim();
 
             while (chunk.Length > 0)
             {
@@ -31,6 +32,10 @@ namespace NimbleBluetoothImpedanceManager
                         string m = match.Groups[0].Value;
                         tokens.Add(m);
                         chunk = chunk.Remove(0, m.Length);
+                    }
+                    else
+                    {
+                        throw new ArgumentException("regex problem");
                     }
                 }
                 else if (chunk.StartsWith("OK"))
@@ -51,6 +56,10 @@ namespace NimbleBluetoothImpedanceManager
                         tokens.Add(temptoken);
                         chunk = chunk.Remove(0, temptoken.Length);
                     }
+                    else
+                    {
+                        throw new ArgumentException("regex problem");
+                    }
                 }
                 else
                 {
@@ -60,6 +69,10 @@ namespace NimbleBluetoothImpedanceManager
                         string m = match.Groups[0].Value;
                         tokens.Add(m);
                         chunk = chunk.Remove(0, m.Length);
+                    }
+                    else
+                    {
+                        throw new ArgumentException("regex problem");
                     }
                 }
             }
