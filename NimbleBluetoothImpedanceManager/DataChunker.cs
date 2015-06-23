@@ -15,7 +15,7 @@ namespace NimbleBluetoothImpedanceManager
 
         public DataChunker()
         {
-            tmr = new Timer(50);
+            tmr = new Timer(100);
             tmr.Elapsed += tmr_Elapsed;
             tmr.AutoReset = false;
             logger.Info("Chunker started");
@@ -27,16 +27,16 @@ namespace NimbleBluetoothImpedanceManager
             lock (mylock)
             {
                 //logger.Debug("Callback! {0}.{1}", DateTime.Now.Second, DateTime.Now.Millisecond);
-                SendOffChunk();
+                SendOffChunk(ChunkingReason.Timeout);
             }
         }
 
-        private void SendOffChunk()
+        private void SendOffChunk(ChunkingReason reason)
         {
             string chunk = sb.ToString().Trim();
             logger.Info("Chunk Ready: {0}", chunk);
             if (ChunkReady != null)
-                ChunkReady(this, new ChunkReadyEventArgs { Chunk = chunk });
+                ChunkReady(this, new ChunkReadyEventArgs { Chunk = chunk , Reason = reason});
             sb.Clear();
         }
 
@@ -48,13 +48,18 @@ namespace NimbleBluetoothImpedanceManager
                 tmr.Start();
                 //logger.Debug("Pause! {0}.{1}", DateTime.Now.Second, DateTime.Now.Millisecond);
                 if(c == '\r' || c=='\n')
-                    SendOffChunk();
+                    SendOffChunk(ChunkingReason.Newline);
                 else
                     sb.Append(c);
                 
             }
         }
 
+        public enum ChunkingReason
+        {
+            Timeout,
+            Newline
+        }
 
         public delegate void ChunkReadyEventHandler(object sender, ChunkReadyEventArgs e);
 
@@ -63,6 +68,7 @@ namespace NimbleBluetoothImpedanceManager
         public class ChunkReadyEventArgs : EventArgs
         {
             public string Chunk { get; set; }
+            public ChunkingReason Reason;
         }
     }
 

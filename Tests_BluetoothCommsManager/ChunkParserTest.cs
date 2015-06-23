@@ -4,8 +4,8 @@ using NimbleBluetoothImpedanceManager;
 
 namespace Tests_BluetoothCommsManager
 {
-    
-    
+
+
     /// <summary>
     ///This is a test class for ChunkParserTest and is intended
     ///to contain all ChunkParserTest Unit Tests
@@ -71,7 +71,7 @@ namespace Tests_BluetoothCommsManager
         public void ParseChunk_OK()
         {
             string chunk = "OK"; // TODO: Initialize to an appropriate value
-            string[] expected = {"OK"};
+            string[] expected = { "OK" };
             List<string> actual;
             actual = ChunkParser.ParseChunk(chunk);
             CollectionAssert.AreEqual(expected, actual.ToArray());
@@ -102,7 +102,8 @@ namespace Tests_BluetoothCommsManager
         public void ParseChunk_randomData()
         {
             string chunk = "skjnsd sld fjdf oisf"; // TODO: Initialize to an appropriate value
-            string[] expected = { "skjnsd sld fjdf oisf" };
+            string[] expected = {};
+            //string[] expected = { "skjnsd sld fjdf oisf" };
             List<string> actual;
             actual = ChunkParser.ParseChunk(chunk);
             CollectionAssert.AreEqual(expected, actual.ToArray());
@@ -112,7 +113,8 @@ namespace Tests_BluetoothCommsManager
         public void ParseChunk_randomDataThenOKPlus()
         {
             string chunk = "skjnsd sld fjdf oisf OK+CONN"; // TODO: Initialize to an appropriate value
-            string[] expected = { "skjnsd sld fjdf oisf ", "OK+CONN" };
+            //string[] expected = { "skjnsd sld fjdf oisf ", "OK+CONN" };
+            string[] expected = {  "OK+CONN" };
             List<string> actual;
             actual = ChunkParser.ParseChunk(chunk);
             CollectionAssert.AreEqual(expected, actual.ToArray());
@@ -122,7 +124,8 @@ namespace Tests_BluetoothCommsManager
         public void ParseChunk_randomDataNewlineThenOKPlus()
         {
             string chunk = "skjnsd sld fjdf oisf\nOK+CONN"; // TODO: Initialize to an appropriate value
-            string[] expected = { "skjnsd sld fjdf oisf\n", "OK+CONN" };
+            string[] expected = { "OK+CONN" };
+            //string[] expected = { "skjnsd sld fjdf oisf\n", "OK+CONN" };
             List<string> actual;
             actual = ChunkParser.ParseChunk(chunk);
             CollectionAssert.AreEqual(expected, actual.ToArray());
@@ -132,7 +135,8 @@ namespace Tests_BluetoothCommsManager
         public void ParseChunk_randomDataNewDatalineThenOKPlus()
         {
             string chunk = "skj.nsd sld fjdf oisf\nsdfsdOK+CONN"; // TODO: Initialize to an appropriate value
-            string[] expected = { "skj.nsd sld fjdf oisf\nsdfsd", "OK+CONN" };
+            //string[] expected = { "skj.nsd sld fjdf oisf\nsdfsd", "OK+CONN" };
+            string[] expected = { "OK+CONN" };
             List<string> actual;
             actual = ChunkParser.ParseChunk(chunk);
             CollectionAssert.AreEqual(expected, actual.ToArray());
@@ -152,17 +156,8 @@ namespace Tests_BluetoothCommsManager
         public void ParseChunk_OKDataOKPlus()
         {
             string chunk = "OKsdfsdfOK+CONN"; // TODO: Initialize to an appropriate value
-            string[] expected = { "OK", "sdfsdf", "OK+CONN" };
-            List<string> actual;
-            actual = ChunkParser.ParseChunk(chunk);
-            CollectionAssert.AreEqual(expected, actual.ToArray());
-        }
-
-        [TestMethod]
-        public void ParseChunk_NoneCaptured()
-        {
-            string chunk = "Start: CPI(2)|NPI(1) C{none captured}End"; // TODO: Initialize to an appropriate value
-            string[] expected = { "Start: CPI(2)|NPI(1) C{none captured}End" };
+            //string[] expected = { "OK", "sdfsdf", "OK+CONN" };
+            string[] expected = { "OK", "OK+CONN" };
             List<string> actual;
             actual = ChunkParser.ParseChunk(chunk);
             CollectionAssert.AreEqual(expected, actual.ToArray());
@@ -172,7 +167,7 @@ namespace Tests_BluetoothCommsManager
         public void ParseChunk_ErronousATPlusBeforeOKPlus()
         {
             string chunk = "AT+SLEEPOK+LOST"; // TODO: Initialize to an appropriate value
-            string[] expected = { "AT+SLEEP","OK+LOST" };
+            string[] expected = { "AT+SLEEP", "OK+LOST" };
             List<string> actual;
             actual = ChunkParser.ParseChunk(chunk);
             CollectionAssert.AreEqual(expected, actual.ToArray());
@@ -187,6 +182,55 @@ namespace Tests_BluetoothCommsManager
             actual = ChunkParser.ParseChunk(chunk);
             CollectionAssert.AreEqual(expected, actual.ToArray());
         }
-        
+
+        [TestMethod]
+        public void ParseChunk_GenGUID()
+        {
+            string chunk = "{GenGUID:24d3ce10-01ea-4b77-bcb3-099d63d3498d}"; // TODO: Initialize to an appropriate value
+            string[] expected = { "{GenGUID:24d3ce10-01ea-4b77-bcb3-099d63d3498d}" };
+            List<string> actual;
+            actual = ChunkParser.ParseChunk(chunk);
+            CollectionAssert.AreEqual(expected, actual.ToArray());
+        }
+
+        [TestMethod]
+        public void ParseChunk_DoubleGenGUID()
+        {
+            string chunk = "{GenGUID:24d3ce10-01ea-4b77-bcb3-099d63d3498d}{GenGUID:24d3ce10-01ea-4b77-bcb3-099d63d3498d}"; // TODO: Initialize to an appropriate value
+            string[] expected = { "{GenGUID:24d3ce10-01ea-4b77-bcb3-099d63d3498d}", "{GenGUID:24d3ce10-01ea-4b77-bcb3-099d63d3498d}" };
+            List<string> actual;
+            actual = ChunkParser.ParseChunk(chunk);
+            CollectionAssert.AreEqual(expected, actual.ToArray());
+        }
+
+        [TestMethod]
+        public void ParseChunk_OnlyJunk()
+        {
+            string chunk = "200-199-199-395-395-395-]}"; // TODO: Initialize to an appropriate value
+            string[] expected = { };
+            List<string> actual;
+            actual = ChunkParser.ParseChunk(chunk);
+            CollectionAssert.AreEqual(expected, actual.ToArray());
+        }
+
+        [TestMethod]
+        public void ParseChunk_JunkBeforeData()
+        {
+            string chunk = "200-199-199-395-395-395-]}{GenGUID:24d3ce10-01ea-4b77-bcb3-099d63d3498d}"; // TODO: Initialize to an appropriate value
+            string[] expected = { "{GenGUID:24d3ce10-01ea-4b77-bcb3-099d63d3498d}" };
+            List<string> actual;
+            actual = ChunkParser.ParseChunk(chunk);
+            CollectionAssert.AreEqual(expected, actual.ToArray());
+        }
+
+        [TestMethod]
+        public void ParseChunk_TelemData()
+        {
+            string chunk = "{T:C168S23I19[nc]}"; // TODO: Initialize to an appropriate value
+            string[] expected = { "{T:C168S23I19[nc]}" };
+            List<string> actual;
+            actual = ChunkParser.ParseChunk(chunk);
+            CollectionAssert.AreEqual(expected, actual.ToArray());
+        }
     }
 }

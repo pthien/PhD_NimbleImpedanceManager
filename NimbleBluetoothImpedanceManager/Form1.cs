@@ -7,21 +7,26 @@ using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using NimbleBluetoothImpedanceManager.Sequences;
+using NLog;
 
 namespace NimbleBluetoothImpedanceManager
 {
     public partial class Form1 : Form
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
         public Form1()
         {
             InitializeComponent();
         }
         //BluetoothCommsDriver bcm = new BluetoothCommsDriver();
-        private NimbleCommsManager nimble;// = new NimbleCommsManager("COM42");
+        private NimbleCommsManager nimble;
+        private SequenceFileManager filemanager;
         private void Form1_Load(object sender, EventArgs e)
         {
             RefreshComPorts();
             nimble = new NimbleCommsManager();
+            filemanager = new SequenceFileManager();
             UpdateStatusStrip();
             nimble.ConnectedToNimble += nimble_ConnectedToNimble;
             nimble.DisconnectedFromNimble += nimble_ConnectedToNimble;
@@ -82,7 +87,7 @@ namespace NimbleBluetoothImpedanceManager
         private void btnCycle_Click(object sender, EventArgs e)
         {
             //string[] lines = txtAddresses.Text.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-            
+
             foreach (object o in cklFoundDevices.Items)
             {
                 string line = o.ToString();
@@ -134,6 +139,29 @@ namespace NimbleBluetoothImpedanceManager
         private void timer1_Tick(object sender, EventArgs e)
         {
             nimble.GetNimbleName();
+        }
+
+        private void btnScan_Click(object sender, EventArgs e)
+        {
+            filemanager.ScanDirectory("");
+        }
+
+        private void bntCheckCurrent_Click(object sender, EventArgs e)
+        {
+            var guid = nimble.GetSequenceGUID();
+            logger.Debug("got sequence id: {0}", guid);
+
+            if (filemanager.FilesByGenGUID.ContainsKey(guid))
+            {
+                logger.Debug("collecting telem data for sequence {0}", guid);
+                FilesForGenerationGUID x = filemanager.FilesByGenGUID[guid];
+                foreach (KeyValuePair<int, string> kvp in x.sequenceFile.MeasurementSegments)
+                {
+                    var z = nimble.CollectTelemetryData(kvp.Key);
+                    Console.Write(z.ToString());
+                }
+            }
+            
         }
     }
 }

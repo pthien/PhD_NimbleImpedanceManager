@@ -34,13 +34,15 @@
             this.btnCycle = new System.Windows.Forms.Button();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.lblDongleStatus = new System.Windows.Forms.ToolStripStatusLabel();
-            this.btnStartScan = new System.Windows.Forms.Button();
             this.lblRemoteDeviceStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.btnStartScan = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.cklFoundDevices = new System.Windows.Forms.CheckedListBox();
             this.lblDevicesRefreshTime = new System.Windows.Forms.Label();
+            this.btnScan = new System.Windows.Forms.Button();
+            this.bntCheckCurrent = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -93,6 +95,14 @@
             this.lblDongleStatus.Size = new System.Drawing.Size(122, 19);
             this.lblDongleStatus.Text = "toolStripStatusLabel1";
             // 
+            // lblRemoteDeviceStatus
+            // 
+            this.lblRemoteDeviceStatus.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Left;
+            this.lblRemoteDeviceStatus.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
+            this.lblRemoteDeviceStatus.Name = "lblRemoteDeviceStatus";
+            this.lblRemoteDeviceStatus.Size = new System.Drawing.Size(122, 19);
+            this.lblRemoteDeviceStatus.Text = "toolStripStatusLabel1";
+            // 
             // btnStartScan
             // 
             this.btnStartScan.Enabled = false;
@@ -103,14 +113,6 @@
             this.btnStartScan.Text = "Scan for Nimble Processors";
             this.btnStartScan.UseVisualStyleBackColor = true;
             this.btnStartScan.Click += new System.EventHandler(this.btnStartScan_Click);
-            // 
-            // lblRemoteDeviceStatus
-            // 
-            this.lblRemoteDeviceStatus.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Left;
-            this.lblRemoteDeviceStatus.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
-            this.lblRemoteDeviceStatus.Name = "lblRemoteDeviceStatus";
-            this.lblRemoteDeviceStatus.Size = new System.Drawing.Size(122, 19);
-            this.lblRemoteDeviceStatus.Text = "toolStripStatusLabel1";
             // 
             // timer1
             // 
@@ -140,6 +142,8 @@
             // cklFoundDevices
             // 
             this.cklFoundDevices.FormattingEnabled = true;
+            this.cklFoundDevices.Items.AddRange(new object[] {
+            "F4B85EB48907"});
             this.cklFoundDevices.Location = new System.Drawing.Point(13, 93);
             this.cklFoundDevices.Name = "cklFoundDevices";
             this.cklFoundDevices.Size = new System.Drawing.Size(177, 139);
@@ -154,11 +158,33 @@
             this.lblDevicesRefreshTime.TabIndex = 9;
             this.lblDevicesRefreshTime.Text = "label1";
             // 
+            // btnScan
+            // 
+            this.btnScan.Location = new System.Drawing.Point(575, 255);
+            this.btnScan.Name = "btnScan";
+            this.btnScan.Size = new System.Drawing.Size(180, 23);
+            this.btnScan.TabIndex = 10;
+            this.btnScan.Text = "Scan for data files";
+            this.btnScan.UseVisualStyleBackColor = true;
+            this.btnScan.Click += new System.EventHandler(this.btnScan_Click);
+            // 
+            // bntCheckCurrent
+            // 
+            this.bntCheckCurrent.Location = new System.Drawing.Point(280, 235);
+            this.bntCheckCurrent.Name = "bntCheckCurrent";
+            this.bntCheckCurrent.Size = new System.Drawing.Size(142, 24);
+            this.bntCheckCurrent.TabIndex = 11;
+            this.bntCheckCurrent.Text = "Check current";
+            this.bntCheckCurrent.UseVisualStyleBackColor = true;
+            this.bntCheckCurrent.Click += new System.EventHandler(this.bntCheckCurrent_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(888, 354);
+            this.Controls.Add(this.bntCheckCurrent);
+            this.Controls.Add(this.btnScan);
             this.Controls.Add(this.lblDevicesRefreshTime);
             this.Controls.Add(this.cklFoundDevices);
             this.Controls.Add(this.button2);
@@ -193,6 +219,8 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.CheckedListBox cklFoundDevices;
         private System.Windows.Forms.Label lblDevicesRefreshTime;
+        private System.Windows.Forms.Button btnScan;
+        private System.Windows.Forms.Button bntCheckCurrent;
     }
 }
 

@@ -27,8 +27,6 @@ namespace NimbleBluetoothImpedanceManager
             get { return initialised; }
         }
 
-    
-
         public bool ConnectedToRemoteDevice
         {
             get { return btDongle.ConnectedToRemoteDevice; }
@@ -48,9 +46,32 @@ namespace NimbleBluetoothImpedanceManager
 
         public delegate void ConnectionLostEventHandler(object sender, EventArgs e);
 
+        public EventWaitHandle NimbleCmdRx_GenGUID_WaitHandle = new AutoResetEvent(false);
+        public EventWaitHandle NimbleCmdRx_ID_WaitHandle = new AutoResetEvent(false);
+        private EventWaitHandle NimbleCmdRx_xmitTelemStart_WaitHandle = new AutoResetEvent(false);
+        private EventWaitHandle NimbleCmdRx_xmitTelemFin_WaitHandle = new AutoResetEvent(false);
+
         public string RemoteDeviceId
         {
             get { return btDongle.RemoteDeviceId; }
+        }
+
+        private string remoteDeviceGenGUID;
+
+        private object receivingTelemDataLock = new object();
+        private string[] _telemData = new string[10];
+        private List<string> telemData_temp = new List<string>();
+        private bool receivingTelemData = false;
+        private string[] TelemetryData
+        {
+            get
+            {
+                lock (receivingTelemDataLock)
+                {
+                    string[] copy = (string[])_telemData.Clone();
+                    return copy;
+                }
+            }
         }
 
         public NimbleCommsManager()
@@ -58,11 +79,12 @@ namespace NimbleBluetoothImpedanceManager
             btDongle = new BluetoothCommsDriver();
             btDongle.DataReceivedFromRemoteDevice += new BluetoothCommsDriver.DataReceivedEventHandler(btDongle_DataReceived);
             btDongle.ConnectionLost += btDongle_ConnectionLost;
+
         }
 
         void btDongle_ConnectionLost(object sender, BluetoothCommsDriver.DataRecievedEventArgs e)
         {
-            
+
         }
 
         public void ConnectToNimble(string address)
@@ -75,6 +97,13 @@ namespace NimbleBluetoothImpedanceManager
             logger.Info("Received nimble command response: {0}", e.RecievedData);
             //throw new NotImplementedException();
             ParseCommandResponse(e.RecievedData);
+            if (receivingTelemData)
+            {
+                lock (receivingTelemDataLock)
+                {
+                    telemData_temp.Add(e.RecievedData);
+                }
+            }
         }
 
         static Regex regex_ID = new Regex(@"{([A-Za-z0-9]+):([ A-Z0-9a-z-:|()]+)}");
@@ -88,7 +117,6 @@ namespace NimbleBluetoothImpedanceManager
                     string command = matches.Groups[1].Value;
                     string data = matches.Groups[2].Value;
                     //_RemoteDeviceID = command;
-
                     ProcessData(command, data);
                 }
             }
@@ -99,8 +127,32 @@ namespace NimbleBluetoothImpedanceManager
             switch (command)
             {
                 case "ID":
+                    NimbleCmdRx_ID_WaitHandle.Set();
                     break;
                 case "Telem":
+                    break;
+                case "GenGUID":
+                    remoteDeviceGenGUID = data;
+                    NimbleCmdRx_GenGUID_WaitHandle.Set();
+                    break;
+                case "xmitTelem":
+                    lock (receivingTelemDataLock)
+                    {
+                        if (data == "fin")
+                        {
+                            receivingTelemData = false;
+                            logger.Info("Recieving telem data finished");
+                            _telemData = telemData_temp.ToArray();
+                            NimbleCmdRx_xmitTelemFin_WaitHandle.Set();
+                        }
+                        if (data == "set")
+                        {
+                            receivingTelemData = true;
+                            NimbleCmdRx_xmitTelemStart_WaitHandle.Set();
+                            logger.Info("Recieving telem data started");
+                            telemData_temp = new List<string>();
+                        }
+                    }
                     break;
             }
             //throw new NotImplementedException();
@@ -144,9 +196,25 @@ namespace NimbleBluetoothImpedanceManager
         }
 
 
-        public void CollectTelemetryData()
+        //TODO: make this thread safe, add a lock around accessing receivngTelemData
+        public string[] CollectTelemetryData(int sequence)
         {
-
+            if(receivingTelemData)
+                return null;
+            //receivingTelemData = true;
+            string command = string.Format("\nsetXmitTelem {0}\n", sequence);
+            btDongle.TransmitToRemoteDevice(command);
+            if (NimbleCmdRx_xmitTelemFin_WaitHandle.WaitOne(20000))
+            {
+                logger.Info("Receive Telem data successful. Sequence {0}, Device {1}", sequence, RemoteDeviceId);
+                return TelemetryData;
+            }
+            else
+            {
+                logger.Warn("Receive Telem timed out. Sequence {0}, Device {1}", sequence, RemoteDeviceId);
+                receivingTelemData = false;
+                return null;
+            }
         }
 
         public bool GetNimbleName()
@@ -160,8 +228,18 @@ namespace NimbleBluetoothImpedanceManager
                 return false;
                 throw;
             }
-           
+
             return true;
+        }
+
+        public string GetSequenceGUID()
+        {
+            btDongle.TransmitToRemoteDevice("\ngetGenGUID\n");
+            if (NimbleCmdRx_GenGUID_WaitHandle.WaitOne(1000))
+            {
+                return remoteDeviceGenGUID;
+            }
+            return "";
         }
 
         public void StartTelemCapture()

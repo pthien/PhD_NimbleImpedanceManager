@@ -12,7 +12,8 @@ namespace NimbleBluetoothImpedanceManager
 
         private static Logger logger = LogManager.GetCurrentClassLogger();
         static Regex regex_ok_start = new Regex(@"\AOK\+[A-Za-z:0-9]+(?=OK|\s|$)");
-        static Regex regex_randomAtStart = new Regex(@"[A-Za-z:0-9\s.|(){}]+(?=OK|\s|$)");
+        static Regex regex_ErronousATPlus = new Regex(@"AT\+[A-Z]+(?=OK|\s|$)");
+        static Regex regex_CommandResponse = new Regex(@"{([A-Za-z0-9]+):([ A-Z0-9a-z-:|()\[\]]+)}");
         public static List<string> ParseChunk(string chunk)
         {
             logger.Debug("Parsing chunk: {0}", chunk);
@@ -48,11 +49,11 @@ namespace NimbleBluetoothImpedanceManager
                 else if (chunk.StartsWith("AT+"))
                 {
                     string temptoken = "AT+";
-                    var match = regex_randomAtStart.Match(chunk);
+                    var match = regex_ErronousATPlus.Match(chunk);
                     if (match.Success)
                     {
                         string m = match.Groups[0].Value;
-                        temptoken = temptoken + m;
+                        temptoken =  m;
                         tokens.Add(temptoken);
                         chunk = chunk.Remove(0, temptoken.Length);
                     }
@@ -61,9 +62,10 @@ namespace NimbleBluetoothImpedanceManager
                         throw new ArgumentException("regex problem");
                     }
                 }
-                else
+                else if (chunk.StartsWith("{"))
                 {
-                    var match = regex_randomAtStart.Match(chunk);
+                  
+                    var match = regex_CommandResponse.Match(chunk);
                     if (match.Success)
                     {
                         string m = match.Groups[0].Value;
@@ -72,8 +74,25 @@ namespace NimbleBluetoothImpedanceManager
                     }
                     else
                     {
-                        throw new ArgumentException("regex problem");
+                        logger.Warn("Bad chunk: {0}", chunk);
+                        chunk = "";
+                        //throw new ArgumentException("regex problem");
                     }
+                }
+                else
+                {
+                    chunk = chunk.Remove(0, 1);
+                    //var match = regex_ErronousATPlus.Match(chunk);
+                    //if (match.Success)
+                    //{
+                    //    string m = match.Groups[0].Value;
+                    //    //tokens.Add(m);
+                    //    chunk = chunk.Remove(0, m.Length);
+                    //}
+                    //else
+                    //{
+                    //    throw new ArgumentException("regex problem");
+                    //}
                 }
             }
 
@@ -88,7 +107,7 @@ namespace NimbleBluetoothImpedanceManager
                 string msg = string.Format(
                     "Tokens extracted from chunk did not reassemble into original chunk: {0}", originalChunck);
                 logger.Error(msg);
-                throw new ApplicationException(msg);
+                //throw new ApplicationException(msg);
             }
 
 
