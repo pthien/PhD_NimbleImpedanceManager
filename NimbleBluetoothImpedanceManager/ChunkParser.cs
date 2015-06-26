@@ -16,9 +16,8 @@ namespace NimbleBluetoothImpedanceManager
         static Regex regex_CommandResponse = new Regex(@"{([A-Za-z0-9]+):([ A-Z0-9a-z-:|()\[\]]+)}");
         public static List<string> ParseChunk(string chunk)
         {
-            logger.Debug("Parsing chunk: {0}", chunk);
+            logger.Debug("Parsing chunk of length {1}: {0}", chunk.Replace("\n", "\\n").Replace("\r", "\\r"), chunk.Length);
             List<string> tokens = new List<string>();
-
             
             chunk = chunk.Trim(new char[]{'\r','\n','\0'});
             string originalChunck = chunk;
@@ -74,7 +73,7 @@ namespace NimbleBluetoothImpedanceManager
                     }
                     else
                     {
-                        logger.Warn("Bad chunk: {0}", chunk);
+                        logger.Warn("Bad chunk: {0}", chunk.Replace("\n", "\\n").Replace("\r", "\\r"));
                         chunk = "";
                         //throw new ArgumentException("regex problem");
                     }
@@ -111,7 +110,7 @@ namespace NimbleBluetoothImpedanceManager
             }
 
 
-            logger.Debug("finished parseing chunk");
+            logger.Debug("finished parsing chunk");
             return tokens;
         }
     }

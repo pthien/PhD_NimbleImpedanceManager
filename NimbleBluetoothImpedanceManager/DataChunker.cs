@@ -33,10 +33,16 @@ namespace NimbleBluetoothImpedanceManager
 
         private void SendOffChunk(ChunkingReason reason)
         {
-            string chunk = sb.ToString().Trim();
-            logger.Info("Chunk Ready: {0}", chunk);
+            if (sb.Length == 0)
+            {
+                logger.Debug("Not sending 0 lenght chunck that was made ready due to {0}", reason);
+                return;
+            }
+
+            string chunk = sb.ToString();
+            logger.Info("Chunk Ready because of {1}: {0}", chunk.Replace("\n", "\\n").Replace("\r", "\\r").Replace(" ", "\\_"), reason);
             if (ChunkReady != null)
-                ChunkReady(this, new ChunkReadyEventArgs { Chunk = chunk , Reason = reason});
+                ChunkReady(this, new ChunkReadyEventArgs { Chunk = chunk, Reason = reason });
             sb.Clear();
         }
 
@@ -47,11 +53,10 @@ namespace NimbleBluetoothImpedanceManager
                 tmr.Stop();
                 tmr.Start();
                 //logger.Debug("Pause! {0}.{1}", DateTime.Now.Second, DateTime.Now.Millisecond);
-                if(c == '\r' || c=='\n')
+                sb.Append(c);
+                if (c == '\r' || c == '\n')
                     SendOffChunk(ChunkingReason.Newline);
-                else
-                    sb.Append(c);
-                
+
             }
         }
 

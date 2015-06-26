@@ -83,10 +83,10 @@ namespace NimbleBluetoothImpedanceManager
 
         private bool _connectedToRemoteDevice = false;
 
-        private string _RemoteDeviceID = "";
-        public string RemoteDeviceId
+        private string _RemoteDeviceAddr = "";
+        public string RemoteDeviceAddr
         {
-            get { return _RemoteDeviceID; }
+            get { return _RemoteDeviceAddr; }
         }
 
         private bool currentlyScanningForDevices = false;
@@ -133,26 +133,28 @@ namespace NimbleBluetoothImpedanceManager
 
         void dataChunker_ChunkReady(object sender, DataChunker.ChunkReadyEventArgs e)
         {
-            logger.Debug("Got a chunk {0}", e.Chunk);
-            dataLoggerRX.Info(e.Reason.ToString() + " " + e.Chunk.Replace("\n", "\\n").Replace("\r", "\\r"));
+            //logger.Debug("Got a chunk {0}", e.Chunk.Replace("\n", "\\n").Replace("\r", "\\r"));
+            dataLoggerRX.Info("[{0}] {1}", e.Reason.ToString(), e.Chunk.Replace("\n", "\\n").Replace("\r", "\\r"));
             MostRecentlyRecievedData = ChunkParser.ParseChunk(e.Chunk).ToArray();
 
             ProcessData(MostRecentlyRecievedData);
         }
 
 
-        public void ConnectToRemoteDevice(string Address)
+        public bool ConnectToRemoteDevice(string Address)
         {
             TransmitAndLog("AT+CON" + Address);
-            _RemoteDeviceID = Address;
+            _RemoteDeviceAddr = Address;
             if (Dongle_ConnectionEstablished_WaitHandle.WaitOne(20000))
             {
                 logger.Info("Connected to {0}", Address);
-
+                return true;
             }
             else
             {
+                _RemoteDeviceAddr = "";
                 logger.Info("Connection to {0} timed out", Address);
+                return false;
             }
         }
 
@@ -235,6 +237,8 @@ namespace NimbleBluetoothImpedanceManager
                         currentlyScanningForDevices = false;
                         logger.Info("Discovery finished");
                         _knownDevices = buildingKnownDevices.ToArray();
+
+                        Dongle_DeviceDiscoveryComplete_WaitHandle.Set();
                     }
                 }
                 else if (s.StartsWith(OK_DEVICEDISCOVERED))
@@ -246,7 +250,6 @@ namespace NimbleBluetoothImpedanceManager
                         buildingKnownDevices.Add(addr);
                         _knownDevices = buildingKnownDevices.ToArray();
                         logger.Info("device found: {0}", addr);
-                        Dongle_DeviceDiscoveryComplete_WaitHandle.Set();
                     }
                 }
                 else if (s.StartsWith("OK+"))
@@ -264,15 +267,21 @@ namespace NimbleBluetoothImpedanceManager
 
         public string[] DiscoverDevices()
         {
+            Dongle_DeviceDiscoveryComplete_WaitHandle.Reset();
             TransmitAndLog("AT+DISC?");
             if (Dongle_DeviceDiscoveryComplete_WaitHandle.WaitOne(10000))
             {
+                logger.Info("Scan for devices completed");
                 return KnownDevices;
             }
             else
             {
-                logger.Warn("Scan for devices timed out");
-                currentlyScanningForDevices = false;
+                lock (knownDevicesLock)
+                {
+                    logger.Warn("Scan for devices timed out");
+                    currentlyScanningForDevices = false;
+                    _knownDevices = buildingKnownDevices.ToArray();
+                }
             }
             return null;
         }

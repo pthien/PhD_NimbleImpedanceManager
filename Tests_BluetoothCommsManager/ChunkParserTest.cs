@@ -232,5 +232,15 @@ namespace Tests_BluetoothCommsManager
             actual = ChunkParser.ParseChunk(chunk);
             CollectionAssert.AreEqual(expected, actual.ToArray());
         }
+
+        [TestMethod]
+        public void ParseChunk_TelemDataNewline()
+        {
+            string chunk = "{T:C168S23I19[nc]}\n"; // TODO: Initialize to an appropriate value
+            string[] expected = { "{T:C168S23I19[nc]}" };
+            List<string> actual;
+            actual = ChunkParser.ParseChunk(chunk);
+            CollectionAssert.AreEqual(expected, actual.ToArray());
+        }
     }
 }
