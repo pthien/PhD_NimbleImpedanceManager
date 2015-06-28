@@ -242,5 +242,15 @@ namespace Tests_BluetoothCommsManager
             actual = ChunkParser.ParseChunk(chunk);
             CollectionAssert.AreEqual(expected, actual.ToArray());
         }
+
+      [TestMethod]
+        public void ParseChunk_ID()
+        {
+            string chunk = "{ID:15_599_OOGIE2}"; // TODO: Initialize to an appropriate value
+            string[] expected = { "{ID:15_599_OOGIE2}" };
+            List<string> actual;
+            actual = ChunkParser.ParseChunk(chunk);
+            CollectionAssert.AreEqual(expected, actual.ToArray());
+        }
     }
 }

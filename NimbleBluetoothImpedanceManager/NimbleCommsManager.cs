@@ -94,7 +94,7 @@ namespace NimbleBluetoothImpedanceManager
             get { return _State; }
             set
             {
-                if(value == _State) //do nothing
+                if (value == _State) //do nothing
                     return;
                 logger.Info("State changed from {0} to {1}", _State, value);
                 _State = value;
@@ -136,13 +136,13 @@ namespace NimbleBluetoothImpedanceManager
             if (btDongle.ConnectToRemoteDevice(address))
             {
                 bool namesuccess = false;
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 3; i++)
                 {
                     namesuccess = GetNimbleName();
                     if (!namesuccess)
                     {
                         logger.Warn("Attempt {0} to get name after connecting to nimble {1} failed", i + 1, address);
-                        Thread.Sleep(5000);
+                        Thread.Sleep(2000);
                     }
                     else
                         break;
@@ -159,7 +159,7 @@ namespace NimbleBluetoothImpedanceManager
                     logger.Error("Connected to remote device ({0}) but could not get its name. "
                         + "Will now attempt to disconnect", address);
                     State = NimbleState.ConnectedToNimbleAndError;
-                    btDongle.TransmitAndLog("AT");
+                    DisconnectFromNimble();
                     return false;
                 }
             }
@@ -170,11 +170,11 @@ namespace NimbleBluetoothImpedanceManager
 
         void btDongle_DataReceived(object sender, BluetoothCommsDriver.DataRecievedEventArgs e)
         {
-            logger.Info("Received nimble command response: {0}", e.RecievedData);
+            logger.Debug("Received nimble command response: {0}", e.RecievedData);
             ParseCommandResponse(e.RecievedData);
         }
 
-        static Regex regex_ID = new Regex(@"{([A-Za-z0-9]+):([ A-Z0-9a-z-:|()]+)}");
+        static Regex regex_ID = new Regex(@"{([A-Za-z0-9]+):([ A-Z0-9a-z-:_|()]+)}");
         private void ParseCommandResponse(string p)
         {
             if (regex_ID.IsMatch(p))
@@ -330,7 +330,7 @@ namespace NimbleBluetoothImpedanceManager
             else
             {
                 logger.Warn("Receive Telem timed out. Sequence {0}, Device {1}", sequence, RemoteDeviceId);
-                ProcessData("xmitTelem","fin");
+                ProcessData("xmitTelem", "fin");
                 //receivingTelemData = false;
                 State = NimbleState.ConnectedToNimbleAndReady;
                 data = (string[])TelemetryData.Clone();
@@ -370,8 +370,8 @@ namespace NimbleBluetoothImpedanceManager
             catch (Exception ex)
             {
                 State = entryState;
-
-                throw ex;
+                logger.Error(ex.Message);
+                //throw ex;
                 return false;
             }
 
@@ -417,34 +417,37 @@ namespace NimbleBluetoothImpedanceManager
             if (!btDongle.ConnectedToRemoteDevice)
                 return false;
 
-            btDongle.TransmitToRemoteDevice("\nclearXmitTelem\n");
-            Thread.Sleep(500);
+            //btDongle.TransmitToRemoteDevice("\nclearXmitTelem\n");
+            //Thread.Sleep(500);
             //btDongle.TransmitAndLog("endSession\n");
-            btDongle.TransmitAndLog("AT");
-            if (btDongle.Dongle_ConnectionLost_WaitHandle.WaitOne(10000))
+            for (int i = 0; i < 10; i++)
             {
-                logger.Info("Successfully disconnected from Nimble processor");
+                btDongle.TransmitAndLog("AT");
+                if (btDongle.Dongle_ConnectionLost_WaitHandle.WaitOne(10000))
+                {
+                    logger.Info("Successfully disconnected from Nimble processor on attempt {0}", i);
+                    break;
+                }
+                else
+                {
+                    logger.Info("Failed to disconnect on attempt {0}", i);
+                }
             }
-            else
-            {
-                logger.Info("Failed to disconnect");
-            }
 
-            return true;
+            return btDongle.IsDongleOK();
+
         }
+    }
 
-        public enum NimbleState
-        {
-            Disconnected = 1,
-            ConnectingToDongle = 2,
-            ConnectedToDongle = 4,
-            ConnectedToDongleAndBusy = 8,
-            ConnectingToNimble = 16,
-            ConnectedToNimbleAndReady = 32,
-            ConnectedToNimbleAndWorking = 64,
-            ConnectedToNimbleAndError = 128,
-        }
-
-
+    internal enum NimbleState
+    {
+        Disconnected = 1,
+        ConnectingToDongle = 2,
+        ConnectedToDongle = 4,
+        ConnectedToDongleAndBusy = 8,
+        ConnectingToNimble = 16,
+        ConnectedToNimbleAndReady = 32,
+        ConnectedToNimbleAndWorking = 64,
+        ConnectedToNimbleAndError = 128,
     }
 }

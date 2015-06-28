@@ -140,7 +140,6 @@ namespace NimbleBluetoothImpedanceManager
             ProcessData(MostRecentlyRecievedData);
         }
 
-
         public bool ConnectToRemoteDevice(string Address)
         {
             TransmitAndLog("AT+CON" + Address);
@@ -254,7 +253,7 @@ namespace NimbleBluetoothImpedanceManager
                 }
                 else if (s.StartsWith("OK+"))
                 {
-                    logger.Warn("handling of {0} not implemented", s);
+                    logger.Debug("handling of {0} not implemented", s);
                     //not yet implemented or not needed
                 }
                 else

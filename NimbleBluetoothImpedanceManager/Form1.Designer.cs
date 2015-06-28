@@ -35,7 +35,9 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.lblDongleStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblRemoteDeviceStatus = new System.Windows.Forms.ToolStripStatusLabel();
-            this.btnStartScan = new System.Windows.Forms.Button();
+            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.lblAutoStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.btnScanForProcessors = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.btnConnectToNimble = new System.Windows.Forms.Button();
             this.cklFoundDevices = new System.Windows.Forms.CheckedListBox();
@@ -46,21 +48,21 @@
             this.grpManualActions = new System.Windows.Forms.GroupBox();
             this.btnDisconnect = new System.Windows.Forms.Button();
             this.btnAutoOperation = new System.Windows.Forms.Button();
-            this.lblAutoStatus = new System.Windows.Forms.ToolStripStatusLabel();
-            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.grpSettings = new System.Windows.Forms.GroupBox();
-            this.txtWorkingDir = new System.Windows.Forms.TextBox();
-            this.txtOutputDir = new System.Windows.Forms.TextBox();
-            this.fileSystemWatcher1 = new System.IO.FileSystemWatcher();
-            this.btnSetWorkingDir = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
+            this.btnSetWorkingDir = new System.Windows.Forms.Button();
+            this.txtOutputDir = new System.Windows.Forms.TextBox();
+            this.txtWorkingDir = new System.Windows.Forms.TextBox();
+            this.fileSystemWatcher1 = new System.IO.FileSystemWatcher();
             this.label1 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.pannel_FoundProcessors = new System.Windows.Forms.Panel();
             this.statusStrip1.SuspendLayout();
             this.grpManualControl.SuspendLayout();
             this.grpManualActions.SuspendLayout();
             this.grpSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher1)).BeginInit();
+            this.pannel_FoundProcessors.SuspendLayout();
             this.SuspendLayout();
             // 
             // cmbCOMPorts
@@ -122,16 +124,28 @@
             this.lblRemoteDeviceStatus.Size = new System.Drawing.Size(79, 19);
             this.lblRemoteDeviceStatus.Text = "device status";
             // 
-            // btnStartScan
+            // toolStripStatusLabel1
             // 
-            this.btnStartScan.Enabled = false;
-            this.btnStartScan.Location = new System.Drawing.Point(6, 113);
-            this.btnStartScan.Name = "btnStartScan";
-            this.btnStartScan.Size = new System.Drawing.Size(159, 23);
-            this.btnStartScan.TabIndex = 5;
-            this.btnStartScan.Text = "Scan for Nimble Processors";
-            this.btnStartScan.UseVisualStyleBackColor = true;
-            this.btnStartScan.Click += new System.EventHandler(this.btnStartScan_Click);
+            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(703, 19);
+            this.toolStripStatusLabel1.Spring = true;
+            // 
+            // lblAutoStatus
+            // 
+            this.lblAutoStatus.Name = "lblAutoStatus";
+            this.lblAutoStatus.Size = new System.Drawing.Size(62, 19);
+            this.lblAutoStatus.Text = "autostatus";
+            // 
+            // btnScanForProcessors
+            // 
+            this.btnScanForProcessors.Enabled = false;
+            this.btnScanForProcessors.Location = new System.Drawing.Point(6, 113);
+            this.btnScanForProcessors.Name = "btnScanForProcessors";
+            this.btnScanForProcessors.Size = new System.Drawing.Size(159, 23);
+            this.btnScanForProcessors.TabIndex = 5;
+            this.btnScanForProcessors.Text = "Scan for Nimble Processors";
+            this.btnScanForProcessors.UseVisualStyleBackColor = true;
+            this.btnScanForProcessors.Click += new System.EventHandler(this.btnStartScan_Click);
             // 
             // timer1
             // 
@@ -153,7 +167,7 @@
             this.cklFoundDevices.FormattingEnabled = true;
             this.cklFoundDevices.Items.AddRange(new object[] {
             "F4B85EB48907"});
-            this.cklFoundDevices.Location = new System.Drawing.Point(390, 140);
+            this.cklFoundDevices.Location = new System.Drawing.Point(3, 21);
             this.cklFoundDevices.Name = "cklFoundDevices";
             this.cklFoundDevices.Size = new System.Drawing.Size(223, 109);
             this.cklFoundDevices.TabIndex = 8;
@@ -161,7 +175,7 @@
             // lblDevicesRefreshTime
             // 
             this.lblDevicesRefreshTime.AutoSize = true;
-            this.lblDevicesRefreshTime.Location = new System.Drawing.Point(387, 252);
+            this.lblDevicesRefreshTime.Location = new System.Drawing.Point(3, 133);
             this.lblDevicesRefreshTime.Name = "lblDevicesRefreshTime";
             this.lblDevicesRefreshTime.Size = new System.Drawing.Size(35, 13);
             this.lblDevicesRefreshTime.TabIndex = 9;
@@ -190,7 +204,7 @@
             // grpManualControl
             // 
             this.grpManualControl.Controls.Add(this.grpManualActions);
-            this.grpManualControl.Controls.Add(this.btnStartScan);
+            this.grpManualControl.Controls.Add(this.btnScanForProcessors);
             this.grpManualControl.Controls.Add(this.btnScanFiles);
             this.grpManualControl.Controls.Add(this.btnConnectToNimble);
             this.grpManualControl.Controls.Add(this.btnCycle);
@@ -225,25 +239,13 @@
             // btnAutoOperation
             // 
             this.btnAutoOperation.Enabled = false;
-            this.btnAutoOperation.Location = new System.Drawing.Point(50, 137);
+            this.btnAutoOperation.Location = new System.Drawing.Point(42, 153);
             this.btnAutoOperation.Name = "btnAutoOperation";
             this.btnAutoOperation.Size = new System.Drawing.Size(170, 23);
             this.btnAutoOperation.TabIndex = 13;
             this.btnAutoOperation.Text = "Toggle Automatic Operation";
             this.btnAutoOperation.UseVisualStyleBackColor = true;
             this.btnAutoOperation.Click += new System.EventHandler(this.btnAutoOperation_Click);
-            // 
-            // lblAutoStatus
-            // 
-            this.lblAutoStatus.Name = "lblAutoStatus";
-            this.lblAutoStatus.Size = new System.Drawing.Size(62, 19);
-            this.lblAutoStatus.Text = "autostatus";
-            // 
-            // toolStripStatusLabel1
-            // 
-            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(703, 19);
-            this.toolStripStatusLabel1.Spring = true;
             // 
             // grpSettings
             // 
@@ -258,30 +260,15 @@
             this.grpSettings.TabStop = false;
             this.grpSettings.Text = "Settings";
             // 
-            // txtWorkingDir
+            // button1
             // 
-            this.txtWorkingDir.BackColor = System.Drawing.SystemColors.Window;
-            this.txtWorkingDir.Location = new System.Drawing.Point(7, 20);
-            this.txtWorkingDir.Name = "txtWorkingDir";
-            this.txtWorkingDir.ReadOnly = true;
-            this.txtWorkingDir.Size = new System.Drawing.Size(406, 20);
-            this.txtWorkingDir.TabIndex = 0;
-            this.txtWorkingDir.Text = "txtWorkingDir";
-            // 
-            // txtOutputDir
-            // 
-            this.txtOutputDir.BackColor = System.Drawing.SystemColors.Window;
-            this.txtOutputDir.Location = new System.Drawing.Point(7, 47);
-            this.txtOutputDir.Name = "txtOutputDir";
-            this.txtOutputDir.ReadOnly = true;
-            this.txtOutputDir.Size = new System.Drawing.Size(406, 20);
-            this.txtOutputDir.TabIndex = 1;
-            this.txtOutputDir.Text = "txtOutputDir";
-            // 
-            // fileSystemWatcher1
-            // 
-            this.fileSystemWatcher1.EnableRaisingEvents = true;
-            this.fileSystemWatcher1.SynchronizingObject = this;
+            this.button1.Location = new System.Drawing.Point(420, 43);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(115, 23);
+            this.button1.TabIndex = 3;
+            this.button1.Text = "Set output directory";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // btnSetWorkingDir
             // 
@@ -293,24 +280,39 @@
             this.btnSetWorkingDir.UseVisualStyleBackColor = true;
             this.btnSetWorkingDir.Click += new System.EventHandler(this.btnSetWorkingDir_Click);
             // 
-            // button1
+            // txtOutputDir
             // 
-            this.button1.Location = new System.Drawing.Point(420, 43);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(115, 23);
-            this.button1.TabIndex = 3;
-            this.button1.Text = "Set output directory";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.txtOutputDir.BackColor = System.Drawing.SystemColors.Window;
+            this.txtOutputDir.Location = new System.Drawing.Point(7, 47);
+            this.txtOutputDir.Name = "txtOutputDir";
+            this.txtOutputDir.ReadOnly = true;
+            this.txtOutputDir.Size = new System.Drawing.Size(406, 20);
+            this.txtOutputDir.TabIndex = 1;
+            this.txtOutputDir.Text = "txtOutputDir";
+            // 
+            // txtWorkingDir
+            // 
+            this.txtWorkingDir.BackColor = System.Drawing.SystemColors.Window;
+            this.txtWorkingDir.Location = new System.Drawing.Point(7, 20);
+            this.txtWorkingDir.Name = "txtWorkingDir";
+            this.txtWorkingDir.ReadOnly = true;
+            this.txtWorkingDir.Size = new System.Drawing.Size(406, 20);
+            this.txtWorkingDir.TabIndex = 0;
+            this.txtWorkingDir.Text = "txtWorkingDir";
+            // 
+            // fileSystemWatcher1
+            // 
+            this.fileSystemWatcher1.EnableRaisingEvents = true;
+            this.fileSystemWatcher1.SynchronizingObject = this;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(387, 124);
+            this.label1.Location = new System.Drawing.Point(3, 5);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(82, 13);
+            this.label1.Size = new System.Drawing.Size(160, 13);
             this.label1.TabIndex = 15;
-            this.label1.Text = "Found Devices:";
+            this.label1.Text = "Automatically get impedance for:";
             // 
             // textBox1
             // 
@@ -320,18 +322,26 @@
             this.textBox1.Size = new System.Drawing.Size(142, 99);
             this.textBox1.TabIndex = 16;
             // 
+            // pannel_FoundProcessors
+            // 
+            this.pannel_FoundProcessors.Controls.Add(this.cklFoundDevices);
+            this.pannel_FoundProcessors.Controls.Add(this.lblDevicesRefreshTime);
+            this.pannel_FoundProcessors.Controls.Add(this.label1);
+            this.pannel_FoundProcessors.Location = new System.Drawing.Point(326, 110);
+            this.pannel_FoundProcessors.Name = "pannel_FoundProcessors";
+            this.pannel_FoundProcessors.Size = new System.Drawing.Size(248, 192);
+            this.pannel_FoundProcessors.TabIndex = 17;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(964, 536);
+            this.Controls.Add(this.pannel_FoundProcessors);
             this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.label1);
             this.Controls.Add(this.grpSettings);
             this.Controls.Add(this.btnAutoOperation);
             this.Controls.Add(this.grpManualControl);
-            this.Controls.Add(this.lblDevicesRefreshTime);
-            this.Controls.Add(this.cklFoundDevices);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.btnConnect);
             this.Controls.Add(this.cmbCOMPorts);
@@ -346,6 +356,8 @@
             this.grpSettings.ResumeLayout(false);
             this.grpSettings.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher1)).EndInit();
+            this.pannel_FoundProcessors.ResumeLayout(false);
+            this.pannel_FoundProcessors.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -358,7 +370,7 @@
         private System.Windows.Forms.Button btnCycle;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel lblDongleStatus;
-        private System.Windows.Forms.Button btnStartScan;
+        private System.Windows.Forms.Button btnScanForProcessors;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Button btnConnectToNimble;
         private System.Windows.Forms.CheckedListBox cklFoundDevices;
@@ -380,6 +392,7 @@
         private System.IO.FileSystemWatcher fileSystemWatcher1;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Panel pannel_FoundProcessors;
     }
 }
 

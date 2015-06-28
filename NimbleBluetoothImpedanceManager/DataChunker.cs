@@ -13,13 +13,15 @@ namespace NimbleBluetoothImpedanceManager
 
         private object mylock = new object();
 
+        private int Timeout = 250;
+
         public DataChunker()
         {
             tmr = new Timer(100);
             tmr.Elapsed += tmr_Elapsed;
             tmr.AutoReset = false;
             logger.Info("Chunker started");
-            sb = new StringBuilder(100);
+            sb = new StringBuilder(Timeout);
         }
 
         void tmr_Elapsed(object sender, ElapsedEventArgs e)
@@ -35,7 +37,7 @@ namespace NimbleBluetoothImpedanceManager
         {
             if (sb.Length == 0)
             {
-                logger.Debug("Not sending 0 lenght chunck that was made ready due to {0}", reason);
+                logger.Debug("Not sending 0 length chunk that was made ready due to {0}", reason);
                 return;
             }
 
@@ -56,7 +58,6 @@ namespace NimbleBluetoothImpedanceManager
                 sb.Append(c);
                 if (c == '\r' || c == '\n')
                     SendOffChunk(ChunkingReason.Newline);
-
             }
         }
 

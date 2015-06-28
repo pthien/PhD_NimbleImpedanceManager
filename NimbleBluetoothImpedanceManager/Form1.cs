@@ -22,13 +22,16 @@ namespace NimbleBluetoothImpedanceManager
         //BluetoothCommsDriver bcm = new BluetoothCommsDriver();
         private NimbleCommsManager nimble;
         private SequenceFileManager filemanager;
-        private bool AutomaticOperation = false;
+        private AutomaticNimbleController autoNimble;
+
 
         private void Form1_Load(object sender, EventArgs e)
         {
             RefreshComPorts();
             nimble = new NimbleCommsManager();
             filemanager = new SequenceFileManager();
+            autoNimble = new AutomaticNimbleController(nimble, filemanager);
+
             UpdateStatusStrip();
             nimble.ConnectedToNimble += nimble_ConnectedToNimble;
             nimble.DisconnectedFromNimble += nimble_ConnectedToNimble;
@@ -46,7 +49,6 @@ namespace NimbleBluetoothImpedanceManager
 
         void nimble_StateChanged(object sender, NimbleCommsManager.StateChangedEventArgs e)
         {
-            logger.Debug("State changed to {0}", e.NewState);
             UpdateStatusStrip();
         }
 
@@ -62,41 +64,41 @@ namespace NimbleBluetoothImpedanceManager
 
         private void UpdateStatusStrip()
         {
-            NimbleCommsManager.NimbleState state = nimble.State;
+            NimbleState state = nimble.State;
 
             string textCon = "";
             string textStatus = "";
             switch (state)
             {
-                case NimbleCommsManager.NimbleState.Disconnected:
+                case NimbleState.Disconnected:
                     textCon = "Not connected to dongle";
                     textStatus = "Not ready";
                     break;
-                case NimbleCommsManager.NimbleState.ConnectingToDongle:
+                case NimbleState.ConnectingToDongle:
                     textCon = "Connecting to dongle ({0}), nimble.Comport";
                     textStatus = "Not ready";
                     break;
-                case NimbleCommsManager.NimbleState.ConnectedToDongle:
+                case NimbleState.ConnectedToDongle:
                     textCon = string.Format("Connected to dongle ({0}), not connected to remote device", nimble.Comport);
                     textStatus = "Not ready";
                     break;
-                case NimbleCommsManager.NimbleState.ConnectedToDongleAndBusy:
+                case NimbleState.ConnectedToDongleAndBusy:
                     textCon = string.Format("Connected to dongle ({0}), not connected to remote device", nimble.Comport);
                     textStatus = "Busy";
                     break;
-                case NimbleCommsManager.NimbleState.ConnectingToNimble:
+                case NimbleState.ConnectingToNimble:
                     textCon = "Connecting to nimble processor " + nimble.RemoteDeviceId;
                     textStatus = "Not ready";
                     break;
-                case NimbleCommsManager.NimbleState.ConnectedToNimbleAndReady:
+                case NimbleState.ConnectedToNimbleAndReady:
                     textCon = string.Format("Connected to nimble processor {0}({1}) via {2}", nimble.NimbleName, nimble.RemoteDeviceId, nimble.Comport);
                     textStatus = "Ready";
                     break;
-                case NimbleCommsManager.NimbleState.ConnectedToNimbleAndError:
+                case NimbleState.ConnectedToNimbleAndError:
                     textCon = string.Format("Connected to nimble processor {0}({1}) via {2}", nimble.NimbleName, nimble.RemoteDeviceId, nimble.Comport);
                     textStatus = "Error";
                     break;
-                case NimbleCommsManager.NimbleState.ConnectedToNimbleAndWorking:
+                case NimbleState.ConnectedToNimbleAndWorking:
                     textCon = string.Format("Connected to nimble processor {0}({1}) via {2}", nimble.NimbleName, nimble.RemoteDeviceId, nimble.Comport);
                     textStatus = "Working...";
                     break;
@@ -106,28 +108,29 @@ namespace NimbleBluetoothImpedanceManager
 
             lblRemoteDeviceStatus.Text = textStatus;
             lblDongleStatus.Text = textCon;
-            lblAutoStatus.Text = "Automatic Impedance Collection is " + (AutomaticOperation ? "On" : "Off");
+            lblAutoStatus.Text = "Automatic Impedance Collection is " + (autoNimble.AutomaticControlEnabled ? "On" : "Off");
 
 
             if (this.InvokeRequired)
                 this.BeginInvoke((Action)(() =>
                 {
-                    UpdateUI(state, AutomaticOperation);
+                    UpdateUI(state, autoNimble.AutomaticControlEnabled);
                     logger.Trace("Update ui from {0}", Thread.CurrentThread.Name);
                 }));
             else
-                UpdateUI(state, AutomaticOperation);
+                UpdateUI(state, autoNimble.AutomaticControlEnabled);
         }
 
-        private void UpdateUI(NimbleCommsManager.NimbleState state, bool automaticControl)
+        private void UpdateUI(NimbleState state, bool automaticControl)
         {
-            grpManualControl.Enabled = (state == NimbleCommsManager.NimbleState.ConnectedToNimbleAndReady ||
-                                       state == NimbleCommsManager.NimbleState.ConnectedToDongle) && !automaticControl;
-            grpManualActions.Enabled = state == NimbleCommsManager.NimbleState.ConnectedToNimbleAndReady;
-            btnConnectToNimble.Enabled = state == NimbleCommsManager.NimbleState.ConnectedToDongle;
-            btnStartScan.Enabled = state == NimbleCommsManager.NimbleState.ConnectingToDongle;
+            grpManualControl.Enabled = (state == NimbleState.ConnectedToNimbleAndReady ||
+                                       state == NimbleState.ConnectedToDongle) && !automaticControl;
+            grpManualActions.Enabled = state == NimbleState.ConnectedToNimbleAndReady;
+            pannel_FoundProcessors.Enabled = grpManualControl.Enabled;
+            btnConnectToNimble.Enabled = state == NimbleState.ConnectedToDongle;
+            btnScanForProcessors.Enabled = state == NimbleState.ConnectedToDongle;
 
-            grpSettings.Enabled = !AutomaticOperation && state <= NimbleCommsManager.NimbleState.ConnectedToDongle;
+            grpSettings.Enabled = !autoNimble.AutomaticControlEnabled && state <= NimbleState.ConnectedToDongle;
         }
 
 
@@ -151,7 +154,6 @@ namespace NimbleBluetoothImpedanceManager
             {
                 Properties.Settings.Default.DefaultComDevice = port;
                 Properties.Settings.Default.Save();
-                AutomaticOperation = false;
             }
         }
 
@@ -182,93 +184,32 @@ namespace NimbleBluetoothImpedanceManager
 
         private void btnStartScan_Click(object sender, EventArgs e)
         {
-            lblDevicesRefreshTime.Text = "Last refresh at " + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString();
-            var devs = nimble.DiscoverDevices();
+            var items = autoNimble.AutoAction_DeepScanForProcessors();
             cklFoundDevices.Items.Clear();
-            //txtAddresses.Text = "";
-            if (devs == null)
-                return;
-            foreach (string s in devs)
+            foreach (NimbleProcessor nimbleProcessor in items)
             {
-                cklFoundDevices.Items.Add(s);
-                cklFoundDevices.SetItemCheckState(0, CheckState.Indeterminate);
-                //txtAddresses.Text = s + "\r\n";
+                cklFoundDevices.Items.Add(nimbleProcessor);
             }
+            lblDevicesRefreshTime.Text = "Last refresh at " + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString();
+            //var devs = nimble.DiscoverDevices();
+            //cklFoundDevices.Items.Clear();
+            ////txtAddresses.Text = "";
+            //if (devs == null)
+            //    return;
+            //foreach (string s in devs)
+            //{
+            //    cklFoundDevices.Items.Add(s);
+            //    cklFoundDevices.SetItemCheckState(0, CheckState.Indeterminate);
+            //    //txtAddresses.Text = s + "\r\n";
+            //}
         }
 
         private void bntCheckCurrent_Click(object sender, EventArgs e)
         {
-            DoImpedanceCheck();
+            autoNimble.DoImpedanceCheck();
         }
 
-        private void DoImpedanceCheck()
-        {
-            var guid = nimble.GetSequenceGUID();
-            logger.Debug("got sequence id: {0}", guid);
 
-            if (filemanager.FilesByGenGUID.ContainsKey(guid))
-            {
-                logger.Info("Collecting telem data for sequence {0} on {1}({2})", guid, nimble.NimbleName, nimble.RemoteDeviceId);
-                FilesForGenerationGUID x = filemanager.FilesByGenGUID[guid];
-                var fullSavePath = GetTelemSavePath(nimble.RemoteDeviceId, nimble.NimbleName, guid);
-                foreach (KeyValuePair<int, string> kvp in x.sequenceFile.MeasurementSegments)
-                {
-                    for (int i = 0; i < 3; i++)
-                    {
-                        string[] telemData;
-                        bool res = nimble.CollectTelemetryData(kvp.Key, out telemData);
-                        if (!res)
-                        {
-                            if (telemData == null)
-                                telemData = new string[] {"Collection failed. no data collected"};
-                        }
-                        SaveTelemData(telemData, kvp.Value, fullSavePath);
-                    }
-                }
-            }
-        }
-
-        private void SaveTelemData(string[] telemData, string measurementName, string folder)
-        {
-            int file_counter = 0;
-            string rawDataFileName = string.Format("{0}_{1}.txt", measurementName, file_counter);
-            while (File.Exists(Path.Combine(folder, rawDataFileName)))
-            {
-                file_counter++;
-                rawDataFileName = string.Format("{0}_{1}.txt", measurementName, file_counter);
-            }
-
-            string rawDataPath = Path.Combine(folder, rawDataFileName);
-
-            FileStream fs = new FileStream(rawDataPath, FileMode.Create);
-            StreamWriter sw = new StreamWriter(fs);
-            if (telemData != null)
-                foreach (string s in telemData)
-                {
-                    sw.WriteLine(s);
-                }
-            sw.Flush();
-            fs.Close();
-        }
-
-        private string GetTelemSavePath(string RemoteAddr, string NimbleName, string GenGuid)
-        {
-            string outputDir = txtOutputDir.Text;
-
-            string saveFolder = string.Format("{0}-{1}-{2}-{3}", NimbleName, RemoteAddr, GenGuid,
-                DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss-tt"));
-
-            string fullSavePath = Path.Combine(outputDir, saveFolder);
-            if (Directory.Exists(fullSavePath))
-            {
-                logger.Error("Output folder for this impedance measurement already exists. {0}", fullSavePath);
-            }
-            else
-            {
-                Directory.CreateDirectory(fullSavePath);
-            }
-            return fullSavePath;
-        }
 
         private void btnDisconnect_Click(object sender, EventArgs e)
         {
@@ -308,7 +249,21 @@ namespace NimbleBluetoothImpedanceManager
 
         private void btnAutoOperation_Click(object sender, EventArgs e)
         {
-            AutomaticOperation = !AutomaticOperation;
+            if (autoNimble.AutomaticControlEnabled)
+                autoNimble.StopAutomaticControl();
+            else
+            {
+                filemanager.ScanDirectory(Settings.Default.SequenceScanFolder);
+                List<NimbleProcessor> tmp = new List<NimbleProcessor>();
+                foreach (object o in cklFoundDevices.CheckedItems)
+                {
+                    if (o is NimbleProcessor)
+                        tmp.Add((NimbleProcessor)o);
+                }
+                autoNimble.SetProcessorsToMonitor(tmp);
+                autoNimble.StartAutomaticControl();
+            }
+
             UpdateStatusStrip();
         }
 

@@ -23,8 +23,8 @@ namespace NimbleBluetoothImpedanceManager.Sequences
 
         public void ScanDirectory(string path)
         {
-            if (path == "")
-                path = @"\\prometheus\user$\thienp\VisionProcessingHardware\DualImplants";
+            //if (path == "")
+            //    path = @"\\prometheus\user$\thienp\VisionProcessingHardware\DualImplants";
 
             DoScanDirectory(path);
 
@@ -39,7 +39,7 @@ namespace NimbleBluetoothImpedanceManager.Sequences
 
             }
         }
-        public void DoScanDirectory(string path)
+        private void DoScanDirectory(string path)
         {
             string[] files = Directory.GetFiles(path);
             foreach (string f in files)
@@ -66,40 +66,48 @@ namespace NimbleBluetoothImpedanceManager.Sequences
             string filename = Path.GetFileName(filepath);
 
             //FileStream fs = new FileStream(filepath, FileMode.Open);
-            string alltext = File.ReadAllText(filepath);
-
-            var match = regex_guid.Match(alltext);
-            if (match.Success)
+            try
             {
-                string guid = match.Groups[1].Value;
+                string alltext = File.ReadAllText(filepath);
 
-                FilesForGenerationGUID files;
-                if (FilesByGenGUID.ContainsKey(guid))
+                var match = regex_guid.Match(alltext);
+                if (match.Success)
                 {
-                    files = FilesByGenGUID[guid];
+                    string guid = match.Groups[1].Value;
+
+                    FilesForGenerationGUID files;
+                    if (FilesByGenGUID.ContainsKey(guid))
+                    {
+                        files = FilesByGenGUID[guid];
+                    }
+                    else
+                    {
+                        files = new FilesForGenerationGUID();
+                        logger.Info("Found new sequence: {0}", guid);
+                    }
+                    switch (filename)
+                    {
+                        case "PulseData.c":
+                            files.PulseData_c = filepath;
+                            break;
+                        case "PulseData.h":
+                            files.PulseData_h = filepath;
+                            break;
+                        case "Sequence.c":
+                            files.Sequence_c = filepath;
+                            break;
+                        case "Sequence.h":
+                            files.Sequence_h = filepath;
+                            break;
+                    }
+                    FilesByGenGUID[guid] = files;
                 }
-                else
-                {
-                    files = new FilesForGenerationGUID();
-                    logger.Info("Found new sequence: {0}", guid);
-                }
-                switch (filename)
-                {
-                    case "PulseData.c":
-                        files.PulseData_c = filepath;
-                        break;
-                    case "PulseData.h":
-                        files.PulseData_h = filepath;
-                        break;
-                    case "Sequence.c":
-                        files.Sequence_c = filepath;
-                        break;
-                    case "Sequence.h":
-                        files.Sequence_h = filepath;
-                        break;
-                }
-                FilesByGenGUID[guid] = files;
             }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message);
+            }
+            
         }
     }
 
