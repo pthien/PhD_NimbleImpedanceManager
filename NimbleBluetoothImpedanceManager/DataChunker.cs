@@ -13,22 +13,21 @@ namespace NimbleBluetoothImpedanceManager
 
         private object mylock = new object();
 
-        private int Timeout = 250;
-
+        public const int Timeout = 500;
         public DataChunker()
         {
-            tmr = new Timer(100);
+            tmr = new Timer(Timeout);
             tmr.Elapsed += tmr_Elapsed;
             tmr.AutoReset = false;
             logger.Info("Chunker started");
-            sb = new StringBuilder(Timeout);
+            sb = new StringBuilder(2000);
         }
 
         void tmr_Elapsed(object sender, ElapsedEventArgs e)
         {
             lock (mylock)
             {
-                //logger.Debug("Callback! {0}.{1}", DateTime.Now.Second, DateTime.Now.Millisecond);
+                logger.Debug("Callback! {0}.{1}", DateTime.Now.Second, DateTime.Now.Millisecond);
                 SendOffChunk(ChunkingReason.Timeout);
             }
         }
@@ -42,7 +41,7 @@ namespace NimbleBluetoothImpedanceManager
             }
 
             string chunk = sb.ToString();
-            logger.Info("Chunk Ready because of {1}: {0}", chunk.Replace("\n", "\\n").Replace("\r", "\\r").Replace(" ", "\\_"), reason);
+            logger.Debug("Chunk Ready because of {1}: {0}", chunk.EscapeWhiteSpace(), reason);
             if (ChunkReady != null)
                 ChunkReady(this, new ChunkReadyEventArgs { Chunk = chunk, Reason = reason });
             sb.Clear();

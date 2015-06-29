@@ -253,16 +253,16 @@
             this.grpSettings.Controls.Add(this.btnSetWorkingDir);
             this.grpSettings.Controls.Add(this.txtOutputDir);
             this.grpSettings.Controls.Add(this.txtWorkingDir);
-            this.grpSettings.Location = new System.Drawing.Point(383, 12);
+            this.grpSettings.Location = new System.Drawing.Point(326, 12);
             this.grpSettings.Name = "grpSettings";
-            this.grpSettings.Size = new System.Drawing.Size(569, 92);
+            this.grpSettings.Size = new System.Drawing.Size(626, 92);
             this.grpSettings.TabIndex = 14;
             this.grpSettings.TabStop = false;
             this.grpSettings.Text = "Settings";
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(420, 43);
+            this.button1.Location = new System.Drawing.Point(505, 44);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(115, 23);
             this.button1.TabIndex = 3;
@@ -272,7 +272,7 @@
             // 
             // btnSetWorkingDir
             // 
-            this.btnSetWorkingDir.Location = new System.Drawing.Point(420, 20);
+            this.btnSetWorkingDir.Location = new System.Drawing.Point(505, 20);
             this.btnSetWorkingDir.Name = "btnSetWorkingDir";
             this.btnSetWorkingDir.Size = new System.Drawing.Size(115, 23);
             this.btnSetWorkingDir.TabIndex = 2;
@@ -286,7 +286,7 @@
             this.txtOutputDir.Location = new System.Drawing.Point(7, 47);
             this.txtOutputDir.Name = "txtOutputDir";
             this.txtOutputDir.ReadOnly = true;
-            this.txtOutputDir.Size = new System.Drawing.Size(406, 20);
+            this.txtOutputDir.Size = new System.Drawing.Size(492, 20);
             this.txtOutputDir.TabIndex = 1;
             this.txtOutputDir.Text = "txtOutputDir";
             // 
@@ -296,7 +296,7 @@
             this.txtWorkingDir.Location = new System.Drawing.Point(7, 20);
             this.txtWorkingDir.Name = "txtWorkingDir";
             this.txtWorkingDir.ReadOnly = true;
-            this.txtWorkingDir.Size = new System.Drawing.Size(406, 20);
+            this.txtWorkingDir.Size = new System.Drawing.Size(492, 20);
             this.txtWorkingDir.TabIndex = 0;
             this.txtWorkingDir.Text = "txtWorkingDir";
             // 

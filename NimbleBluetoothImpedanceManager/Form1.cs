@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
+using System.Drawing;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
@@ -67,53 +68,78 @@ namespace NimbleBluetoothImpedanceManager
             NimbleState state = nimble.State;
 
             string textCon = "";
+            Color clrReady = Color.LimeGreen;
+            Color clrWorking = Color.Gold;
+            Color clrNotReady = Color.Firebrick;
+
+            Color colourCon = SystemColors.ControlLight;
+            Color colourStatus = SystemColors.ControlLight;
             string textStatus = "";
             switch (state)
             {
                 case NimbleState.Disconnected:
                     textCon = "Not connected to dongle";
                     textStatus = "Not ready";
+                    colourCon = clrNotReady;
+                    colourStatus = clrNotReady;
                     break;
                 case NimbleState.ConnectingToDongle:
                     textCon = "Connecting to dongle ({0}), nimble.Comport";
                     textStatus = "Not ready";
+                    colourCon = clrWorking;
+                    colourStatus = clrNotReady;
                     break;
                 case NimbleState.ConnectedToDongle:
                     textCon = string.Format("Connected to dongle ({0}), not connected to remote device", nimble.Comport);
-                    textStatus = "Not ready";
+                    textStatus = "Idle";
+                    colourCon = clrReady;
+                    colourStatus = clrReady;
                     break;
                 case NimbleState.ConnectedToDongleAndBusy:
                     textCon = string.Format("Connected to dongle ({0}), not connected to remote device", nimble.Comport);
                     textStatus = "Busy";
+                    colourCon = clrReady;
+                    colourStatus = clrWorking;
                     break;
                 case NimbleState.ConnectingToNimble:
                     textCon = "Connecting to nimble processor " + nimble.RemoteDeviceId;
                     textStatus = "Not ready";
+                    colourCon = clrWorking;
+                    colourStatus = clrNotReady;
                     break;
                 case NimbleState.ConnectedToNimbleAndReady:
                     textCon = string.Format("Connected to nimble processor {0}({1}) via {2}", nimble.NimbleName, nimble.RemoteDeviceId, nimble.Comport);
                     textStatus = "Ready";
+                    colourCon = clrReady;
+                    colourStatus = clrReady;
                     break;
                 case NimbleState.ConnectedToNimbleAndError:
                     textCon = string.Format("Connected to nimble processor {0}({1}) via {2}", nimble.NimbleName, nimble.RemoteDeviceId, nimble.Comport);
                     textStatus = "Error";
+                    colourCon = clrReady;
+                    colourStatus = clrNotReady;
                     break;
                 case NimbleState.ConnectedToNimbleAndWorking:
                     textCon = string.Format("Connected to nimble processor {0}({1}) via {2}", nimble.NimbleName, nimble.RemoteDeviceId, nimble.Comport);
                     textStatus = "Working...";
+                    colourCon = clrReady;
+                    colourStatus = clrWorking;
                     break;
                 default:
                     break;
             }
 
-            lblRemoteDeviceStatus.Text = textStatus;
-            lblDongleStatus.Text = textCon;
-            lblAutoStatus.Text = "Automatic Impedance Collection is " + (autoNimble.AutomaticControlEnabled ? "On" : "Off");
 
 
             if (this.InvokeRequired)
                 this.BeginInvoke((Action)(() =>
                 {
+                    lblRemoteDeviceStatus.Text = textStatus;
+                    lblRemoteDeviceStatus.BackColor = colourStatus;
+                    lblDongleStatus.Text = textCon;
+                    lblDongleStatus.BackColor = colourCon;
+                    lblAutoStatus.Text = "Automatic Impedance Collection is " + (autoNimble.AutomaticControlEnabled ? "On" : "Off");
+
                     UpdateUI(state, autoNimble.AutomaticControlEnabled);
                     logger.Trace("Update ui from {0}", Thread.CurrentThread.Name);
                 }));
@@ -220,8 +246,12 @@ namespace NimbleBluetoothImpedanceManager
         {
             if (cklFoundDevices.SelectedIndex >= 0)
             {
-                string line = cklFoundDevices.Items[cklFoundDevices.SelectedIndex].ToString();
-                nimble.ConnectToNimble(line);
+                var line = cklFoundDevices.Items[cklFoundDevices.SelectedIndex];
+                if (line is NimbleProcessor)
+                {
+                    string addr = ((NimbleProcessor) line).BluetoothAddress;
+                    nimble.ConnectToNimble(addr);
+                }
             }
             else
             {
@@ -244,7 +274,7 @@ namespace NimbleBluetoothImpedanceManager
 
         private void btnScan_Click(object sender, EventArgs e)
         {
-            filemanager.ScanDirectory("");
+            filemanager.ScanDirectory(Settings.Default.SequenceScanFolder);
         }
 
         private void btnAutoOperation_Click(object sender, EventArgs e)

@@ -32,14 +32,17 @@ namespace NimbleBluetoothImpedanceManager
             get { return _ImpedanceMeasurePeriod; }
         }
 
+        private DateTime NextDueAliveScan = DateTime.MinValue;
+        private DateTime NextDueImpedanceMeasure = DateTime.MinValue;
+
         private bool _AutomaticControlEnabled = false;
         public bool AutomaticControlEnabled
         {
             get { return _AutomaticControlEnabled; }
         }
 
-        private readonly TimeSpan MIN_ALIVESCAN_PERIOD = new TimeSpan(0, 0, 5, 0);
-        private readonly TimeSpan MIN_IMPEDANCE_PERIOD = new TimeSpan(0, 0, 20, 0);
+        private readonly TimeSpan MIN_ALIVESCAN_PERIOD = new TimeSpan(0, 0, 3, 0);
+        private readonly TimeSpan MIN_IMPEDANCE_PERIOD = new TimeSpan(0, 0, 5, 0);
 
         private List<NimbleProcessor> processorsToMeasure = new List<NimbleProcessor>();
 
@@ -73,6 +76,15 @@ namespace NimbleBluetoothImpedanceManager
 
             lock (automaticActionLock)
             {
+                //if (NextDueAliveScan > DateTime.MinValue && NextDueImpedanceMeasure > DateTime.MinValue)
+                //{
+                //    TimeSpan AliveScanDueTime = NextDueAliveScan - DateTime.Now;
+                //    TimeSpan ImpedanceDueTime = NextDueImpedanceMeasure - DateTime.Now;
+                //}
+
+                //NextDueAliveScan = DateTime.Now + TimeSpan.FromSeconds(1);
+                //NextDueImpedanceMeasure = DateTime.Now + aliveScanOffset;
+
                 tmrAliveScan = new Timer(AutoAction_AliveScan, null, TimeSpan.FromSeconds(1), _AliveScanPeriod);
                 tmrImpedance = new Timer(AutoAction_ImpedanceMeasurements,
                     null, aliveScanOffset, _ImpedanceMeasurePeriod);
@@ -95,15 +107,18 @@ namespace NimbleBluetoothImpedanceManager
 
         public void AutoAction_AliveScan(object state)
         {
-            DateTime start = DateTime.Now; ;
+            DateTime start = DateTime.Now;
             lock (automaticActionLock)
             {
+                NextDueAliveScan = DateTime.Now + AliveScanPeriod;
                 logger.Info("Alive scan started");
                 logger.Trace("lock time: {0}s", (start - DateTime.Now).TotalSeconds);
                 string[] found = nimble.DiscoverDevices();
+                if (found == null)
+                    found = new string[0];
                 logger.Info("Found {1} device(s) {0}", string.Join(", ", found), found.Length);
                 RecordFoundDevices(found);
-                logger.Info("Alive scan finished");
+                logger.Info("Alive scan finished. Took {0}s", (DateTime.Now - start).TotalSeconds);
             }
         }
 
@@ -112,16 +127,18 @@ namespace NimbleBluetoothImpedanceManager
             DateTime start = DateTime.Now; ;
             lock (automaticActionLock)
             {
-
+                NextDueImpedanceMeasure = DateTime.Now + ImpedanceMeasurePeriod;
                 logger.Info("Automatic impedance measurements started");
                 logger.Trace("lock time: {0}s", (DateTime.Now - start).TotalSeconds);
                 //string[] found = nimble.DiscoverDevices();
 
                 foreach (NimbleProcessor nimbleProcessor in processorsToMeasure)
                 {
+                    logger.Info("Starting impedance measurement for {0}", nimbleProcessor);
                     if (nimble.ConnectToNimble(nimbleProcessor.BluetoothAddress))
                     {
                         DoImpedanceCheck();
+                        nimble.DisconnectFromNimble();
                     }
                 }
                 logger.Info("Automatic impedance finished. Took {0}s", (DateTime.Now - start).TotalSeconds);
@@ -153,7 +170,7 @@ namespace NimbleBluetoothImpedanceManager
                     else
                         logger.Warn("Could not connect to {0}", address);
                 }
-                logger.Info("Deep scan finished");
+                logger.Info("Deep scan finished. Took {0}s", (DateTime.Now - start).TotalSeconds);
                 return tmpProcessors;
             }
         }
@@ -262,7 +279,6 @@ namespace NimbleBluetoothImpedanceManager
             }
             return fullSavePath;
         }
-
 
         private static long GCD(long a, long b)
         {

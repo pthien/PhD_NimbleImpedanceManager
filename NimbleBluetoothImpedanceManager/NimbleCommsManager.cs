@@ -62,6 +62,11 @@ namespace NimbleBluetoothImpedanceManager
             get { return _NimbleName; }
         }
 
+        public NimbleProcessor RemoteNimbleProcessor
+        {
+            get { return new NimbleProcessor() { Name = NimbleName, BluetoothAddress = RemoteDeviceId }; }
+        }
+
         private string remoteDeviceGenGUID;
 
         private object receivingTelemDataLock = new object();
@@ -113,7 +118,10 @@ namespace NimbleBluetoothImpedanceManager
 
         void btDongle_ConnectionLost(object sender, BluetoothCommsDriver.DataRecievedEventArgs e)
         {
-            State = NimbleState.ConnectedToDongle;
+            lock (stateLock)
+            {
+                State = NimbleState.ConnectedToDongle;
+            }
         }
 
         /// <summary>
@@ -320,10 +328,14 @@ namespace NimbleBluetoothImpedanceManager
                 _telemData = null;
             }
             btDongle.TransmitToRemoteDevice(command);
-            if (NimbleCmdRx_xmitTelemFin_WaitHandle.WaitOne(10000))
+            if (NimbleCmdRx_xmitTelemFin_WaitHandle.WaitOne(DataChunker.Timeout + 10000))
             {
                 logger.Info("Receive Telem data successful. Sequence {0}, Device {1}", sequence, RemoteDeviceId);
-                State = NimbleState.ConnectedToNimbleAndReady;
+                lock (stateLock)
+                {
+                    if (State == NimbleState.ConnectedToNimbleAndWorking)
+                        State = NimbleState.ConnectedToNimbleAndReady;
+                }
                 data = (string[])TelemetryData.Clone();
                 return true;
             }
@@ -332,7 +344,11 @@ namespace NimbleBluetoothImpedanceManager
                 logger.Warn("Receive Telem timed out. Sequence {0}, Device {1}", sequence, RemoteDeviceId);
                 ProcessData("xmitTelem", "fin");
                 //receivingTelemData = false;
-                State = NimbleState.ConnectedToNimbleAndReady;
+                lock (stateLock)
+                {
+                    if (State == NimbleState.ConnectedToNimbleAndWorking)
+                        State = NimbleState.ConnectedToNimbleAndReady;
+                }
                 data = (string[])TelemetryData.Clone();
                 return false;
             }
@@ -356,7 +372,7 @@ namespace NimbleBluetoothImpedanceManager
             {
                 NimbleCmdRx_Name_WaitHandle.Reset();
                 btDongle.TransmitToRemoteDevice("\nGetID\n");
-                if (NimbleCmdRx_Name_WaitHandle.WaitOne(1000))
+                if (NimbleCmdRx_Name_WaitHandle.WaitOne(DataChunker.Timeout + 1000))
                 {
                     State = NimbleState.ConnectedToNimbleAndReady;
                     return true;
@@ -393,7 +409,7 @@ namespace NimbleBluetoothImpedanceManager
 
             NimbleCmdRx_GenGUID_WaitHandle.Reset();
             btDongle.TransmitToRemoteDevice("\ngetGenGUID\n");
-            if (NimbleCmdRx_GenGUID_WaitHandle.WaitOne(1000))
+            if (NimbleCmdRx_GenGUID_WaitHandle.WaitOne(DataChunker.Timeout + 2000))
             {
                 State = NimbleState.ConnectedToNimbleAndReady;
                 return remoteDeviceGenGUID;
@@ -414,27 +430,43 @@ namespace NimbleBluetoothImpedanceManager
 
         public bool DisconnectFromNimble()
         {
-            if (!btDongle.ConnectedToRemoteDevice)
-                return false;
-
-            //btDongle.TransmitToRemoteDevice("\nclearXmitTelem\n");
-            //Thread.Sleep(500);
-            //btDongle.TransmitAndLog("endSession\n");
-            for (int i = 0; i < 10; i++)
+            logger.Info("Disconnecting from nimble {0}", RemoteNimbleProcessor);
+            if (btDongle.ConnectedToRemoteDevice)
             {
-                btDongle.TransmitAndLog("AT");
-                if (btDongle.Dongle_ConnectionLost_WaitHandle.WaitOne(10000))
+                //btDongle.TransmitToRemoteDevice("\nclearXmitTelem\n");
+                //Thread.Sleep(500);
+                //btDongle.TransmitAndLog("endSession\n");
+                for (int i = 0; i < 10; i++)
                 {
-                    logger.Info("Successfully disconnected from Nimble processor on attempt {0}", i);
-                    break;
+                    btDongle.TransmitAndLog("AT");
+                    if (btDongle.Dongle_ConnectionLost_WaitHandle.WaitOne(10000))
+                    {
+                        logger.Info("Disconnected from Nimble processor on attempt {0}", i);
+                        break;
+                    }
+                    else
+                        logger.Info("Failed to disconnect on attempt {0}", i);
+                }
+            }
+            bool res = false;
+            logger.Info("Ensuring dongle is ok after disconnecting:");
+            for (int i = 0; i < 100; i++)
+            {
+                logger.Info("Ensuring dongle is ok after disconnecting:");
+                res = btDongle.IsDongleOK();
+                if (!res)
+                {
+                    logger.Warn("After disconnecting logger not ok after {1} request(s)", i);
+                    State = NimbleState.ConnectedToNimbleAndError;
                 }
                 else
                 {
-                    logger.Info("Failed to disconnect on attempt {0}", i);
+                    logger.Info("Disconnection completed successfuly", i);
+                    State= NimbleState.ConnectedToDongle;
+                    break;
                 }
             }
-
-            return btDongle.IsDongleOK();
+            return res;
 
         }
     }

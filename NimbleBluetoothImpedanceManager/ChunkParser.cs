@@ -8,15 +8,13 @@ namespace NimbleBluetoothImpedanceManager
 {
     public static class ChunkParser
     {
-
-
         private static Logger logger = LogManager.GetCurrentClassLogger();
         static Regex regex_ok_start = new Regex(@"\AOK\+[A-Za-z:0-9]+(?=OK|\s|$)");
         static Regex regex_ErronousATPlus = new Regex(@"AT\+[A-Z]+(?=OK|\s|$)");
         static Regex regex_CommandResponse = new Regex(@"{([A-Za-z0-9]+):([ A-Z0-9a-z-:_|()\[\]]+)}");
         public static List<string> ParseChunk(string chunk)
         {
-            logger.Debug("Parsing chunk of length {1}: {0}", chunk.Replace("\n", "\\n").Replace("\r", "\\r"), chunk.Length);
+            logger.Debug("Parsing chunk of length {1}: {0}", chunk.EscapeWhiteSpace(), chunk.Length);
             List<string> tokens = new List<string>();
             
             chunk = chunk.Trim(new char[]{'\r','\n','\0'});
@@ -73,7 +71,7 @@ namespace NimbleBluetoothImpedanceManager
                     }
                     else
                     {
-                        logger.Warn("Bad chunk: {0}", chunk.Replace("\n", "\\n").Replace("\r", "\\r"));
+                        logger.Warn("Bad chunk: {0}", chunk.EscapeWhiteSpace());
                         chunk = "";
                         //throw new ArgumentException("regex problem");
                     }

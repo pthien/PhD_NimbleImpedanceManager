@@ -134,7 +134,7 @@ namespace NimbleBluetoothImpedanceManager
         void dataChunker_ChunkReady(object sender, DataChunker.ChunkReadyEventArgs e)
         {
             //logger.Debug("Got a chunk {0}", e.Chunk.Replace("\n", "\\n").Replace("\r", "\\r"));
-            dataLoggerRX.Info("[{0}] {1}", e.Reason.ToString(), e.Chunk.Replace("\n", "\\n").Replace("\r", "\\r"));
+            dataLoggerRX.Info("[{0}] {1}", e.Reason.ToString(), e.Chunk.EscapeWhiteSpace());
             MostRecentlyRecievedData = ChunkParser.ParseChunk(e.Chunk).ToArray();
 
             ProcessData(MostRecentlyRecievedData);
@@ -144,7 +144,7 @@ namespace NimbleBluetoothImpedanceManager
         {
             TransmitAndLog("AT+CON" + Address);
             _RemoteDeviceAddr = Address;
-            if (Dongle_ConnectionEstablished_WaitHandle.WaitOne(20000))
+            if (Dongle_ConnectionEstablished_WaitHandle.WaitOne(DataChunker.Timeout + 20000))
             {
                 logger.Info("Connected to {0}", Address);
                 return true;
@@ -161,12 +161,13 @@ namespace NimbleBluetoothImpedanceManager
         {
             if (currentlyScanningForDevices)
             {
+                logger.Error("Cant transmit while scanning for devices. Discarding transmission: {0}", text.EscapeWhiteSpace());
                 if (!System.Diagnostics.Debugger.IsAttached)
                     throw new AccessViolationException("Cant transmit while scanning for devices");
                 return;
             }
             serialPort.Write(text);
-            dataLoggerTX.Info(text.Replace("\r", "\\r").Replace("\n", "\\n"));
+            dataLoggerTX.Info(text.EscapeWhiteSpace());
         }
 
         /// <summary>
@@ -181,7 +182,10 @@ namespace NimbleBluetoothImpedanceManager
         public void TransmitToRemoteDevice(string command)
         {
             if (!ConnectedToRemoteDevice)
-                throw new Exception("Not connected to any nimble processor");
+            {
+                logger.Error("Not connected to any nimble processor. Discarding transmission: {0}", command.EscapeWhiteSpace());
+                //throw new Exception("Not connected to any nimble processor");
+            }
             TransmitAndLog(command);
         }
 
@@ -225,7 +229,7 @@ namespace NimbleBluetoothImpedanceManager
                     lock (knownDevicesLock)
                     {
                         currentlyScanningForDevices = true;
-                        logger.Info("discovery started");
+                        logger.Info("Discovery started");
                         buildingKnownDevices.Clear();
                     }
                 }
@@ -268,7 +272,7 @@ namespace NimbleBluetoothImpedanceManager
         {
             Dongle_DeviceDiscoveryComplete_WaitHandle.Reset();
             TransmitAndLog("AT+DISC?");
-            if (Dongle_DeviceDiscoveryComplete_WaitHandle.WaitOne(10000))
+            if (Dongle_DeviceDiscoveryComplete_WaitHandle.WaitOne(DataChunker.Timeout + 10000))
             {
                 logger.Info("Scan for devices completed");
                 return KnownDevices;
@@ -288,7 +292,7 @@ namespace NimbleBluetoothImpedanceManager
         public bool IsDongleOK()
         {
             TransmitAndLog("AT");
-            if (Dongle_ATOK_WaitHandle.WaitOne(5000))
+            if (Dongle_ATOK_WaitHandle.WaitOne(DataChunker.Timeout + 500))
             {
                 logger.Debug("Dongle is OK!");
                 return true;
