@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using NimbleBluetoothImpedanceManager.Properties;
-using NimbleBluetoothImpedanceManager.Sequences;
+using Nimble.Sequences;
 using NLog;
 
 namespace NimbleBluetoothImpedanceManager
@@ -41,7 +41,7 @@ namespace NimbleBluetoothImpedanceManager
             get { return _AutomaticControlEnabled; }
         }
 
-        private readonly TimeSpan MIN_ALIVESCAN_PERIOD = new TimeSpan(0, 0, 3, 0);
+        private readonly TimeSpan MIN_ALIVESCAN_PERIOD = new TimeSpan(0, 0, 15, 0);
         private readonly TimeSpan MIN_IMPEDANCE_PERIOD = new TimeSpan(0, 0, 5, 0);
 
         private List<NimbleProcessor> processorsToMeasure = new List<NimbleProcessor>();
@@ -175,16 +175,17 @@ namespace NimbleBluetoothImpedanceManager
             }
         }
 
-        public void SetProcessorsToMonitor(IEnumerable<NimbleProcessor> processors)
+        public void SetProcessorsToMonitor(List<NimbleProcessor> processors)
         {
             lock (automaticActionLock)
             {
                 processorsToMeasure.Clear();
                 foreach (NimbleProcessor p in processors)
                 {
-                    logger.Info("Set processor to monitor: {0}", p);
                     processorsToMeasure.Add(p);
                 }
+                logger.Info("Set processor to monitor: {0}", string.Join(", ",processors.ToArray()));
+
             }
         }
 
@@ -210,16 +211,18 @@ namespace NimbleBluetoothImpedanceManager
                 var guid = nimble.GetSequenceGUID();
                 logger.Debug("got sequence id: {0}", guid);
 
-                if (fileManager.FilesByGenGUID.ContainsKey(guid))
+                if (fileManager.CompiledSequences.ContainsKey(guid))
                 {
                     logger.Info("Collecting telem data for sequence {0} on {1}({2})", guid, nimble.NimbleName,
                         nimble.RemoteDeviceId);
-                    FilesForGenerationGUID x = fileManager.FilesByGenGUID[guid];
+                    CompiledSequence compseq = fileManager.CompiledSequences[guid];
+
                     var fullSavePath = GetTelemSavePath(nimble.RemoteDeviceId, nimble.NimbleName, guid);
-                    foreach (KeyValuePair<int, string> kvp in x.sequenceFile.MeasurementSegments)
+                    foreach (KeyValuePair<int, string> kvp in compseq.MeasurementSegments)
                     {
                         for (int i = 0; i < 3; i++)
                         {
+                            logger.Info("Collecting segment {0} repeat {1}", kvp.Value, i);
                             string[] telemData;
                             bool res = nimble.CollectTelemetryData(kvp.Key, out telemData);
                             if (!res)

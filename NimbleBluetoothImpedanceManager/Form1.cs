@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using NimbleBluetoothImpedanceManager.Properties;
-using NimbleBluetoothImpedanceManager.Sequences;
+using Nimble.Sequences;
 using NLog;
 
 namespace NimbleBluetoothImpedanceManager
@@ -173,14 +173,17 @@ namespace NimbleBluetoothImpedanceManager
 
         private void btnConnectToDongle_Click(object sender, EventArgs e)
         {
+            btnConnect.Enabled = false;
             string port = cmbCOMPorts.Text;
             var res = nimble.Initialise(port);
-            ConnectedToDongle(res);
             if (res)
             {
                 Properties.Settings.Default.DefaultComDevice = port;
                 Properties.Settings.Default.Save();
+                btnStartScan_Click(null, null);
             }
+            btnConnect.Enabled = true;
+            ConnectedToDongle(res);
         }
 
         private void ConnectedToDongle(bool connected)
@@ -216,7 +219,8 @@ namespace NimbleBluetoothImpedanceManager
             {
                 cklFoundDevices.Items.Add(nimbleProcessor);
             }
-            lblDevicesRefreshTime.Text = "Last refresh at " + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString();
+            lblDevicesRefreshTime.Text = "Last refresh at " + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString()
+                + string.Format("\r\nPress '{0}' to refresh.", btnScanForProcessors.Text);
             //var devs = nimble.DiscoverDevices();
             //cklFoundDevices.Items.Clear();
             ////txtAddresses.Text = "";
@@ -249,7 +253,7 @@ namespace NimbleBluetoothImpedanceManager
                 var line = cklFoundDevices.Items[cklFoundDevices.SelectedIndex];
                 if (line is NimbleProcessor)
                 {
-                    string addr = ((NimbleProcessor) line).BluetoothAddress;
+                    string addr = ((NimbleProcessor)line).BluetoothAddress;
                     nimble.ConnectToNimble(addr);
                 }
             }
@@ -279,10 +283,23 @@ namespace NimbleBluetoothImpedanceManager
 
         private void btnAutoOperation_Click(object sender, EventArgs e)
         {
+            btnAutoOperation.Enabled = false;
             if (autoNimble.AutomaticControlEnabled)
                 autoNimble.StopAutomaticControl();
             else
             {
+                if (cklFoundDevices.CheckedItems.Count == 0)
+                {
+                    var res =
+                        MessageBox.Show(
+                            "No processor has been selected for automatic impedance monitoring. Do you want to continue?",
+                            "Warning", MessageBoxButtons.OKCancel);
+                    if (res == DialogResult.Cancel)
+                    {
+                        btnAutoOperation.Enabled = true;
+                        return;
+                    }
+                }
                 filemanager.ScanDirectory(Settings.Default.SequenceScanFolder);
                 List<NimbleProcessor> tmp = new List<NimbleProcessor>();
                 foreach (object o in cklFoundDevices.CheckedItems)
@@ -295,6 +312,8 @@ namespace NimbleBluetoothImpedanceManager
             }
 
             UpdateStatusStrip();
+            btnAutoOperation.Enabled = true;
+
         }
 
         private void btnSetWorkingDir_Click(object sender, EventArgs e)
@@ -323,6 +342,20 @@ namespace NimbleBluetoothImpedanceManager
                 Settings.Default.ImpedanceOutputFolder = fbd.SelectedPath;
                 Settings.Default.Save();
             }
+        }
+
+        private void lblDevicesRefreshTime_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private Nimble.Sequences.Viewer x;
+        private void button2_Click(object sender, EventArgs e)
+        {
+            x = new Viewer();
+            x.ImpedanceDirectory = Settings.Default.ImpedanceOutputFolder;
+            x.SequenceDirectory = Settings.Default.SequenceScanFolder;
+            x.Show();
         }
 
 

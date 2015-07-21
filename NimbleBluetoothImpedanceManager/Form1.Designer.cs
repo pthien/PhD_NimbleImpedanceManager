@@ -55,8 +55,8 @@
             this.txtWorkingDir = new System.Windows.Forms.TextBox();
             this.fileSystemWatcher1 = new System.IO.FileSystemWatcher();
             this.label1 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
             this.pannel_FoundProcessors = new System.Windows.Forms.Panel();
+            this.button2 = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.grpManualControl.SuspendLayout();
             this.grpManualActions.SuspendLayout();
@@ -167,19 +167,18 @@
             this.cklFoundDevices.FormattingEnabled = true;
             this.cklFoundDevices.Items.AddRange(new object[] {
             "F4B85EB48907"});
-            this.cklFoundDevices.Location = new System.Drawing.Point(3, 21);
+            this.cklFoundDevices.Location = new System.Drawing.Point(3, 24);
             this.cklFoundDevices.Name = "cklFoundDevices";
             this.cklFoundDevices.Size = new System.Drawing.Size(223, 109);
             this.cklFoundDevices.TabIndex = 8;
             // 
             // lblDevicesRefreshTime
             // 
-            this.lblDevicesRefreshTime.AutoSize = true;
-            this.lblDevicesRefreshTime.Location = new System.Drawing.Point(3, 133);
+            this.lblDevicesRefreshTime.Location = new System.Drawing.Point(3, 136);
             this.lblDevicesRefreshTime.Name = "lblDevicesRefreshTime";
-            this.lblDevicesRefreshTime.Size = new System.Drawing.Size(35, 13);
+            this.lblDevicesRefreshTime.Size = new System.Drawing.Size(223, 40);
             this.lblDevicesRefreshTime.TabIndex = 9;
-            this.lblDevicesRefreshTime.Text = "label1";
+            this.lblDevicesRefreshTime.Click += new System.EventHandler(this.lblDevicesRefreshTime_Click);
             // 
             // btnScanFiles
             // 
@@ -308,19 +307,12 @@
             // label1
             // 
             this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.Location = new System.Drawing.Point(3, 5);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(160, 13);
+            this.label1.Size = new System.Drawing.Size(227, 16);
             this.label1.TabIndex = 15;
-            this.label1.Text = "Automatically get impedance for:";
-            // 
-            // textBox1
-            // 
-            this.textBox1.Location = new System.Drawing.Point(537, 389);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(142, 99);
-            this.textBox1.TabIndex = 16;
+            this.label1.Text = "Automatically monitor impedance for:";
             // 
             // pannel_FoundProcessors
             // 
@@ -332,13 +324,23 @@
             this.pannel_FoundProcessors.Size = new System.Drawing.Size(248, 192);
             this.pannel_FoundProcessors.TabIndex = 17;
             // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(249, 374);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.TabIndex = 18;
+            this.button2.Text = "button2";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(964, 536);
+            this.Controls.Add(this.button2);
             this.Controls.Add(this.pannel_FoundProcessors);
-            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.grpSettings);
             this.Controls.Add(this.btnAutoOperation);
             this.Controls.Add(this.grpManualControl);
@@ -390,9 +392,9 @@
         private System.Windows.Forms.TextBox txtOutputDir;
         private System.Windows.Forms.TextBox txtWorkingDir;
         private System.IO.FileSystemWatcher fileSystemWatcher1;
-        private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Panel pannel_FoundProcessors;
+        private System.Windows.Forms.Button button2;
     }
 }
 

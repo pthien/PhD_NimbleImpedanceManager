@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NimbleBluetoothImpedanceManager;
 
@@ -74,6 +75,8 @@ namespace Tests_BluetoothCommsManager
             string[] expected = { "OK" };
             List<string> actual;
             actual = ChunkParser.ParseChunk(chunk);
+           var t= testContextInstance.TestRunDirectory;
+            string d = Directory.GetCurrentDirectory();
             CollectionAssert.AreEqual(expected, actual.ToArray());
         }
 
