@@ -208,25 +208,25 @@ namespace Nimble.Sequences
         }
         #endregion
 
-        public NimbleImpedanceRecord ProcessSequenceResponse(NimbleMeasurementRecord measurementRecord)
-        {
-            NimbleImpedanceRecord impedanceRecord = new NimbleImpedanceRecord(measurementRecord);
-            var measurements = measurementRecord.GetMeasurments();
+        //public NimbleImpedanceRecord ProcessSequenceResponse(NimbleMeasurementRecord measurementRecord)
+        //{
+        //    NimbleImpedanceRecord impedanceRecord = new NimbleImpedanceRecord(measurementRecord);
+        //    var measurements = measurementRecord.GetMeasurments();
 
-            foreach (NimbleSegmentMeasurment m in measurements)
-            {
-                List<ImpedanceResult> impedanceResults = ProcessMeasurementCall(m);
-                impedanceRecord.AddImpedanceResult(impedanceResults);
-            }
+        //    foreach (NimbleSegmentMeasurment m in measurements)
+        //    {
+        //        List<ImpedanceResult> impedanceResults = ProcessMeasurementCall(m);
+        //        impedanceRecord.AddSegmentImpedanceResult(impedanceResults);
+        //    }
             
-            return impedanceRecord;
-        }
+        //    return impedanceRecord;
+        //}
 
-        private List<ImpedanceResult> ProcessMeasurementCall(NimbleSegmentMeasurment m1)
+        public List<ImpedanceResult> ProcessMeasurementCall(NimbleSegmentMeasurment m1)
         {
             CICState ImplantA = new CICState();
             CICState ImplantB = new CICState();
-
+            
             int maxPWMA = -1, maxPWMB = -1, minPWMA = -1, minPWMB = -1;
             List<ImpedanceResult> impedanceResults = new List<ImpedanceResult>();
             var telemResponses = m1.TelemetryResponses;
@@ -258,28 +258,28 @@ namespace Nimble.Sequences
                             }
                             if (telemResp.Captures_ticks.Count == 0)
                             {
-                                logger.Error("none captured. Telemresponse:{2}. Pulse:{0}, measurement:{1}", p, m1.path, telemResp);
+                                logger.Debug("none captured. Telemresponse:{2}. Pulse:{0}, measurement:{1}", p, m1.path, telemResp);
                                 continue;
                             }
 
                             if (ImplantA.SetUpToReadMaxPWM)
                             {
-                                logger.Info("Got Implant A Max PWM. Measurement:{0}, TelemResponse:{1}", m1, telemResp);
+                                logger.Debug("Got Implant A Max PWM. Measurement:{0}, TelemResponse:{1}", m1, telemResp);
                                 maxPWMA = telemResp.Captures_ticks[0];
                             }
                             else if (ImplantB.SetUpToReadMaxPWM)
                             {
-                                logger.Info("Got Implant B Max PWM. Measurement:{0}, TelemResponse:{1}", m1, telemResp);
+                                logger.Debug("Got Implant B Max PWM. Measurement:{0}, TelemResponse:{1}", m1, telemResp);
                                 maxPWMB = telemResp.Captures_ticks[0];
                             }
                             else if (ImplantA.SetUpToReadMinPWM)
                             {
-                                logger.Info("Got Implant A Min PWM. Measurement:{0}, TelemResponse:{1}", m1, telemResp);
+                                logger.Debug("Got Implant A Min PWM. Measurement:{0}, TelemResponse:{1}", m1, telemResp);
                                 minPWMA = telemResp.Captures_ticks[0];
                             }
                             else if (ImplantB.SetUpToReadMinPWM)
                             {
-                                logger.Info("Got Implant B Min PWM. Measurement:{0}, TelemResponse:{1}", m1, telemResp);
+                                logger.Debug("Got Implant B Min PWM. Measurement:{0}, TelemResponse:{1}", m1, telemResp);
                                 minPWMB = telemResp.Captures_ticks[0];
                             }
                             else if (ImplantA.SetUpForImpedanceTelemetry)
@@ -314,9 +314,13 @@ namespace Nimble.Sequences
                             }
 
                         }
-                        else
+                        else if (list.Count > 1)
                         {
                             logger.Error("More items than I'm expecting. Pulse:{0}, measurement:{1}", p, m1.path);
+                        }
+                        else
+                        {
+                            logger.Debug("Telem Response not found. Pulse:{0}, measurement:{1}", p, m1.path);
                         }
                     }
                 }

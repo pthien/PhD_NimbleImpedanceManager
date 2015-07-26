@@ -14,7 +14,7 @@ namespace TelemParserTests
         {
             string[] input = new string[]
             {"14_514_Kingston-84EB1877B26F-608e3568-59c1-408d-a53b-34203648716e-2015-06-29_04-21-17-PM"};
-            var output = SequenceParser.ParseTelemDataDirecortyNames(input, "");
+            var output = SequenceFileManager_Accessor.ParseTelemDataDirecortyNames(input, "");
 
             Assert.AreEqual(output.Count, 1);
             Assert.AreEqual(output[0].SubjectName, "14_514_Kingston");
@@ -28,7 +28,7 @@ namespace TelemParserTests
         {
             string[] input = new string[]
             {"14_514_PCB1-F4B85EB48907-3b5bb552-704f-42f3-b627-08258d7b8c4e-2015-06-29_04-42-05-PM"};
-            var output = SequenceParser.ParseTelemDataDirecortyNames(input, "");
+            var output = SequenceFileManager_Accessor.ParseTelemDataDirecortyNames(input, "");
 
             Assert.AreEqual(output.Count, 1);
             Assert.AreEqual(output[0].SubjectName, "14_514_PCB1");
@@ -42,7 +42,7 @@ namespace TelemParserTests
         {
             string[] input = new string[]
             {"14_514_Kingston-84EB1877B26F-608e3568-59c1-408d-a53b-34203648716e-2015-06-29_04-21-17-PM"};
-            var output = SequenceParser.ParseTelemDataDirecortyNames(null, "");
+            var output = SequenceFileManager_Accessor.ParseTelemDataDirecortyNames(null, "");
             Assert.IsNotNull(output);
             Assert.AreEqual(output.Count, 0);
         }
@@ -98,7 +98,7 @@ namespace TelemParserTests
             rec.RecordDirectory =
                 @"14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM";
 
-            var x = seq.ProcessSequenceResponse(rec);
+            //var x = seq.ProcessSequenceResponse(rec);
         }
     }
 }

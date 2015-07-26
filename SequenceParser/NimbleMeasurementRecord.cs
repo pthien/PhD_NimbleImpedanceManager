@@ -91,7 +91,7 @@ namespace Nimble.Sequences
 
         public override string ToString()
         {
-            return String.Format("Measurement Record: {0}", RecordDirectory);
+            return String.Format("Record: {0}, {1}", SubjectName, Timestamp.ToShortDateString() + " " + Timestamp.ToShortTimeString());
         }
     }
 }

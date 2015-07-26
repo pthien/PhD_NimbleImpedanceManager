@@ -6,6 +6,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests_BluetoothCommsManager", "Tests_BluetoothCommsManager\Tests_BluetoothCommsManager.csproj", "{6E6E30A0-FB4A-45F3-80B9-8C9096895B94}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{48134D57-AA08-40FA-B1AD-5F7AECAE2DAE}"
+	ProjectSection(SolutionItems) = preProject
+		Local.testsettings = Local.testsettings
+		NimbleBluetoothImpedanceManager1.vsmdi = NimbleBluetoothImpedanceManager1.vsmdi
+		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NimbleSequences", "SequenceParser\NimbleSequences.csproj", "{0E677005-74F7-475A-9B6C-245EE3ECED01}"
 EndProject
@@ -17,7 +22,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PIC_Sequence", "..\Cochlear
 EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = NimbleBluetoothImpedanceManager.vsmdi
+		CategoryFile = NimbleBluetoothImpedanceManager1.vsmdi
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

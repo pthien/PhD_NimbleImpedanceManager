@@ -17,9 +17,35 @@ namespace Nimble.Sequences
         public ImpedanceMeasurementTypes _Type;
         public ImpedanceCatagorization _Category;
 
+        //public ImpedanceResult()
+        //{
+        //    _Electrode = -1;
+        //    _Return = -1;
+        //    _PhaseWidht_us = -1;
+        //    _Implant = Implant.ImplantA;
+        //    _Impedance_ohms = -1;
+        //    _Type = ImpedanceMeasurementTypes.MonoPolar;
+        //    _Category = ImpedanceCatagorization.OK;
+        //}
+
+        public string ElectrodeName
+        {
+            get
+            {
+                switch (_Implant)
+                {
+                    case Implant.ImplantA:
+                        return "A" + _Electrode;
+                    case Implant.ImplantB:
+                        return "B" + _Electrode;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+
         public ImpedanceResult(int E, int M, double current_uA, int maxPWM, int minPWM, int TelemResponse_ticks, CICState.VTEL_AmplifierGain Gain, Implant implant, int PhaseWidth_us)
         {
-
             _Electrode = E;
             _Return = M;
             _Implant = implant;
@@ -30,7 +56,6 @@ namespace Nimble.Sequences
             _Impedance_ohms = CalculateImpedance(current_uA, minPWM, maxPWM, TelemResponse_ticks, vfs);
 
             _Category = ImpedanceCatagorization.Error;
-            
         }
 
         private static double CalculateImpedance(double current_uA, int minPWM_ticks, int maxPWM_ticks, int RawVal_ticks, double VoltageFullScale_V)
@@ -64,6 +89,18 @@ namespace Nimble.Sequences
         }
     }
 
+    public struct NimbleSegmentImpedance
+    {
+        public string SegmentName;
+        public int RepeateCount;
+        public List<ImpedanceResult> Impedances;
+
+        public override string ToString()
+        {
+            return String.Format("{0} #{1}", SegmentName, RepeateCount);
+        }
+    }
+
     public struct NimbleImpedanceRecord
     {
 
@@ -72,7 +109,7 @@ namespace Nimble.Sequences
         private string _subjectName;
         private Guid _genGuid;
         private string _recordDirectory;
-        private List<ImpedanceResult> _impedances;
+        private List<NimbleSegmentImpedance> _segmentImpedances;
 
         public DateTime Timestamp
         {
@@ -99,9 +136,9 @@ namespace Nimble.Sequences
             get { return _recordDirectory; }
         }
 
-        public ImpedanceResult[] Impedances
+        public NimbleSegmentImpedance[] SegmentImpedances
         {
-            get { return _impedances.ToArray(); }
+            get { return _segmentImpedances.ToArray(); }
         }
 
         public NimbleImpedanceRecord(NimbleMeasurementRecord record)
@@ -111,21 +148,21 @@ namespace Nimble.Sequences
             _genGuid = record.GenGuid;
             _subjectName = record.SubjectName;
             _recordDirectory = record.RecordDirectory;
-            _impedances = new List<ImpedanceResult>();
+            _segmentImpedances = new List<NimbleSegmentImpedance>();
         }
 
-        public void AddImpedanceResult(ImpedanceResult impres)
+        public void AddSegmentImpedanceResult(NimbleSegmentImpedance impres)
         {
-            _impedances.Add(impres);
+            _segmentImpedances.Add(impres);
         }
 
-        public void AddImpedanceResult(List<ImpedanceResult> impres)
+        public void AddSegmentImpedanceResult(List<NimbleSegmentImpedance> impres)
         {
-            foreach (ImpedanceResult r in impres)
-                _impedances.Add(r);
+            foreach (NimbleSegmentImpedance r in impres)
+                _segmentImpedances.Add(r);
         }
     }
-    
+
 
     public enum ImpedanceMeasurementTypes
     {

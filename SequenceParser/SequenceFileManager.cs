@@ -61,7 +61,7 @@ namespace Nimble.Sequences
                     DoScanDirectory(d);
                 }
             }
-            catch (System.Exception excpt)
+            catch (Exception excpt)
             {
                 Console.WriteLine(excpt.Message);
             }
@@ -114,6 +114,77 @@ namespace Nimble.Sequences
             }
 
         }
+
+
+        public static List<NimbleMeasurementRecord> GetTelemetryRecords(string directory)
+        {
+            string[] possibledirectories = Directory.GetDirectories(directory);
+            var telemRecords = ParseTelemDataDirecortyNames(possibledirectories, directory);
+            return telemRecords;
+        }
+
+        private static List<NimbleMeasurementRecord> ParseTelemDataDirecortyNames(string[] possibledirectories, string containingDirectory)
+        {
+            var results = new List<NimbleMeasurementRecord>();
+            if (possibledirectories == null)
+                return results;
+
+            List<string> TelemetryRecordDirectories = new List<string>();
+            Regex folder = new Regex("([A-Za-z0-9_]+)-([A-Z0-9]{12})-([A-Za-z0-9-]{36})-([0-9APM_-]{22})");
+            foreach (string s in possibledirectories)
+            {
+                var m = folder.Match(s);
+                if (m.Success)
+                {
+                    NimbleMeasurementRecord temp = new NimbleMeasurementRecord();
+                    temp.SubjectName = m.Groups[1].Value;
+                    temp.BluetoothAddress = m.Groups[2].Value;
+                    temp.GenGuid = Guid.Parse(m.Groups[3].Value);
+                    string[] timeparts = m.Groups[4].Value.Split(new char[] { '-', '_' });
+
+                    int hours = Int32.Parse(timeparts[3]) + (timeparts[6] == "AM" ? 0 : 12);
+                    var x = new DateTime(
+                        Int32.Parse(timeparts[0]), Int32.Parse(timeparts[1]), Int32.Parse(timeparts[2]),
+                        hours,
+                        Int32.Parse(timeparts[4]), Int32.Parse(timeparts[5]));
+
+                    temp.Timestamp = x;
+                    temp.RecordDirectory = Path.Combine(containingDirectory, s);
+                    results.Add(temp);
+                }
+            }
+
+            return results;
+
+        }
+
+        public NimbleImpedanceRecord ProcessSequenceResponse(NimbleMeasurementRecord measurementRecord)
+        {
+            NimbleImpedanceRecord impedanceRecord = new NimbleImpedanceRecord(measurementRecord);
+            var measurements = measurementRecord.GetMeasurments();
+
+            if (CompiledSequences.ContainsKey(measurementRecord.GenGuid.ToString()))
+            {
+                CompiledSequence cs = CompiledSequences[measurementRecord.GenGuid.ToString()];
+                foreach (NimbleSegmentMeasurment m in measurements)
+                {
+                    NimbleSegmentImpedance segImp = new NimbleSegmentImpedance
+                    {
+                        SegmentName = m.SegmentName,
+                        RepeateCount = m.RepeateCount,
+                        Impedances = cs.ProcessMeasurementCall(m)
+                    };
+                    impedanceRecord.AddSegmentImpedanceResult(segImp);
+                }
+            }
+            else
+            {
+                logger.Warn("Compiled sequence {0} not found. Probably need to do a scan");
+            }
+            
+            return impedanceRecord;
+        }
+
     }
 
     public class FilesForGenerationGUID

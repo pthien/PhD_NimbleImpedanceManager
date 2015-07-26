@@ -78,10 +78,10 @@ namespace Nimble.Sequences
             A = A < 0 ? -A : A;
             E = E < 0 ? -E : E;
             M = M < 0 ? -M : M;
-            logger.Info("Applying pulse E:{0} M:{1} A:{2}", E, M, A);
+            logger.Debug("Applying pulse E:{0} M:{1} A:{2}", E, M, A);
             if (E != 0)
             {
-                logger.Info("Not a control pulse, ingoring");
+                logger.Debug("Not a control pulse, ingoring");
                 return;
             }
 
@@ -133,8 +133,8 @@ namespace Nimble.Sequences
 
         public enum SenseElectrodes
         {
-            Unknown,
-            StimElecs
+            StimElecs,
+            SE1andSE2_reg
         }
 
         public enum VTEL_AmplifierGain

@@ -204,6 +204,43 @@ namespace NimbleBluetoothImpedanceManager
             }
         }
 
+        public void DebugImpedanceCheck()
+        {
+            lock (automaticActionLock)
+            {
+                var guid = nimble.GetSequenceGUID();
+                logger.Debug("got sequence id: {0}", guid);
+
+                if (fileManager.CompiledSequences.ContainsKey(guid))
+                {
+                    logger.Info("Collecting telem data for sequence {0} on {1}({2})", guid, nimble.NimbleName,
+                        nimble.RemoteDeviceId);
+                    CompiledSequence compseq = fileManager.CompiledSequences[guid];
+
+                    var fullSavePath = GetTelemSavePath(nimble.RemoteDeviceId, nimble.NimbleName, guid);
+                    foreach (KeyValuePair<int, string> kvp in compseq.MeasurementSegments)
+                    {
+                        for (int i = 0; i < 1; i++)
+                        {
+                            logger.Info("Collecting segment {0} repeat {1}", kvp.Value, i);
+                            string[] telemData;
+                            bool res = nimble.CollectTelemetryData(kvp.Key, out telemData);
+                            if (!res)
+                            {
+                                if (telemData == null)
+                                    telemData = new string[] { "Collection failed. no data collected" };
+                            }
+                            SaveTelemData(telemData, kvp.Value, fullSavePath);
+                        }
+                    }
+                }
+                else
+                {
+                    logger.Warn("Guid not found {0}", guid);
+                }
+            }  
+        }
+
         public void DoImpedanceCheck()
         {
             lock (automaticActionLock)
