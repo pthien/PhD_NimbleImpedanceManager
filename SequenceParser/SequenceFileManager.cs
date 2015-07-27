@@ -161,6 +161,11 @@ namespace Nimble.Sequences
         public NimbleImpedanceRecord ProcessSequenceResponse(NimbleMeasurementRecord measurementRecord)
         {
             NimbleImpedanceRecord impedanceRecord = new NimbleImpedanceRecord(measurementRecord);
+
+            var x = impedanceRecord.Load();
+            if (x.HasValue)
+                return x.Value;
+
             var measurements = measurementRecord.GetMeasurments();
 
             if (CompiledSequences.ContainsKey(measurementRecord.GenGuid.ToString()))
@@ -181,7 +186,8 @@ namespace Nimble.Sequences
             {
                 logger.Warn("Compiled sequence {0} not found. Probably need to do a scan");
             }
-            
+
+            impedanceRecord.Save();
             return impedanceRecord;
         }
 

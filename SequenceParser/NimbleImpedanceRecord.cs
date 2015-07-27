@@ -2,9 +2,13 @@ using System;
 using System.Collections.Generic;
 using NLog;
 using PIC_Sequence;
+using System.IO;
+using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Nimble.Sequences
 {
+    [Serializable]
     public struct ImpedanceResult
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
@@ -89,6 +93,7 @@ namespace Nimble.Sequences
         }
     }
 
+    [Serializable]
     public struct NimbleSegmentImpedance
     {
         public string SegmentName;
@@ -101,6 +106,7 @@ namespace Nimble.Sequences
         }
     }
 
+    [Serializable]
     public struct NimbleImpedanceRecord
     {
 
@@ -160,6 +166,86 @@ namespace Nimble.Sequences
         {
             foreach (NimbleSegmentImpedance r in impres)
                 _segmentImpedances.Add(r);
+        }
+
+        public void SaveSummary()
+        {
+            string path = Path.Combine(RecordDirectory, "summary.csv");
+            using (FileStream fs = new FileStream(path, FileMode.Create))
+            {
+                WriteToStream(fs);
+                fs.Flush();
+            }
+        }
+
+        public NimbleImpedanceRecord? Load()
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            string path = Path.Combine(RecordDirectory, "preprocessed.bin");
+            if (File.Exists(path))
+            {
+                Stream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+                var o = (NimbleImpedanceRecord)formatter.Deserialize(stream);
+                stream.Close();
+                return o;
+            }
+            return null;
+        }
+
+        public void Save()
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            string path = Path.Combine(RecordDirectory, "preprocessed.bin");
+            Stream stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
+            formatter.Serialize(stream, this);
+            stream.Close();
+
+        }
+
+        private void WriteToStream(Stream s)
+        {
+            StreamWriter sw = new StreamWriter(s);
+
+            sw.WriteLine("Subject, {0}", SubjectName);
+            sw.WriteLine("Bluetooth Addr, {0}", BluetoothAddress);
+            sw.WriteLine("Timestamp, {0}", Timestamp);
+            sw.WriteLine("Sequence GUID, {0}", GenGuid);
+            sw.WriteLine("Record Directory, {0}", RecordDirectory);
+
+            foreach (NimbleSegmentImpedance m in SegmentImpedances)
+            {
+                sw.Write(m + ",");
+
+                for (int i = 1; i < 7; i++)
+                {
+                    var one = m.Impedances.Where(x => x._Implant == Implant.ImplantA && x._Electrode == i);
+                    if (one.Any())
+                    {
+                        var first = one.First();
+                        sw.Write(first._Impedance_ohms + ",");
+                    }
+                    else
+                    {
+                        sw.Write(" ,");
+                    }
+
+                }
+                for (int i = 1; i < 7; i++)
+                {
+                    var one = m.Impedances.Where(x => x._Implant == Implant.ImplantB && x._Electrode == i);
+                    if (one.Any())
+                    {
+                        var first = one.First();
+                        sw.Write(first._Impedance_ohms + ",");
+                    }
+                    else
+                    {
+                        sw.Write(" ,");
+                    }
+                }
+                sw.WriteLine();
+            }
+            s.Flush();
         }
     }
 
