@@ -10,12 +10,14 @@ using System.Windows.Forms;
 using NimbleBluetoothImpedanceManager.Properties;
 using Nimble.Sequences;
 using NLog;
+using NLog.Config;
+using NLog.Windows.Forms;
 
 namespace NimbleBluetoothImpedanceManager
 {
     public partial class Form1 : Form
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static Logger logger;
         public Form1()
         {
             InitializeComponent();
@@ -28,6 +30,8 @@ namespace NimbleBluetoothImpedanceManager
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            logger = LogManager.GetCurrentClassLogger();
+
             RefreshComPorts();
             nimble = new NimbleCommsManager();
             filemanager = new SequenceFileManager();
@@ -46,6 +50,18 @@ namespace NimbleBluetoothImpedanceManager
                 Settings.Default.SequenceScanFolder = Directory.GetCurrentDirectory();
             txtWorkingDir.Text = Settings.Default.SequenceScanFolder;
 
+            //LoggingConfiguration logConfig = new LoggingConfiguration();
+
+            //RichTextBoxTarget rtbTarget = new RichTextBoxTarget();
+            //rtbTarget.FormName ="Form1";
+            //rtbTarget.ControlName = "richTextBox1";
+            //rtbTarget.Layout = "${date:format=HH\\:MM\\:ss} ${logger} ${message}";
+            //LogManager.Configuration.AddTarget("rtfout2", rtbTarget);
+
+            //LoggingRule lr = new LoggingRule("*", LogLevel.Info, rtbTarget);
+            //LogManager.Configuration.LoggingRules.Add(lr);
+
+            //.Configuration.
         }
 
         void nimble_StateChanged(object sender, NimbleCommsManager.StateChangedEventArgs e)
@@ -237,6 +253,7 @@ namespace NimbleBluetoothImpedanceManager
         private void bntCheckCurrent_Click(object sender, EventArgs e)
         {
             autoNimble.DoImpedanceCheck();
+            //autoNimble.DoComplianceCheck();
         }
 
 

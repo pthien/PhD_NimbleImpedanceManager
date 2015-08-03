@@ -71,7 +71,7 @@ namespace NimbleBluetoothImpedanceManager
                     }
                     else
                     {
-                        logger.Warn("Bad chunk: {0}", chunk.EscapeWhiteSpace());
+                        logger.Debug("Bad chunk: {0}", chunk.EscapeWhiteSpace());
                         chunk = "";
                         //throw new ArgumentException("regex problem");
                     }
@@ -103,7 +103,7 @@ namespace NimbleBluetoothImpedanceManager
             {
                 string msg = string.Format(
                     "Tokens extracted from chunk did not reassemble into original chunk: {0}", originalChunck);
-                logger.Error(msg);
+                logger.Debug(msg);
                 //throw new ApplicationException(msg);
             }
 

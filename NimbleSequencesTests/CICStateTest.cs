@@ -4,8 +4,8 @@ using System;
 
 namespace NimbleSequencesTests
 {
-    
-    
+
+
     /// <summary>
     ///This is a test class for CICStateTest and is intended
     ///to contain all CICStateTest Unit Tests
@@ -125,8 +125,8 @@ namespace NimbleSequencesTests
         public void ApplyPulseTest_SetVtel_vsts()
         {
             CICState target = new CICState(); // TODO: Initialize to an appropriate value
-           
-            target.ApplyPulse(0, 6,117);
+
+            target.ApplyPulse(0, 6, 117);
             Assert.AreEqual(CICState.SenseElectrodes.StimElecs, target.SenseElecs);
             Assert.AreEqual(CICState.VTEL_AmplifierGain.Gain1, target.vtel_gain);
             Assert.AreEqual(CICState.VTEL_SampleTime_TokenClock.OnTokenClock, target.vtel_ts_tokenclock);
@@ -172,6 +172,58 @@ namespace NimbleSequencesTests
             Assert.AreEqual(true, target.SetUpForImpedanceTelemetry);
             Assert.IsFalse(target.SetUpToReadMaxPWM);
             Assert.IsFalse(target.SetUpToReadMinPWM);
+        }
+
+        /// <summary>
+        ///A test for vtel_gain_To_VFullScale
+        ///</summary>
+        [TestMethod()]
+        public void vtel_gain_To_VFullScaleTest_gain1()
+        {
+            CICState.VTEL_AmplifierGain Gain = CICState.VTEL_AmplifierGain.Gain1; // TODO: Initialize to an appropriate value
+            double expected = 2;
+            double actual;
+            actual = CICState.vtel_gain_To_VFullScale(Gain);
+            Assert.AreEqual(expected, actual);
+        }
+
+        /// <summary>
+        ///A test for vtel_gain_To_VFullScale
+        ///</summary>
+        [TestMethod()]
+        public void vtel_gain_To_VFullScaleTest_gain2()
+        {
+            CICState.VTEL_AmplifierGain Gain = CICState.VTEL_AmplifierGain.Gain2; // TODO: Initialize to an appropriate value
+            double expected = 1;
+            double actual;
+            actual = CICState.vtel_gain_To_VFullScale(Gain);
+            Assert.AreEqual(expected, actual);
+        }
+
+        /// <summary>
+        ///A test for vtel_gain_To_VFullScale
+        ///</summary>
+        [TestMethod()]
+        public void vtel_gain_To_VFullScaleTest_gain2on5()
+        {
+            CICState.VTEL_AmplifierGain Gain = CICState.VTEL_AmplifierGain.Gain2on5; // TODO: Initialize to an appropriate value
+            double expected = 5;
+            double actual;
+            actual = CICState.vtel_gain_To_VFullScale(Gain);
+            Assert.AreEqual(expected, actual);
+        }
+
+        /// <summary>
+        ///A test for vtel_gain_To_VFullScale
+        ///</summary>
+        [TestMethod()]
+        public void vtel_gain_To_VFullScaleTest_gain1on5()
+        {
+            CICState.VTEL_AmplifierGain Gain = CICState.VTEL_AmplifierGain.Gain1on5; // TODO: Initialize to an appropriate value
+            double expected = 10;
+            double actual;
+            actual = CICState.vtel_gain_To_VFullScale(Gain);
+            Assert.AreEqual(expected, actual);
         }
     }
 }

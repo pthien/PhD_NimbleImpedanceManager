@@ -10,12 +10,13 @@ namespace Nimble.Sequences
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        public SenseElectrodes SenseElecs;
-        public VTEL_AmplifierGain vtel_gain;
-        public VTEL_VoltageSelect vtel_vs;
-        public VTEL_SampleTime_TokenPos vtel_ts_tokenpos;
-        public VTEL_SampleTime_TokenClock vtel_ts_tokenclock;
-        public bool TelemetryEnabled = false;
+        public SenseElectrodes SenseElecs { get; private set; }
+        public VTEL_AmplifierGain vtel_gain { get; private set; }
+        public VTEL_VoltageSelect vtel_vs { get; private set; }
+        public VTEL_SampleTime_TokenPos vtel_ts_tokenpos { get; private set; }
+        public VTEL_SampleTime_TokenClock vtel_ts_tokenclock { get; private set; }
+        public bool VoltageTelemetryEnabled { get; private set; }
+        public bool ComplianceTelemetryEnabled  { get; private set; }
 
         public const double VREF = 1.105;
 
@@ -27,7 +28,7 @@ namespace Nimble.Sequences
                     vtel_gain == VTEL_AmplifierGain.Gain2 &&
                     vtel_vs == VTEL_VoltageSelect.vdd &&
                     vtel_ts_tokenclock == VTEL_SampleTime_TokenClock.OnTokenClock &&
-                    TelemetryEnabled == true;
+                    VoltageTelemetryEnabled && !ComplianceTelemetryEnabled;
                 return x;
             }
         }
@@ -40,7 +41,7 @@ namespace Nimble.Sequences
                     vtel_gain == VTEL_AmplifierGain.Gain1on5 &&
                     vtel_vs == VTEL_VoltageSelect.vss &&
                     vtel_ts_tokenclock == VTEL_SampleTime_TokenClock.OnTokenClock &&
-                    TelemetryEnabled == true;
+                    VoltageTelemetryEnabled && !ComplianceTelemetryEnabled;
                 return x;
             }
         }
@@ -53,7 +54,17 @@ namespace Nimble.Sequences
                     vtel_vs == VTEL_VoltageSelect.senseelectrodes &&
                     vtel_ts_tokenclock == VTEL_SampleTime_TokenClock.OnTokenClock &&
                     vtel_ts_tokenpos == VTEL_SampleTime_TokenPos.t6 &&
-                    TelemetryEnabled == true;
+                    VoltageTelemetryEnabled && !ComplianceTelemetryEnabled;
+                return x;
+            }
+        }
+
+        public bool SetUpForComplianceTelemetry
+        {
+            get
+            {
+              
+                bool x = !VoltageTelemetryEnabled && ComplianceTelemetryEnabled;
                 return x;
             }
         }
@@ -69,7 +80,7 @@ namespace Nimble.Sequences
             vtel_ts_tokenclock = VTEL_SampleTime_TokenClock.OnTokenClock;
             vtel_gain = VTEL_AmplifierGain.Gain1;
             vtel_vs = VTEL_VoltageSelect.vref;
-            TelemetryEnabled = false;
+            VoltageTelemetryEnabled = false;
             SenseElecs = SenseElectrodes.StimElecs;
         }
 
@@ -93,10 +104,15 @@ namespace Nimble.Sequences
                         SenseElecs = SenseElectrodes.StimElecs;
                         break;
                     case 87:
-                        TelemetryEnabled = true;
+                        VoltageTelemetryEnabled = true;
                         break;
                     case 30:
-                        TelemetryEnabled = false;
+                        VoltageTelemetryEnabled = false;
+                        ComplianceTelemetryEnabled = false;
+
+                        break;
+                    case 92:
+                        ComplianceTelemetryEnabled = true;
                         break;
                     case 13:
                         ResetRegs();
@@ -187,16 +203,16 @@ namespace Nimble.Sequences
             switch (Gain)
             {
                 case CICState.VTEL_AmplifierGain.Gain2:
-                    gain = CICState.VREF / 2;
+                    gain = 1;
                     break;
                 case CICState.VTEL_AmplifierGain.Gain1:
-                    gain = CICState.VREF / 1;
+                    gain = 2;
                     break;
                 case CICState.VTEL_AmplifierGain.Gain2on5:
-                    gain = CICState.VREF * 5 / 2;
+                    gain =5;
                     break;
                 case CICState.VTEL_AmplifierGain.Gain1on5:
-                    gain = CICState.VREF * 5;
+                    gain = 10;
                     break;
                 default:
                     gain = -1;

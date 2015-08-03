@@ -9,60 +9,81 @@ using System.Runtime.Serialization.Formatters.Binary;
 namespace Nimble.Sequences
 {
     [Serializable]
-    public struct ImpedanceResult
+    public abstract class TelemetryResult
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        public int _Electrode;
-        public int _Return;
-        public int _PhaseWidht_us;
-        public Implant _Implant;
-        public double _Impedance_ohms;
-        public ImpedanceMeasurementTypes _Type;
-        public ImpedanceCatagorization _Category;
-
-        //public ImpedanceResult()
-        //{
-        //    _Electrode = -1;
-        //    _Return = -1;
-        //    _PhaseWidht_us = -1;
-        //    _Implant = Implant.ImplantA;
-        //    _Impedance_ohms = -1;
-        //    _Type = ImpedanceMeasurementTypes.MonoPolar;
-        //    _Category = ImpedanceCatagorization.OK;
-        //}
+        public int Electrode { get; protected set; }
+        public int Return { get; protected set; }
+        public int PhaseWidth_us { get; protected set; }
+        public Implant Implant { get; protected set; }
+        public PulseType Type
+        {
+            get
+            {
+                return Electrode == Return ? PulseType.CommonGround : PulseType.MonoPolar;
+            }
+        }
+        public double Current_uA { get; protected set; }
 
         public string ElectrodeName
         {
             get
             {
-                switch (_Implant)
+                switch (Implant)
                 {
                     case Implant.ImplantA:
-                        return "A" + _Electrode;
+                        return "A" + Electrode;
                     case Implant.ImplantB:
-                        return "B" + _Electrode;
+                        return "B" + Electrode;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
             }
         }
 
+        public override string ToString()
+        {
+            string typestr = "";
+            switch (Type)
+            {
+                case PulseType.MonoPolar:
+                    typestr = "MP";
+                    break;
+                case PulseType.CommonGround:
+                    typestr = "CG";
+                    break;
+                default:
+                    break;
+            }
+            //return string.Format("{4}{0} vs {1} ({2}) {3:G4} @ {5}us", Electrode, Return, typestr, _Impedance_ohms, Implant == Implant.ImplantA ? "A" : "B", PhaseWidth_us);
+            return base.ToString();
+        }
+    }
+
+    [Serializable]
+    public class ImpedanceResult : TelemetryResult
+    {
+        public ImpedanceCatagorization _Category;
+        public double _Impedance_ohms;
+
         public ImpedanceResult(int E, int M, double current_uA, int maxPWM, int minPWM, int TelemResponse_ticks, CICState.VTEL_AmplifierGain Gain, Implant implant, int PhaseWidth_us)
         {
-            _Electrode = E;
-            _Return = M;
-            _Implant = implant;
-            _Type = E == M ? ImpedanceMeasurementTypes.CommonGround : ImpedanceMeasurementTypes.MonoPolar;
-            _PhaseWidht_us = PhaseWidth_us;
+            Electrode = E;
+            Return = M;
+            Implant = implant;
+            base.PhaseWidth_us = PhaseWidth_us;
+            Current_uA = current_uA;
             double vfs = CICState.vtel_gain_To_VFullScale(Gain);
 
             _Impedance_ohms = CalculateImpedance(current_uA, minPWM, maxPWM, TelemResponse_ticks, vfs);
 
             _Category = ImpedanceCatagorization.Error;
+
+          
         }
 
-        private static double CalculateImpedance(double current_uA, int minPWM_ticks, int maxPWM_ticks, int RawVal_ticks, double VoltageFullScale_V)
+        private double CalculateImpedance(double current_uA, int minPWM_ticks, int maxPWM_ticks, int RawVal_ticks, double VoltageFullScale_V)
         {
             int RampTime_ticks = RawVal_ticks - minPWM_ticks;
             double RampTime_percentMax = (double)RampTime_ticks / (maxPWM_ticks - minPWM_ticks);
@@ -77,28 +98,75 @@ namespace Nimble.Sequences
         public override string ToString()
         {
             string typestr = "";
-            switch (_Type)
+            switch (Type)
             {
-                case ImpedanceMeasurementTypes.MonoPolar:
+                case PulseType.MonoPolar:
                     typestr = "MP";
                     break;
-                case ImpedanceMeasurementTypes.CommonGround:
+                case PulseType.CommonGround:
                     typestr = "CG";
                     break;
                 default:
                     break;
             }
-            return string.Format("{4}{0} vs {1} ({2}) {3:G4} @ {5}us", _Electrode, _Return, typestr, _Impedance_ohms, _Implant == Implant.ImplantA ? "A" : "B", _PhaseWidht_us);
+            return string.Format("{4}{0} vs {1} ({2}) {3:G4} @ {5}us", Electrode, Return, typestr, _Impedance_ohms, Implant == Implant.ImplantA ? "A" : "B", PhaseWidth_us);
             //return base.ToString();
         }
     }
 
     [Serializable]
-    public struct NimbleSegmentImpedance
+    public class ComplianceResult : TelemetryResult
+    {
+        public bool InCompliance
+        {
+            get
+            {
+                if (clockrate_MHz == 20)
+                    return TelemResponse_ticks < 150;
+                throw new NotImplementedException();
+                //return false;
+            }
+        }
+
+        private int TelemResponse_ticks;
+        private int clockrate_MHz;
+
+        public ComplianceResult(Pulse p, Implant implant, int TelemResponse_ticks, int clockrate_MHz = 20)
+        {
+            Implant = implant;
+            PhaseWidth_us = p.PW_us;
+            this.clockrate_MHz = clockrate_MHz;
+            this.TelemResponse_ticks = TelemResponse_ticks;
+            switch (implant)
+            {
+                case Implant.ImplantA:
+                    Electrode = p.LE;
+                    Return = p.LM;
+                    Current_uA = p.LA_uA;
+                    break;
+                case Implant.ImplantB:
+                    Electrode = p.RE;
+                    Return = p.RM;
+                    Current_uA = p.RA_uA;
+                    break;
+            }
+
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0} - {1}uA, {2}us {3} compliance", ElectrodeName, Current_uA, PhaseWidth_us,
+                InCompliance ? "in" : "out of");
+            return base.ToString();
+        }
+    }
+
+    [Serializable]
+    public struct NimbleSegmentTelemetry
     {
         public string SegmentName;
         public int RepeateCount;
-        public List<ImpedanceResult> Impedances;
+        public List<TelemetryResult> Impedances;
 
         public override string ToString()
         {
@@ -109,13 +177,14 @@ namespace Nimble.Sequences
     [Serializable]
     public struct NimbleImpedanceRecord
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
 
         private DateTime _timestamp;
         private string _bluetoothAddress;
         private string _subjectName;
         private Guid _genGuid;
         private string _recordDirectory;
-        private List<NimbleSegmentImpedance> _segmentImpedances;
+        private List<NimbleSegmentTelemetry> _segmentImpedances;
 
         public DateTime Timestamp
         {
@@ -142,7 +211,7 @@ namespace Nimble.Sequences
             get { return _recordDirectory; }
         }
 
-        public NimbleSegmentImpedance[] SegmentImpedances
+        public NimbleSegmentTelemetry[] SegmentImpedances
         {
             get { return _segmentImpedances.ToArray(); }
         }
@@ -154,23 +223,24 @@ namespace Nimble.Sequences
             _genGuid = record.GenGuid;
             _subjectName = record.SubjectName;
             _recordDirectory = record.RecordDirectory;
-            _segmentImpedances = new List<NimbleSegmentImpedance>();
+            _segmentImpedances = new List<NimbleSegmentTelemetry>();
         }
 
-        public void AddSegmentImpedanceResult(NimbleSegmentImpedance impres)
+        public void AddSegmentImpedanceResult(NimbleSegmentTelemetry impres)
         {
             _segmentImpedances.Add(impres);
         }
 
-        public void AddSegmentImpedanceResult(List<NimbleSegmentImpedance> impres)
+        public void AddSegmentImpedanceResult(List<NimbleSegmentTelemetry> impres)
         {
-            foreach (NimbleSegmentImpedance r in impres)
+            foreach (NimbleSegmentTelemetry r in impres)
                 _segmentImpedances.Add(r);
         }
 
         public void SaveSummary()
         {
             string path = Path.Combine(RecordDirectory, "summary.csv");
+            logger.Info("Saved summary: {0}", path);
             using (FileStream fs = new FileStream(path, FileMode.Create))
             {
                 WriteToStream(fs);
@@ -187,6 +257,7 @@ namespace Nimble.Sequences
                 Stream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
                 var o = (NimbleImpedanceRecord)formatter.Deserialize(stream);
                 stream.Close();
+                logger.Info("Loaded preprocessed file: {0}", path);
                 return o;
             }
             return null;
@@ -199,7 +270,9 @@ namespace Nimble.Sequences
             Stream stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
             formatter.Serialize(stream, this);
             stream.Close();
+            logger.Info("Saved processed impedances: {0}", path);
 
+            SaveSummary();
         }
 
         private void WriteToStream(Stream s)
@@ -212,13 +285,14 @@ namespace Nimble.Sequences
             sw.WriteLine("Sequence GUID, {0}", GenGuid);
             sw.WriteLine("Record Directory, {0}", RecordDirectory);
 
-            foreach (NimbleSegmentImpedance m in SegmentImpedances)
+            foreach (NimbleSegmentTelemetry m in SegmentImpedances)
             {
+                
                 sw.Write(m + ",");
 
                 for (int i = 1; i < 7; i++)
                 {
-                    var one = m.Impedances.Where(x => x._Implant == Implant.ImplantA && x._Electrode == i);
+                    var one = m.Impedances.Where(x => x.Implant == Implant.ImplantA && x.Electrode == i).OfType<ImpedanceResult>();
                     if (one.Any())
                     {
                         var first = one.First();
@@ -232,7 +306,7 @@ namespace Nimble.Sequences
                 }
                 for (int i = 1; i < 7; i++)
                 {
-                    var one = m.Impedances.Where(x => x._Implant == Implant.ImplantB && x._Electrode == i);
+                    var one = m.Impedances.Where(x => x.Implant == Implant.ImplantB && x.Electrode == i).OfType<ImpedanceResult>();
                     if (one.Any())
                     {
                         var first = one.First();
@@ -250,7 +324,7 @@ namespace Nimble.Sequences
     }
 
 
-    public enum ImpedanceMeasurementTypes
+    public enum PulseType
     {
         MonoPolar,
         CommonGround,

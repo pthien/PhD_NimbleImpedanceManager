@@ -151,7 +151,7 @@ const int PulseData[108][12] = {
         public void ParseSequenceTest_BasicPulseData()
         {
             var output = CompiledSequence_Accessor.ParsePulseData(basicPulseData);
-            Pulse p = new Pulse() { LE = 23, LM = 23, LA = 0, RE = 23, RM = 23, RA = 0, PW_us = 30, IPG_us = 16 };
+            Pulse p = new Pulse() { LE = 23, LM = 23, LA_uA = 0, RE = 23, RM = 23, RA_uA = 0, PW_us = 30, IPG_us = 16 };
             List<Pulse> expected = new List<Pulse>();
             expected.Add(p);
             CollectionAssert.AreEqual(expected, output);

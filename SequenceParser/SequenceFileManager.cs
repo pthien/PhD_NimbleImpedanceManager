@@ -74,38 +74,44 @@ namespace Nimble.Sequences
             //FileStream fs = new FileStream(filepath, FileMode.Open);
             try
             {
-                string alltext = File.ReadAllText(filepath);
-
-                var match = regex_guid.Match(alltext);
-                string guid = CompiledSequence.ExtractGuid(alltext).ToString();
-                if (guid != Guid.Empty.ToString())
+                if (filename == "PulseData.c" || filename == "PulseData.h" ||
+                    filename == "Sequence.c" ||
+                    filename == "Sequence.h")
                 {
-                    FilesForGenerationGUID files;
-                    if (FilesByGenGUID.ContainsKey(guid))
+
+                    string alltext = File.ReadAllText(filepath);
+
+                    var match = regex_guid.Match(alltext);
+                    string guid = CompiledSequence.ExtractGuid(alltext).ToString();
+                    if (guid != Guid.Empty.ToString())
                     {
-                        files = FilesByGenGUID[guid];
+                        FilesForGenerationGUID files;
+                        if (FilesByGenGUID.ContainsKey(guid))
+                        {
+                            files = FilesByGenGUID[guid];
+                        }
+                        else
+                        {
+                            files = new FilesForGenerationGUID();
+                            logger.Info("Found new sequence: {0}", guid);
+                        }
+                        switch (filename)
+                        {
+                            case "PulseData.c":
+                                files.PulseData_c = filepath;
+                                break;
+                            case "PulseData.h":
+                                files.PulseData_h = filepath;
+                                break;
+                            case "Sequence.c":
+                                files.Sequence_c = filepath;
+                                break;
+                            case "Sequence.h":
+                                files.Sequence_h = filepath;
+                                break;
+                        }
+                        FilesByGenGUID[guid] = files;
                     }
-                    else
-                    {
-                        files = new FilesForGenerationGUID();
-                        logger.Info("Found new sequence: {0}", guid);
-                    }
-                    switch (filename)
-                    {
-                        case "PulseData.c":
-                            files.PulseData_c = filepath;
-                            break;
-                        case "PulseData.h":
-                            files.PulseData_h = filepath;
-                            break;
-                        case "Sequence.c":
-                            files.Sequence_c = filepath;
-                            break;
-                        case "Sequence.h":
-                            files.Sequence_h = filepath;
-                            break;
-                    }
-                    FilesByGenGUID[guid] = files;
                 }
             }
             catch (Exception ex)
@@ -143,10 +149,12 @@ namespace Nimble.Sequences
                     string[] timeparts = m.Groups[4].Value.Split(new char[] { '-', '_' });
 
                     int hours = Int32.Parse(timeparts[3]) + (timeparts[6] == "AM" ? 0 : 12);
+                    if (hours == 24)
+                        hours = 12;
                     var x = new DateTime(
                         Int32.Parse(timeparts[0]), Int32.Parse(timeparts[1]), Int32.Parse(timeparts[2]),
                         hours,
-                        Int32.Parse(timeparts[4]), Int32.Parse(timeparts[5]));
+                        Int32.Parse(timeparts[4]), Int32.Parse(timeparts[5]), DateTimeKind.Local);
 
                     temp.Timestamp = x;
                     temp.RecordDirectory = Path.Combine(containingDirectory, s);
@@ -160,6 +168,9 @@ namespace Nimble.Sequences
 
         public NimbleImpedanceRecord ProcessSequenceResponse(NimbleMeasurementRecord measurementRecord)
         {
+            //return ProcessSequenceResponseV2(measurementRecord);
+            DateTime start = DateTime.Now;
+
             NimbleImpedanceRecord impedanceRecord = new NimbleImpedanceRecord(measurementRecord);
 
             var x = impedanceRecord.Load();
@@ -170,13 +181,14 @@ namespace Nimble.Sequences
 
             if (CompiledSequences.ContainsKey(measurementRecord.GenGuid.ToString()))
             {
+                logger.Warn("Calculating impedances for {0} ({1})", measurementRecord, measurementRecord.RecordDirectory);
                 CompiledSequence cs = CompiledSequences[measurementRecord.GenGuid.ToString()];
                 foreach (NimbleSegmentMeasurment m in measurements)
                 {
-                    NimbleSegmentImpedance segImp = new NimbleSegmentImpedance
+                    NimbleSegmentTelemetry segImp = new NimbleSegmentTelemetry
                     {
                         SegmentName = m.SegmentName,
-                        RepeateCount = m.RepeateCount,
+                        RepeateCount = m.RepeatCount,
                         Impedances = cs.ProcessMeasurementCall(m)
                     };
                     impedanceRecord.AddSegmentImpedanceResult(segImp);
@@ -186,11 +198,77 @@ namespace Nimble.Sequences
             {
                 logger.Warn("Compiled sequence {0} not found. Probably need to do a scan");
             }
+            logger.Info("Finished processing sequences response. Took {0}s", (DateTime.Now - start).TotalSeconds);
 
             impedanceRecord.Save();
+
             return impedanceRecord;
         }
 
+        public NimbleImpedanceRecord ProcessSequenceResponseV2(NimbleMeasurementRecord measurementRecord)
+        {
+            DateTime start = DateTime.Now;
+
+            NimbleImpedanceRecord impedanceRecord = new NimbleImpedanceRecord(measurementRecord);
+
+            var x = impedanceRecord.Load();
+            if (x.HasValue)
+                return x.Value;
+
+            var measurements = measurementRecord.GetMeasurments();
+
+            if (CompiledSequences.ContainsKey(measurementRecord.GenGuid.ToString()))
+            {
+                logger.Warn("Calculating impedances for {0} ({1})", measurementRecord, measurementRecord.RecordDirectory);
+                CompiledSequence cs = CompiledSequences[measurementRecord.GenGuid.ToString()];
+
+                var superSegments = CollateTelemetryResponses(measurements);
+                
+                foreach (NimbleSegmentMeasurment m in measurements)
+                {
+                    NimbleSegmentTelemetry segImp = new NimbleSegmentTelemetry
+                    {
+                        SegmentName = m.SegmentName,
+                        RepeateCount = m.RepeatCount,
+                        Impedances = cs.ProcessMeasurementCall(m)
+                    };
+                    impedanceRecord.AddSegmentImpedanceResult(segImp);
+                }
+            }
+            else
+            {
+                logger.Warn("Compiled sequence {0} not found. Probably need to do a scan");
+            }
+            logger.Info("Finished processing sequences response. Took {0}s", (DateTime.Now - start).TotalSeconds);
+
+            impedanceRecord.Save();
+
+            return impedanceRecord;
+        }
+
+        //collects the telemetry responses of multiple segment repeats into a single super segment
+        private static List<NimbleSegmentMeasurment> CollateTelemetryResponses(List<NimbleSegmentMeasurment> measurements)
+        {
+            var groupedBySegments = measurements.GroupBy(a => a.SegmentName);
+
+            List<NimbleSegmentMeasurment> superSegments = new List<NimbleSegmentMeasurment>();
+            foreach (var segmentGroup in groupedBySegments)
+            {
+                NimbleSegmentMeasurment superSegment = new NimbleSegmentMeasurment();
+                superSegment.path = "";
+                superSegment.RepeatCount = -1;
+                superSegment.TelemetryResponses = new List<TelemetryResponse>();
+                superSegment.SegmentsRun = new List<int>();
+                superSegment.SegmentName = segmentGroup.Key;
+                foreach (NimbleSegmentMeasurment measurement in segmentGroup)
+                {
+                    superSegment.SegmentsRun.AddRange(measurement.SegmentsRun.ToArray());
+                    superSegment.TelemetryResponses.AddRange(measurement.TelemetryResponses.ToArray());
+                }
+                superSegments.Add(superSegment);
+            }
+            return superSegments;
+        }
     }
 
     public class FilesForGenerationGUID

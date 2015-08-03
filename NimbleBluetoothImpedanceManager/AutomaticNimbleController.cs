@@ -34,6 +34,7 @@ namespace NimbleBluetoothImpedanceManager
 
         private DateTime NextDueAliveScan = DateTime.MinValue;
         private DateTime NextDueImpedanceMeasure = DateTime.MinValue;
+        private DateTime NextDueComplianceMeasure = DateTime.MinValue;
 
         private bool _AutomaticControlEnabled = false;
         public bool AutomaticControlEnabled
@@ -42,7 +43,7 @@ namespace NimbleBluetoothImpedanceManager
         }
 
         private readonly TimeSpan MIN_ALIVESCAN_PERIOD = new TimeSpan(0, 0, 15, 0);
-        private readonly TimeSpan MIN_IMPEDANCE_PERIOD = new TimeSpan(0, 0, 5, 0);
+        private readonly TimeSpan MIN_IMPEDANCE_PERIOD = new TimeSpan(0, 0, 30, 0);
 
         private List<NimbleProcessor> processorsToMeasure = new List<NimbleProcessor>();
 
@@ -146,6 +147,29 @@ namespace NimbleBluetoothImpedanceManager
             }
         }
 
+        public void AutoAction_ComplianceMeasurements(object state)
+        {
+            DateTime start = DateTime.Now; ;
+            lock (automaticActionLock)
+            {
+                NextDueComplianceMeasure = DateTime.Now + ImpedanceMeasurePeriod;
+                logger.Info("Automatic compliance measurements started");
+                logger.Trace("lock time: {0}s", (DateTime.Now - start).TotalSeconds);
+
+                foreach (NimbleProcessor nimbleProcessor in processorsToMeasure)
+                {
+                    logger.Info("Starting compliance measurement for {0}", nimbleProcessor);
+                    if (nimble.ConnectToNimble(nimbleProcessor.BluetoothAddress))
+                    {
+                        DoImpedanceCheck();
+                        nimble.DisconnectFromNimble();
+                    }
+                }
+                logger.Info("Automatic compliance finished. Took {0}s", (DateTime.Now - start).TotalSeconds);
+
+            }
+        }
+
         public List<NimbleProcessor> AutoAction_DeepScanForProcessors()
         {
             DateTime start = DateTime.Now; ;
@@ -185,7 +209,6 @@ namespace NimbleBluetoothImpedanceManager
                     processorsToMeasure.Add(p);
                 }
                 logger.Info("Set processor to monitor: {0}", string.Join(", ",processors.ToArray()));
-
             }
         }
 
@@ -243,6 +266,7 @@ namespace NimbleBluetoothImpedanceManager
 
         public void DoImpedanceCheck()
         {
+            DateTime start = DateTime.Now; ;
             lock (automaticActionLock)
             {
                 var guid = nimble.GetSequenceGUID();
@@ -262,6 +286,48 @@ namespace NimbleBluetoothImpedanceManager
                             logger.Info("Collecting segment {0} repeat {1}", kvp.Value, i);
                             string[] telemData;
                             bool res = nimble.CollectTelemetryData(kvp.Key, out telemData);
+                            if (!res)
+                            {
+                                if (telemData == null)
+                                    telemData = new string[] { "Collection failed. no data collected" };
+                            }
+                            SaveTelemData(telemData, kvp.Value, fullSavePath);
+                        }
+                    }
+                }
+                else
+                {
+                    logger.Warn("Guid not found {0}", guid);
+                }
+            }
+            logger.Info("Doing measurements finished. Took {0}s", (DateTime.Now - start).TotalSeconds);
+        }
+
+        /// <summary>
+        /// Does a compliance check on the connected nimble processor
+        /// </summary>
+        public void DoComplianceCheck()
+        {
+            lock (automaticActionLock)
+            {
+                var guid = nimble.GetSequenceGUID();
+                logger.Debug("got sequence id: {0}", guid);
+
+
+                if (fileManager.CompiledSequences.ContainsKey(guid))
+                {
+                    logger.Info("Collecting compliance data for sequence {0} on {1}({2})", guid, nimble.NimbleName,
+                        nimble.RemoteDeviceId);
+                    CompiledSequence compseq = fileManager.CompiledSequences[guid];
+
+                    var fullSavePath = GetTelemSavePath(nimble.RemoteDeviceId, nimble.NimbleName, guid);
+                    foreach (KeyValuePair<int, string> kvp in compseq.MeasurementSegments)
+                    {
+                        for (int i = 0; i < 3; i++)
+                        {
+                            logger.Info("Collecting segment {0} repeat {1}", kvp.Value, i);
+                            string[] telemData;
+                            bool res = nimble.CollectTelemetryData(27, out telemData);
                             if (!res)
                             {
                                 if (telemData == null)

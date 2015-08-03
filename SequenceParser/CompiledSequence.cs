@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Xml.Serialization;
 using PIC_Sequence;
 using NLog;
 
@@ -103,7 +104,7 @@ namespace Nimble.Sequences
 
                 for (int i = 0; i < commentsSplit.Length; i++)
                 {
-                    if (commentsSplit[i].StartsWith("IMPEDANCE"))
+                    if (commentsSplit[i].StartsWith("IMPEDANCE") || commentsSplit[i].StartsWith("COMPLIANCEON_"))
                     {
                         MeasurementSegments.Add(i, commentsSplit[i].ToString());
                     }
@@ -193,10 +194,10 @@ namespace Nimble.Sequences
 
                     p.LE = int.Parse(metadatasplit[1], NumberStyles.Integer);
                     p.LM = int.Parse(metadatasplit[2], NumberStyles.Integer);
-                    p.LA = int.Parse(metadatasplit[3], NumberStyles.Integer);
+                    p.LA_uA = int.Parse(metadatasplit[3], NumberStyles.Integer);
                     p.RE = int.Parse(metadatasplit[4], NumberStyles.Integer);
                     p.RM = int.Parse(metadatasplit[5], NumberStyles.Integer);
-                    p.RA = int.Parse(metadatasplit[6], NumberStyles.Integer);
+                    p.RA_uA = int.Parse(metadatasplit[6], NumberStyles.Integer);
                     p.PW_us = int.Parse(metadatasplit[7], NumberStyles.Integer);
                     p.IPG_us = int.Parse(metadatasplit[8], NumberStyles.Integer);
 
@@ -218,34 +219,38 @@ namespace Nimble.Sequences
         //        List<ImpedanceResult> impedanceResults = ProcessMeasurementCall(m);
         //        impedanceRecord.AddSegmentImpedanceResult(impedanceResults);
         //    }
-            
+
         //    return impedanceRecord;
         //}
 
-        public List<ImpedanceResult> ProcessMeasurementCall(NimbleSegmentMeasurment m1)
+        public List<TelemetryResult> ProcessMeasurementCall(NimbleSegmentMeasurment m1)
         {
+            if(!m1.path.Contains(this.Guid.ToString()))
+                throw new ArgumentException("Must supply a measurement from this sequence");
+
             CICState ImplantA = new CICState();
             CICState ImplantB = new CICState();
-            
+
             int maxPWMA = -1, maxPWMB = -1, minPWMA = -1, minPWMB = -1;
-            List<ImpedanceResult> impedanceResults = new List<ImpedanceResult>();
+            List<TelemetryResult> telemetryResults = new List<TelemetryResult>();
             var telemResponses = m1.TelemetryResponses;
             foreach (int n in m1.SegmentsRun)
             {
-                if (n <= _HashDefines["NORMAL_SEGMENTS"])
-                    continue;
+                //if (n <= _HashDefines["NORMAL_SEGMENTS"])
+                //    continue;
 
                 for (int i = 0; i < Sequence[n].Length; i++)
                 {
                     int pulsenum = Sequence[n][i];
                     Pulse p = PulseData[pulsenum];
 
-                    ImplantA.ApplyPulse(p.LE, p.LM, p.LA);
-                    ImplantB.ApplyPulse(p.RE, p.RM, p.RA);
-
-                    if (p.TelemetryCount > 0)
+                    ImplantA.ApplyPulse(p.LE, p.LM, p.LA_uA);
+                    ImplantB.ApplyPulse(p.RE, p.RM, p.RA_uA);
+                    bool any =
+                        telemResponses.Any(x => x.Sequence == n && x.SequenceIndex == (i) && x.PulseIndex == pulsenum);
+                    if (p.TelemetryCount > 0 || any)
                     {
-                        var resp = telemResponses.Where(x => x.Sequence == n && x.SequenceIndex == (i + 1) && x.PulseIndex == pulsenum);
+                        var resp = telemResponses.Where(x => x.Sequence == n && x.SequenceIndex == (i) && x.PulseIndex == pulsenum);
                         var list = resp.ToList<TelemetryResponse>();
 
                         if (list.Count == 1)
@@ -284,12 +289,12 @@ namespace Nimble.Sequences
                             }
                             else if (ImplantA.SetUpForImpedanceTelemetry)
                             {
-                                double current_uA = CochlearImplantTokenEncoder.CITokenEncoder.AmplitudeToCurrent(p.LA);
+                                //double current_uA = CochlearImplantTokenEncoder.CITokenEncoder.AmplitudeToCurrent(p.LA_uA);
                                 if (minPWMA > 0 && maxPWMA > 0 && telemResp.Captures_ticks.Count == 1)
                                 {
-                                    var impRes = new ImpedanceResult(p.LE, p.LM, current_uA, maxPWMA, minPWMA,
+                                    var impRes = new ImpedanceResult(p.LE, p.LM, p.LA_uA, maxPWMA, minPWMA,
                                          telemResp.Captures_ticks[0], ImplantA.vtel_gain, Implant.ImplantA, p.PW_us);
-                                    impedanceResults.Add(impRes);
+                                    telemetryResults.Add(impRes);
                                 }
                                 else
                                 {
@@ -299,18 +304,33 @@ namespace Nimble.Sequences
                             }
                             else if (ImplantB.SetUpForImpedanceTelemetry)
                             {
-                                double current_uA = CochlearImplantTokenEncoder.CITokenEncoder.AmplitudeToCurrent(p.RA);
+                                //double current_uA = CochlearImplantTokenEncoder.CITokenEncoder.AmplitudeToCurrent(p.RA_uA);
                                 if (minPWMB > 0 && maxPWMB > 0 && telemResp.Captures_ticks.Count == 1)
                                 {
-                                    var impRes = new ImpedanceResult(p.RE, p.RM, current_uA, maxPWMB, minPWMB,
+                                    var impRes = new ImpedanceResult(p.RE, p.RM, p.RA_uA, maxPWMB, minPWMB,
                                          telemResp.Captures_ticks[0], ImplantB.vtel_gain, Implant.ImplantB, p.PW_us);
-                                    impedanceResults.Add(impRes);
+                                    telemetryResults.Add(impRes);
                                 }
                                 else
                                 {
                                     logger.Error("Something missing when trying to calculate impedance. MaxPWM:{0}, MinPWM:{1}, telemResult:{2}, MeasurementRecord:{3}",
                                         maxPWMB, minPWMB, telemResp, m1);
                                 }
+                            }
+                            else if (ImplantA.SetUpForComplianceTelemetry)
+                            {
+                                ComplianceResult cr = new ComplianceResult(p, Implant.ImplantA, telemResp.Captures_ticks[0], ClockRate);
+                                telemetryResults.Add(cr);
+                            }
+                            else if (ImplantB.SetUpForComplianceTelemetry)
+                            {
+                                ComplianceResult cr = new ComplianceResult(p, Implant.ImplantB, telemResp.Captures_ticks[0], ClockRate);
+                                telemetryResults.Add(cr);
+                            }
+                            else
+                            {
+                                logger.Error("Unknown telemetry kind: {0}", m1.path);
+                                throw new ArgumentOutOfRangeException("what kind of telemetry are you doing?!?!");
                             }
 
                         }
@@ -326,7 +346,7 @@ namespace Nimble.Sequences
                 }
 
             }
-            return impedanceResults;
+            return telemetryResults;
         }
     }
 

@@ -143,7 +143,7 @@ namespace Nimble.Sequences
 
                 //    for (int i = 1; i < 7; i++)
                 //    {
-                //        var one = m.Impedances.Where(x => x._Implant == Implant.ImplantA && x._Electrode == i);
+                //        var one = m.Impedances.Where(x => x.Implant == Implant.ImplantA && x.Electrode == i);
                 //        if (one.Any())
                 //        {
                 //            var first = one.First();
@@ -157,7 +157,7 @@ namespace Nimble.Sequences
                 //    }
                 //    for (int i = 1; i < 7; i++)
                 //    {
-                //        var one = m.Impedances.Where(x => x._Implant == Implant.ImplantB && x._Electrode == i);
+                //        var one = m.Impedances.Where(x => x.Implant == Implant.ImplantB && x.Electrode == i);
                 //        if (one.Any())
                 //        {
                 //            var first = one.First();
@@ -202,25 +202,21 @@ namespace Nimble.Sequences
                 {
                     Series segSeries = new Series(segmentImpedance.ToString());
 
-                    foreach (TelemetryResult impedanceResult in segmentImpedance.Impedances)
+                    foreach (ImpedanceResult impedanceResult in segmentImpedance.Impedances)
                     {
-                        if (impedanceResult is ImpedanceResult)
-                        {
-                            int x = impedanceResult._Electrode + (impedanceResult._Implant == Implant.ImplantA ? 0 : 6);
-                            double y = impedanceResult._Impedance_ohms;
-                            DataPoint dp = new DataPoint(x, y);
-                            segSeries.Points.Add(dp);
-                        }
-                        else
-                        {
-                            int x = impedanceResult._Electrode + (impedanceResult._Implant == Implant.ImplantA ? 0 : 6);
-                            double y = impedanceResult.InCompliance ? 0 : 1;
-                            DataPoint dp = new DataPoint(x, y);
-                            segSeries.Points.Add(dp);
-                        }
+                        int x = impedanceResult.Electrode + (impedanceResult.Implant == Implant.ImplantA ? 0 : 6);
+                        double y = impedanceResult._Impedance_ohms;
+                        DataPoint dp = new DataPoint(x, y);
+                        segSeries.Points.Add(dp);
                     }
                     chart1.Series.Add(segSeries);
+                    //segSeries.Points.Add()
+                    //segmentImpedance.Impedances.
                 }
+                //foreach (NimbleSegmentMeasurment m in theseMeasures)
+                //{
+                //    //fileman.ProcessSequenceResponse()
+                //}
             }
         }
         Point? prevPosition = null;

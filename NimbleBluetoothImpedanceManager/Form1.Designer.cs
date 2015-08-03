@@ -53,15 +53,14 @@
             this.btnSetWorkingDir = new System.Windows.Forms.Button();
             this.txtOutputDir = new System.Windows.Forms.TextBox();
             this.txtWorkingDir = new System.Windows.Forms.TextBox();
-            this.fileSystemWatcher1 = new System.IO.FileSystemWatcher();
             this.label1 = new System.Windows.Forms.Label();
             this.pannel_FoundProcessors = new System.Windows.Forms.Panel();
             this.button2 = new System.Windows.Forms.Button();
+            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.statusStrip1.SuspendLayout();
             this.grpManualControl.SuspendLayout();
             this.grpManualActions.SuspendLayout();
             this.grpSettings.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher1)).BeginInit();
             this.pannel_FoundProcessors.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -299,11 +298,6 @@
             this.txtWorkingDir.TabIndex = 0;
             this.txtWorkingDir.Text = "txtWorkingDir";
             // 
-            // fileSystemWatcher1
-            // 
-            this.fileSystemWatcher1.EnableRaisingEvents = true;
-            this.fileSystemWatcher1.SynchronizingObject = this;
-            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -326,7 +320,7 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(249, 374);
+            this.button2.Location = new System.Drawing.Point(104, 263);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(75, 23);
             this.button2.TabIndex = 18;
@@ -334,11 +328,20 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
+            // richTextBox1
+            // 
+            this.richTextBox1.Location = new System.Drawing.Point(326, 357);
+            this.richTextBox1.Name = "richTextBox1";
+            this.richTextBox1.Size = new System.Drawing.Size(626, 125);
+            this.richTextBox1.TabIndex = 19;
+            this.richTextBox1.Text = "";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(964, 536);
+            this.Controls.Add(this.richTextBox1);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.pannel_FoundProcessors);
             this.Controls.Add(this.grpSettings);
@@ -357,7 +360,6 @@
             this.grpManualActions.ResumeLayout(false);
             this.grpSettings.ResumeLayout(false);
             this.grpSettings.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher1)).EndInit();
             this.pannel_FoundProcessors.ResumeLayout(false);
             this.pannel_FoundProcessors.PerformLayout();
             this.ResumeLayout(false);
@@ -391,10 +393,10 @@
         private System.Windows.Forms.Button btnSetWorkingDir;
         private System.Windows.Forms.TextBox txtOutputDir;
         private System.Windows.Forms.TextBox txtWorkingDir;
-        private System.IO.FileSystemWatcher fileSystemWatcher1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Panel pannel_FoundProcessors;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.RichTextBox richTextBox1;
     }
 }
 

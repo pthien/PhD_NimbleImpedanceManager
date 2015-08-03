@@ -16,7 +16,7 @@ namespace Nimble.Sequences
         /// </summary>
         public List<int> SegmentsRun;
         public string SegmentName;
-        public int RepeateCount;
+        public int RepeatCount;
         public string path;
 
         public NimbleSegmentMeasurment(string filepath)
@@ -24,7 +24,7 @@ namespace Nimble.Sequences
             TelemetryResponses = new List<TelemetryResponse>();
             SegmentsRun = new List<int>();
             SegmentName = "";
-            RepeateCount = -1;
+            RepeatCount = -1;
             path = "";
 
             string fname = Path.GetFileNameWithoutExtension(filepath);
@@ -33,7 +33,7 @@ namespace Nimble.Sequences
             if (m.Success)
             {
                 SegmentName = m.Groups[1].Value;
-                RepeateCount = int.Parse(m.Groups[2].Value);
+                RepeatCount = int.Parse(m.Groups[2].Value);
                 path = filepath;
 
                 string alltext = File.ReadAllText(filepath);
@@ -65,6 +65,10 @@ namespace Nimble.Sequences
 
         }
 
+        public override string ToString()
+        {
+            return string.Format("{0} #{1}", SegmentName, RepeatCount);//return base.ToString();
+        }
     }
 
     /// <summary>
