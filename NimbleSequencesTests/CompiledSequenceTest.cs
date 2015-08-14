@@ -100,7 +100,7 @@ STARTLOOP_SEGMENT: the segment at the start of the continuous loop.
 TOTAL_SEGMENTS: the total number of segments. not 0 based.
 */
 //{SegmentComments: DUTY_ON, DUTY_OFF, DUTY_ON, DUTY_OFF, DUTY_ON, DUTY_OFF, DUTY_ON, DUTY_OFF, DUTY_ON, DUTY_OFF, DUTY_ON, DUTY_OFF, DUTY_ON, DUTY_OFF, DUTY_ON, DUTY_OFF, DUTY_ON, DUTY_OFF, DUTY_ON, DUTY_OFF, READMINMAX, IMPEDANCE_MP145, IMPEDANCE_MP290, IMPEDANCE_MP580, IMPEDANCE_MP25, IMPEDANCE_CG145, WARMDOWN}
-extern const int Segment[27][38];
+extern const int Sequence[27][38];
 extern int SegmentLengths [27];
 extern int SegmentRepeats [27];
 "; // TODO: Initialize to an appropriate value

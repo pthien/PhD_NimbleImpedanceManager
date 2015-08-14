@@ -23,7 +23,7 @@ namespace NimbleBluetoothImpedanceManager
             InitializeComponent();
         }
         //BluetoothCommsDriver bcm = new BluetoothCommsDriver();
-        private NimbleCommsManager nimble;
+        private INimbleCommsManager nimble;
         private SequenceFileManager filemanager;
         private AutomaticNimbleController autoNimble;
 
@@ -32,14 +32,17 @@ namespace NimbleBluetoothImpedanceManager
         {
             logger = LogManager.GetCurrentClassLogger();
 
+            logger.Warn("Test warning. Program started. Please ignore");
+
             RefreshComPorts();
             nimble = new NimbleCommsManager();
+            //nimble = new Mock_NimbleCommsManager();
             filemanager = new SequenceFileManager();
             autoNimble = new AutomaticNimbleController(nimble, filemanager);
-
+            autoNimble.AutomaticActionHappened += new AutomaticNimbleController.AutomaticActionHappenedEventHandler(autoNimble_AutomaticActionHappened);
             UpdateStatusStrip();
-            nimble.ConnectedToNimble += nimble_ConnectedToNimble;
-            nimble.DisconnectedFromNimble += nimble_ConnectedToNimble;
+            //nimble.ConnectedToNimble += nimble_ConnectedToNimble;
+            //nimble.DisconnectedFromNimble += nimble_ConnectedToNimble;
             nimble.StateChanged += new NimbleCommsManager.StateChangedEventHandler(nimble_StateChanged);
 
             if (Settings.Default.ImpedanceOutputFolder == "")
@@ -64,14 +67,38 @@ namespace NimbleBluetoothImpedanceManager
             //.Configuration.
         }
 
+        void autoNimble_AutomaticActionHappened(object sender, AutomaticNimbleController.AutomaticActionEventArgs e)
+        {
+            if (this.InvokeRequired)
+                this.BeginInvoke((Action)(() =>
+                {
+                    string fmt;
+                    switch (e.Type)
+                    {
+                        case AutomaticNimbleController.AutomaticActionEventArgs.ActionType.AliveScan:
+                            fmt = string.Format("Updated: {0}\r\nAlive Processors: {1}",
+                                DateTime.Now, string.Join(", ", e.AliveDevices));
+                            lblAutoStatus_alive.Text = fmt;
+                            break;
+                        case AutomaticNimbleController.AutomaticActionEventArgs.ActionType.Measurements:
+                            fmt = string.Format("Updated: {0}\r\nMeasurementsMade: {2}\r\nMeasured Processors: {1}",
+                                DateTime.Now,
+                                string.Join(", ", e.SuccessfullyMeasuredDevices), e.SuccessfullMeasurements);
+                            lblAutoStatus_Measure.Text = fmt;
+                            break;
+                        case AutomaticNimbleController.AutomaticActionEventArgs.ActionType.DeepScan:
+                            break;
+                        case AutomaticNimbleController.AutomaticActionEventArgs.ActionType.AutoStarted:
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                }));
+        }
+
         void nimble_StateChanged(object sender, NimbleCommsManager.StateChangedEventArgs e)
         {
             UpdateStatusStrip();
-        }
-
-        void nimble_ConnectedToNimble(object sender, BluetoothCommsDriver.DataRecievedEventArgs e)
-        {
-            //UpdateStatusStrip();
         }
 
         private void Form1_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -149,18 +176,27 @@ namespace NimbleBluetoothImpedanceManager
 
             if (this.InvokeRequired)
                 this.BeginInvoke((Action)(() =>
-                {
-                    lblRemoteDeviceStatus.Text = textStatus;
-                    lblRemoteDeviceStatus.BackColor = colourStatus;
-                    lblDongleStatus.Text = textCon;
-                    lblDongleStatus.BackColor = colourCon;
-                    lblAutoStatus.Text = "Automatic Impedance Collection is " + (autoNimble.AutomaticControlEnabled ? "On" : "Off");
+               {
+                   lblRemoteDeviceStatus.Text = textStatus;
+                   lblRemoteDeviceStatus.BackColor = colourStatus;
+                   lblDongleStatus.Text = textCon;
+                   lblDongleStatus.BackColor = colourCon;
+                   lblAutoStatus.Text = "Automatic Impedance Collection is " +
+                                        (autoNimble.AutomaticControlEnabled ? "On" : "Off");
 
-                    UpdateUI(state, autoNimble.AutomaticControlEnabled);
-                    logger.Trace("Update ui from {0}", Thread.CurrentThread.Name);
-                }));
+                   UpdateUI(state, autoNimble.AutomaticControlEnabled);
+                   logger.Trace("Update ui from {0}", Thread.CurrentThread.Name);
+               }));
             else
+            {
+                lblRemoteDeviceStatus.Text = textStatus;
+                lblRemoteDeviceStatus.BackColor = colourStatus;
+                lblDongleStatus.Text = textCon;
+                lblDongleStatus.BackColor = colourCon;
+                lblAutoStatus.Text = "Automatic Impedance Collection is " +
+                                     (autoNimble.AutomaticControlEnabled ? "On" : "Off");
                 UpdateUI(state, autoNimble.AutomaticControlEnabled);
+            }
         }
 
         private void UpdateUI(NimbleState state, bool automaticControl)
@@ -233,7 +269,7 @@ namespace NimbleBluetoothImpedanceManager
             cklFoundDevices.Items.Clear();
             foreach (NimbleProcessor nimbleProcessor in items)
             {
-                cklFoundDevices.Items.Add(nimbleProcessor);
+                cklFoundDevices.Items.Add(nimbleProcessor, true);
             }
             lblDevicesRefreshTime.Text = "Last refresh at " + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString()
                 + string.Format("\r\nPress '{0}' to refresh.", btnScanForProcessors.Text);
@@ -252,7 +288,7 @@ namespace NimbleBluetoothImpedanceManager
 
         private void bntCheckCurrent_Click(object sender, EventArgs e)
         {
-            autoNimble.DoImpedanceCheck();
+            autoNimble.DoMeasurements();
             //autoNimble.DoComplianceCheck();
         }
 
@@ -286,11 +322,6 @@ namespace NimbleBluetoothImpedanceManager
         private void cmbCOMPorts_MouseClick(object sender, MouseEventArgs e)
         {
             RefreshComPorts();
-        }
-
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-
         }
 
         private void btnScan_Click(object sender, EventArgs e)
@@ -375,6 +406,55 @@ namespace NimbleBluetoothImpedanceManager
             x.Show();
         }
 
+        private void btnUptime_Click(object sender, EventArgs e)
+        {
+            new AliveDevicesViewer().Show();
+        }
 
+        private void tabControl1_Selected(object sender, TabControlEventArgs e)
+        {
+            if (e.TabPageIndex == 2)
+                UpdateSequencesList();
+        }
+
+        private void UpdateSequencesList()
+        {
+            lstFoundSequences.Items.Clear();
+            lstFoundSequences.Items.AddRange(filemanager.CompiledSequences.Keys.ToArray());
+        }
+
+        private bool fatalTriggered = false;
+        private void tmrAuto_Tick(object sender, EventArgs e)
+        {
+            string fmt = "Next impedance measurement in {0}\r\nNext alive scan in {1}";
+            if (autoNimble.AutomaticControlEnabled)
+            {
+                TimeSpan ttni = autoNimble.NextDueImpedanceMeasure - DateTime.Now;
+                lblTime.Text = string.Format(fmt,
+                    ttni, autoNimble.NextDueAliveScan - DateTime.Now);
+
+
+                if (ttni < TimeSpan.FromMinutes(-10) ||
+                    autoNimble.NextDueAliveScan - DateTime.Now < TimeSpan.FromMinutes(-10))
+                {
+                    if (!fatalTriggered)
+                    {
+                        fatalTriggered = true;
+                        logger.Fatal("Apparent deadlock condition. Please restart program.");
+                    }
+                }
+            }
+            else
+            {
+                lblTime.Text = string.Format(fmt, "--", "--");
+            }
+
+
+        }
+
+        private void lblAutoStatus_Measure_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

@@ -84,8 +84,9 @@ namespace Nimble.Sequences
             SenseElecs = SenseElectrodes.StimElecs;
         }
 
-        public void ApplyPulse(int E, int M, int A)
+        public void ApplyPulse(int E, int M, double A_dbl)
         {
+            int A = (int) A_dbl;
             A = A < 0 ? -A : A;
             E = E < 0 ? -E : E;
             M = M < 0 ? -M : M;
@@ -118,6 +119,7 @@ namespace Nimble.Sequences
                         ResetRegs();
                         break;
                     default:
+                        logger.Error("Trying to apply an unknown M: E:{0} M:{1} A{2}", E, M, A);
                         throw new NotImplementedException();
                 }
             }
@@ -141,7 +143,10 @@ namespace Nimble.Sequences
                         int pos = (A >> 4);
                         vtel_ts_tokenpos = (VTEL_SampleTime_TokenPos)pos;
                         break;
+                    case 31:
+                        break;
                     default:
+                        logger.Error("Trying to apply an unknown M: E:{0} M:{1} A{2}", E, M, A);
                         throw new NotImplementedException();
                 }
             }

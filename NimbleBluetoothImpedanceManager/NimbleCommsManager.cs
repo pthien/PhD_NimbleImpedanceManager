@@ -5,14 +5,15 @@ using System.Text;
 using System.Threading;
 using NLog;
 using System.Text.RegularExpressions;
+using System.Windows.Forms.DataVisualization.Charting;
 
 
 namespace NimbleBluetoothImpedanceManager
 {
-    class NimbleCommsManager
+    class NimbleCommsManager : INimbleCommsManager
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
-        public BluetoothCommsDriver btDongle;
+        private BluetoothCommsDriver btDongle;
 
         private string comport;
 
@@ -38,7 +39,7 @@ namespace NimbleBluetoothImpedanceManager
             remove { btDongle.ConnectionEstablished -= value; }
         }
 
-        public event BluetoothCommsDriver.ConnectionLostEventHandler DisconnectedFromNimble
+        private event BluetoothCommsDriver.ConnectionLostEventHandler DisconnectedFromNimble
         {
             add { btDongle.ConnectionLost += value; }
             remove { btDongle.ConnectionLost -= value; }
@@ -50,6 +51,7 @@ namespace NimbleBluetoothImpedanceManager
         public EventWaitHandle NimbleCmdRx_Name_WaitHandle = new AutoResetEvent(false);
         private EventWaitHandle NimbleCmdRx_xmitTelemStart_WaitHandle = new AutoResetEvent(false);
         private EventWaitHandle NimbleCmdRx_xmitTelemFin_WaitHandle = new AutoResetEvent(false);
+        private EventWaitHandle NimbleCmdRx_WDTO_WaitHandle = new AutoResetEvent(false);
 
         public string RemoteDeviceId
         {
@@ -158,9 +160,18 @@ namespace NimbleBluetoothImpedanceManager
 
                 if (namesuccess)
                 {
-                    logger.Info("Successfully connected to {0}", address);
-                    State = NimbleState.ConnectedToNimbleAndReady;
-                    return true;
+                    if (NimbleCmdRx_WDTO_WaitHandle.WaitOne(100))
+                    {
+                        logger.Warn("Not connecting to remote device due to watchdog timeout.");
+                        State = NimbleState.ConnectedToDongle;
+                        return false;
+                    }
+                    else
+                    {
+                        logger.Info("Successfully connected to {0}", address);
+                        State = NimbleState.ConnectedToNimbleAndReady;
+                        return true;
+                    }
                 }
                 else
                 {
@@ -237,8 +248,28 @@ namespace NimbleBluetoothImpedanceManager
                             _telemData = null;
                             NimbleCmdRx_xmitTelemStart_WaitHandle.Set();
                         }
+                        if (data == "discon")
+                        {
+                            receivingTelemData = false;
+                            telemData_temp = new List<string>();
+                            _telemData = telemData_temp.ToArray(); 
+                            logger.Info("Recieving telem failed because a coil is disconnected, {0}", RemoteNimbleProcessor);
+                            NimbleCmdRx_xmitTelemFin_WaitHandle.Set();
+                        }
+
                     }
                     break;
+                case "BothConnected":
+                    if(data=="n")
+                        logger.Error("Nimble processor {0} has 1 or more coils detached", RemoteNimbleProcessor);
+                    if (data == "y")
+                        logger.Info("Nimble processor {0} has all coils attached", RemoteNimbleProcessor);
+                    break;
+                case "WDTO":
+                    logger.Fatal("Watchdog timer expired on {0}. Disconnect processor from subject and do not reattach, potential for unexpected stimulation. Stimulation has been halted.", RemoteNimbleProcessor);
+                    NimbleCmdRx_WDTO_WaitHandle.Set();
+                    break;
+
             }
             //throw new NotImplementedException();
         }
@@ -274,6 +305,8 @@ namespace NimbleBluetoothImpedanceManager
                     return false;
                 }
             }
+
+          
 
             logger.Info("Initialisation successful");
             State = NimbleState.ConnectedToDongle;
@@ -330,7 +363,7 @@ namespace NimbleBluetoothImpedanceManager
             btDongle.TransmitToRemoteDevice(command);
             if (NimbleCmdRx_xmitTelemFin_WaitHandle.WaitOne(DataChunker.Timeout + 10000))
             {
-                logger.Info("Receive Telem data successful. Segment {0}, Device {1}", sequence, RemoteDeviceId);
+                logger.Info("Receive Telem data successful. Sequence {0}, Device {1}", sequence, RemoteDeviceId);
                 lock (stateLock)
                 {
                     if (State == NimbleState.ConnectedToNimbleAndWorking)
@@ -341,7 +374,7 @@ namespace NimbleBluetoothImpedanceManager
             }
             else
             {
-                logger.Warn("Receive Telem timed out. Segment {0}, Device {1}", sequence, RemoteDeviceId);
+                logger.Info("Receive Telem timed out. Sequence {0}, Device {1}", sequence, RemoteDeviceId);
                 ProcessData("xmitTelem", "fin");
                 //receivingTelemData = false;
                 lock (stateLock)

@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using NLog;
@@ -43,7 +41,7 @@ namespace Nimble.Sequences
         }
 
         private SequenceFileManager fileman;
-
+        
         public Viewer()
         {
             InitializeComponent();
@@ -52,7 +50,16 @@ namespace Nimble.Sequences
 
         private void Viewer_Load(object sender, EventArgs e)
         {
+            btnRefresh_Click(null, null);
+        }
 
+
+        private void Bgw_DoWork(object e)
+        {
+            logger.Info("do work started {0}", e);
+            Thread.Sleep(10000);
+            logger.Info("do work wake {0}", e);
+            //throw new NotImplementedException();
         }
 
         private void btnSetWorkingDir_Click(object sender, EventArgs e)
@@ -100,7 +107,7 @@ namespace Nimble.Sequences
             {
                 string subject = cmbSubject.Text;
 
-                var dates = records.Where(x => x.SubjectName == subject).ToArray();//.Select(x => x.Timestamp);
+                var dates = records.Where(x => x.SubjectName == subject).OrderByDescending(x => x.Timestamp).ToArray();//.Select(x => x.Timestamp);
 
                 cmbMeasurementRecord.Items.Clear();
                 foreach (var dateTime in dates)
@@ -121,61 +128,19 @@ namespace Nimble.Sequences
 
                 List<NimbleSegmentMeasurment> segmentMeasurments = r.GetMeasurments();
 
-                var uniqeSegments = segmentMeasurments.GroupBy(x => x.SegmentName).Select(g=>g.First()).ToList();
+                var uniqeSegments = segmentMeasurments.GroupBy(x => x.SegmentName).Select(g => g.First()).ToList();
 
                 foreach (NimbleSegmentMeasurment segment in uniqeSegments)
                 {
                     lstSpecificMeasurements.Items.Add(segment.SegmentName);
                 }
 
-                //foreach (var m in r.GetMeasurments())
-                //{
-                //    lstSpecificMeasurements.Items.Add(string.Format("{0} #{1}", m.SegmentName, m.RepeatCount));
-                //}
 
-                //FileStream fs = new FileStream("test.txt", FileMode.Create);
-                //StreamWriter sw = new StreamWriter(fs);
-                //sw.WriteLine(r.RecordDirectory);
-                //NimbleImpedanceRecord impedanceRecord = fileman.ProcessSequenceResponse(r);
-                //foreach (NimbleSegmentImpedance m in impedanceRecord.SegmentImpedances)
-                //{
-                //    sw.Write(m + ",");
-
-                //    for (int i = 1; i < 7; i++)
-                //    {
-                //        var one = m.Impedances.Where(x => x._Implant == Implant.ImplantA && x._Electrode == i);
-                //        if (one.Any())
-                //        {
-                //            var first = one.First();
-                //            sw.Write(first._Impedance_ohms+",");
-                //        }
-                //        else
-                //        {
-                //            sw.Write(" ,");
-                //        }
-
-                //    }
-                //    for (int i = 1; i < 7; i++)
-                //    {
-                //        var one = m.Impedances.Where(x => x._Implant == Implant.ImplantB && x._Electrode == i);
-                //        if (one.Any())
-                //        {
-                //            var first = one.First();
-                //            sw.Write(first._Impedance_ohms + ",");
-                //        }
-                //        else
-                //        {
-                //            sw.Write(" ,");
-                //        }
-                //    }
-                //    sw.WriteLine();
-                //}
-                //sw.Flush();
                 //fs.Close();
             }
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void btnRefresh_Click(object sender, EventArgs e)
         {
             fileman.ScanDirectory(SequenceDirectory);
             ScanForLogs(ImpedanceDirectory);
@@ -183,46 +148,110 @@ namespace Nimble.Sequences
 
         private void lstSpecificMeasurements_SelectedIndexChanged(object sender, EventArgs e)
         {
-            chart1.Series.Clear();
-
-            object o = cmbMeasurementRecord.SelectedItem;
-            NimbleMeasurementRecord r = (NimbleMeasurementRecord)o;
-            NimbleImpedanceRecord imprec = fileman.ProcessSequenceResponse(r);
-            List<NimbleSegmentMeasurment> measurments = r.GetMeasurments();
-
-
-            foreach (var l in lstSpecificMeasurements.SelectedItems)
+            try
             {
-                string whole = l.ToString();
-                string name = whole.Split(' ')[0];
+                chart1.Series.Clear();
+                chart1.Titles.Clear();
+                chart1.ChartAreas[0].AxisX.Maximum = 14;
+                chart1.ChartAreas[0].AxisX.Minimum = 0;
 
-                IEnumerable<NimbleSegmentTelemetry> theseSegments = imprec.SegmentImpedances.Where(x => x.SegmentName == name);
 
-                foreach (NimbleSegmentTelemetry segmentImpedance in theseSegments)
+                object o = cmbMeasurementRecord.SelectedItem;
+                NimbleMeasurementRecord r = (NimbleMeasurementRecord)o;
+                NimbleImpedanceRecord imprec = fileman.ProcessSequenceResponse(r);
+                List<NimbleSegmentMeasurment> measurments = r.GetMeasurments();
+
+                bool lockedToImpedance = false;
+                bool lockedToCompliance = false;
+                int count = 0;
+                foreach (var l in lstSpecificMeasurements.SelectedItems)
                 {
-                    Series segSeries = new Series(segmentImpedance.ToString());
+                    string whole = l.ToString();
+                    string name = whole.Split(' ')[0];
 
-                    foreach (TelemetryResult impedanceResult in segmentImpedance.Impedances)
+                    IEnumerable<NimbleSegmentTelemetry> theseSegments = imprec.SegmentImpedances.Where(x => x.SegmentName == name);
+
+                    foreach (NimbleSegmentTelemetry segmentImpedance in theseSegments)
                     {
-                        if (impedanceResult is ImpedanceResult)
+                        Series segSeries = new Series(segmentImpedance.ToString());
+
+                        foreach (TelemetryResult impedanceResult in segmentImpedance.Impedances)
                         {
-                            int x = impedanceResult.Electrode + (impedanceResult.Implant == Implant.ImplantA ? 0 : 6);
-                            double y = ((ImpedanceResult)impedanceResult)._Impedance_ohms;
-                            DataPoint dp = new DataPoint(x, y);
-                            segSeries.Points.Add(dp);
+                            if (impedanceResult is ImpedanceResult)
+                            {
+                                if (lockedToCompliance)
+                                    continue;
+                                lockedToImpedance = true;
+                                int x = impedanceResult.Electrode + (impedanceResult.Implant == Implant.ImplantA ? 0 : 6);
+                                double y = ((ImpedanceResult)impedanceResult)._Impedance_ohms;
+                                DataPoint dp = new DataPoint(x, y);
+                                dp.MarkerStyle = MarkerStyle.Cross;
+                                segSeries.Points.Add(dp);
+                                count++;
+                            }
+                            else
+                            {
+                                if (lockedToImpedance)
+                                    continue;
+                                lockedToCompliance = true;
+                                int x = impedanceResult.Electrode + (impedanceResult.Implant == Implant.ImplantA ? 0 : 6);
+                                double y = ((ComplianceResult)impedanceResult).InCompliance ? 1 : -1;
+                                DataPoint dp = new DataPoint(x, y);
+                                segSeries.Points.Add(dp);
+                                count++;
+                            }
                         }
-                        else
-                        {
-                            int x = impedanceResult.Electrode + (impedanceResult.Implant == Implant.ImplantA ? 0 : 6);
-                            double y = ((ComplianceResult)impedanceResult).InCompliance ? 1 : -1;
-                            DataPoint dp = new DataPoint(x, y);
-                            segSeries.Points.Add(dp);
-                        }
+                        chart1.Series.Add(segSeries);
                     }
-                    chart1.Series.Add(segSeries);
+                }
+                if (count == 0)
+                {
+                    chart1.Series.Clear();
+                    chart1.Titles.Add("Error: No data");
+                }
+                else
+                {
+                    chart1.ChartAreas[0].AxisX.Maximum = 12;
+                    chart1.ChartAreas[0].AxisX.Maximum = 12;
+
+                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(0.51, 1.49, "A1");
+                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(1.51, 2.49, "A2");
+                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(2.51, 3.49, "A3");
+                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(3.51, 4.49, "A4");
+                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(4.51, 5.49, "A5");
+                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(5.51, 6.49, "A6");
+                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(6.51, 7.49, "B1");
+                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(7.51, 8.49, "B2");
+                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(8.51, 9.49, "B3");
+                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(9.51, 10.49, "B4");
+                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(10.51, 11.49, "B5");
+                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(11.51, 12.49, "B6");
+
+                    //chart1.ChartAreas[0].AxisX.la
+                    chart1.Legends[0].LegendStyle = LegendStyle.Row;
+                    chart1.Legends[0].Docking = Docking.Top;
+                    if (lockedToImpedance)
+                    {
+                        chart1.ChartAreas[0].AxisY.Title = "Impedance (ohms)";
+                        chart1.ChartAreas[0].AxisY.TextOrientation = TextOrientation.Auto;
+                        chart1.ChartAreas[0].AxisY.CustomLabels.Clear();
+                    }
+                    else
+                    {
+                        chart1.ChartAreas[0].AxisY.Title = "";
+                        chart1.ChartAreas[0].AxisY.CustomLabels.Add(0.9, 1.1, "In compliance");
+                        chart1.ChartAreas[0].AxisY.CustomLabels.Add(-1.1, -.9, "Out of compliance");
+                        chart1.ChartAreas[0].AxisY.TextOrientation = TextOrientation.Auto;
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+                MessageBox.Show(ex.ToString(), "An error has occured. It may be wise to restart the program");
+            }
         }
+
         Point? prevPosition = null;
         ToolTip tooltip = new ToolTip();
         private void chart1_MouseMove(object sender, MouseEventArgs e)
@@ -236,7 +265,7 @@ namespace Nimble.Sequences
                                             ChartElementType.DataPoint);
             foreach (var result in results)
             {
-                
+
                 if (result.ChartElementType == ChartElementType.DataPoint)
                 {
                     var prop = result.Object as DataPoint;
@@ -249,11 +278,12 @@ namespace Nimble.Sequences
                         //if (Math.Abs(pos.X - pointXPixel) < 3 /*&&
                         //    Math.Abs(pos.Y - pointYPixel) < 2*/)
                         {
-                            tooltip.Show("X=" + prop.XValue + ", Y=" + prop.YValues[0] + "  " + result.Series, this.chart1,
+                            string s = string.Format("X={0},Y={1:G7} {2}", prop.XValue, prop.YValues[0], result.Series);
+                            tooltip.Show(s, this.chart1,
                                             pos.X, pos.Y - 15);
-                            logger.Debug("yay!");
+                            //logger.Debug("yay!");
                         }
-                        logger.Debug("({0},{1}) - ({2},{3})", pos.X, pos.Y, pointXPixel, pointYPixel );
+                        //logger.Debug("({0},{1:G}) - ({2},{3})", pos.X, pos.Y, pointXPixel, pointYPixel);
 
                     }
                 }

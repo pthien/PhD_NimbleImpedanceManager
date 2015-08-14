@@ -31,6 +31,7 @@
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Viewer));
             this.cmbSubject = new System.Windows.Forms.ComboBox();
             this.cmbMeasurementRecord = new System.Windows.Forms.ComboBox();
             this.button1 = new System.Windows.Forms.Button();
@@ -103,13 +104,13 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(159, 337);
+            this.button2.Location = new System.Drawing.Point(12, 256);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.Size = new System.Drawing.Size(298, 23);
             this.button2.TabIndex = 8;
-            this.button2.Text = "button2";
+            this.button2.Text = "Refresh";
             this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.button2.Click += new System.EventHandler(this.btnRefresh_Click);
             // 
             // lstSpecificMeasurements
             // 
@@ -155,6 +156,7 @@
             this.Controls.Add(this.txtWorkingDir);
             this.Controls.Add(this.cmbMeasurementRecord);
             this.Controls.Add(this.cmbSubject);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Viewer";
             this.Text = "Viewer";
             this.Load += new System.EventHandler(this.Viewer_Load);

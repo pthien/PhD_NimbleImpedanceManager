@@ -142,12 +142,12 @@ namespace Nimble.Sequences
                 case Implant.ImplantA:
                     Electrode = p.LE;
                     Return = p.LM;
-                    Current_uA = p.LA_uA;
+                    Current_uA = p.LA;
                     break;
                 case Implant.ImplantB:
                     Electrode = p.RE;
                     Return = p.RM;
-                    Current_uA = p.RA_uA;
+                    Current_uA = p.RA;
                     break;
             }
 
@@ -281,7 +281,7 @@ namespace Nimble.Sequences
             sw.WriteLine("Subject, {0}", SubjectName);
             sw.WriteLine("Bluetooth Addr, {0}", BluetoothAddress);
             sw.WriteLine("Timestamp, {0}", Timestamp);
-            sw.WriteLine("Segment GUID, {0}", GenGuid);
+            sw.WriteLine("Sequence GUID, {0}", GenGuid);
             sw.WriteLine("Record Directory, {0}", RecordDirectory);
 
             foreach (NimbleSegmentTelemetry m in SegmentImpedances)

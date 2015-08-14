@@ -36,6 +36,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PIC_Sequence, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\PIC_Sequence.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <Choose>
@@ -55,10 +59,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\CochlearImplantSequenceEncoder\CochlearImplantSequenceEncoder\PIC_Sequence\PIC_Sequence.csproj">
-      <Project>{5d075e0c-7117-4608-b0dd-278e8c2ca928}</Project>
-      <Name>PIC_Sequence</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SequenceParser\NimbleSequences.csproj">
       <Project>{0e677005-74f7-475a-9b6c-245ee3eced01}</Project>
       <Name>NimbleSequences</Name>

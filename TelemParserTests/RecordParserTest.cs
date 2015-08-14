@@ -77,8 +77,8 @@ namespace TelemParserTests
         private static CompiledSequence GetTestSequence_ImpedanceOnly()
         {
             FilesForGenerationGUID files = new FilesForGenerationGUID();
-            files.Sequence_h = @"14_514_Kingston_608e3568-59c1-408d-a53b-34203648716e\Segment.h";
-            files.Sequence_c = @"14_514_Kingston_608e3568-59c1-408d-a53b-34203648716e\Segment.c";
+            files.Sequence_h = @"14_514_Kingston_608e3568-59c1-408d-a53b-34203648716e\Sequence.h";
+            files.Sequence_c = @"14_514_Kingston_608e3568-59c1-408d-a53b-34203648716e\Sequence.c";
             files.PulseData_h = @"14_514_Kingston_608e3568-59c1-408d-a53b-34203648716e\PulseData.h";
             files.PulseData_c = @"14_514_Kingston_608e3568-59c1-408d-a53b-34203648716e\PulseData.c";
 
@@ -89,8 +89,8 @@ namespace TelemParserTests
         private static CompiledSequence GetTestSequence_ImpedanceAndCompliance()
         {
             FilesForGenerationGUID files = new FilesForGenerationGUID();
-            files.Sequence_h = @"14_514_PCB1_bacd73be-60b4-49e3-ba31-e0903738cc93\Segment.h";
-            files.Sequence_c = @"14_514_PCB1_bacd73be-60b4-49e3-ba31-e0903738cc93\Segment.c";
+            files.Sequence_h = @"14_514_PCB1_bacd73be-60b4-49e3-ba31-e0903738cc93\Sequence.h";
+            files.Sequence_c = @"14_514_PCB1_bacd73be-60b4-49e3-ba31-e0903738cc93\Sequence.c";
             files.PulseData_h = @"14_514_PCB1_bacd73be-60b4-49e3-ba31-e0903738cc93\PulseData.h";
             files.PulseData_c = @"14_514_PCB1_bacd73be-60b4-49e3-ba31-e0903738cc93\PulseData.c";
 

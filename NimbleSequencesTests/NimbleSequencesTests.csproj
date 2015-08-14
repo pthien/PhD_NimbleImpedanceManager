@@ -42,6 +42,10 @@
     <Reference Include="NLog.Windows.Forms">
       <HintPath>..\packages\NLog.Windows.Forms.2.0.0.0\lib\net35\NLog.Windows.Forms.dll</HintPath>
     </Reference>
+    <Reference Include="PIC_Sequence, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\PIC_Sequence.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -71,10 +75,6 @@
     <Compile Include="SequenceFileManagerTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\CochlearImplantSequenceEncoder\CochlearImplantSequenceEncoder\PIC_Sequence\PIC_Sequence.csproj">
-      <Project>{5D075E0C-7117-4608-B0DD-278E8C2CA928}</Project>
-      <Name>PIC_Sequence</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SequenceParser\NimbleSequences.csproj">
       <Project>{0E677005-74F7-475A-9B6C-245EE3ECED01}</Project>
       <Name>NimbleSequences</Name>

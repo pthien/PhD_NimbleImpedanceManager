@@ -98,6 +98,38 @@ namespace Nimble.Sequences
             return output;
         }
 
+        public static NimbleMeasurementRecord? OpenMeasurementRecord(string full_path_folder_of_record)
+        {
+            List<string> TelemetryRecordDirectories = new List<string>();
+            Regex folder_regex = new Regex("([A-Za-z0-9_]+)-([A-Z0-9]{12})-([A-Za-z0-9-]{36})-([0-9APM_-]{22})");
+
+            string foldername = Path.GetFileName(full_path_folder_of_record);
+            var m = folder_regex.Match(full_path_folder_of_record);
+            if (m.Success)
+            {
+                NimbleMeasurementRecord temp = new NimbleMeasurementRecord();
+                temp.SubjectName = m.Groups[1].Value;
+                temp.BluetoothAddress = m.Groups[2].Value;
+                temp.GenGuid = Guid.Parse(m.Groups[3].Value);
+                string[] timeparts = m.Groups[4].Value.Split(new char[] { '-', '_' });
+
+                int hours = Int32.Parse(timeparts[3]) + (timeparts[6] == "AM" ? 0 : 12);
+                if (hours == 24)
+                    hours = 12;
+                var x = new DateTime(
+                    Int32.Parse(timeparts[0]), Int32.Parse(timeparts[1]), Int32.Parse(timeparts[2]),
+                    hours,
+                    Int32.Parse(timeparts[4]), Int32.Parse(timeparts[5]), DateTimeKind.Local);
+
+                temp.Timestamp = x;
+                temp.RecordDirectory = full_path_folder_of_record;
+                return temp;
+            }
+            else
+                return null;
+
+        }
+
         public override string ToString()
         {
             return String.Format("Record: {0}, {1}", SubjectName, Timestamp.ToShortDateString() + " " + Timestamp.ToShortTimeString());

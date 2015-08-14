@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelemParserTests", "TelemPa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NimbleSequencesTests", "NimbleSequencesTests\NimbleSequencesTests.csproj", "{236B99F7-EF37-4479-9320-2D4B3320A28E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PIC_Sequence", "..\CochlearImplantSequenceEncoder\CochlearImplantSequenceEncoder\PIC_Sequence\PIC_Sequence.csproj", "{5D075E0C-7117-4608-B0DD-278E8C2CA928}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PIC_Sequence", "H:\CochlearImplantSequenceEncoder\PIC_Sequence\PIC_Sequence.csproj", "{5D075E0C-7117-4608-B0DD-278E8C2CA928}"
 EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution

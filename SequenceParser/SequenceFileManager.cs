@@ -30,32 +30,37 @@ namespace Nimble.Sequences
         /// <param name="path"></param>
         public void ScanDirectory(string path)
         {
-            //if (path == "")
-            //    path = @"\\prometheus\user$\thienp\VisionProcessingHardware\DualImplants";
 
-            DoScanDirectory(path);
-
-            foreach (KeyValuePair<string, FilesForGenerationGUID> kvp in FilesByGenGUID)
+            try
             {
-                FilesForGenerationGUID filesforguid = kvp.Value;
-                if (filesforguid.AllFilesReferenced && !CompiledSequences.ContainsKey(kvp.Key))
-                {
-                    CompiledSequence cs = new CompiledSequence(kvp.Value);
-                    CompiledSequences.Add(kvp.Key, cs);
-                    logger.Info("Built sequence for: {0}", kvp.Key);
-                }
+                DoScanDirectory(path);
 
+                foreach (KeyValuePair<string, FilesForGenerationGUID> kvp in FilesByGenGUID)
+                {
+                    FilesForGenerationGUID filesforguid = kvp.Value;
+                    if (filesforguid.AllFilesReferenced && !CompiledSequences.ContainsKey(kvp.Key))
+                    {
+                        CompiledSequence cs = new CompiledSequence(kvp.Value);
+                        CompiledSequences.Add(kvp.Key, cs);
+                        logger.Info("Built sequence with ID {0}", kvp.Key);
+                    }
+
+                }
+            }
+            catch (Exception e)
+            {
+              logger.Error(e);
             }
         }
         private void DoScanDirectory(string path)
         {
-            string[] files = Directory.GetFiles(path);
-            foreach (string f in files)
-            {
-                TestIfValidFile(Path.Combine(path, f));
-            }
             try
             {
+                string[] files = Directory.GetFiles(path);
+                foreach (string f in files)
+                {
+                    TestIfValidFile(Path.Combine(path, f));
+                }
                 foreach (string d in Directory.GetDirectories(path))
                 {
                     DoScanDirectory(d);
@@ -131,78 +136,93 @@ namespace Nimble.Sequences
 
         private static List<NimbleMeasurementRecord> ParseTelemDataDirecortyNames(string[] possibledirectories, string containingDirectory)
         {
-            var results = new List<NimbleMeasurementRecord>();
-            if (possibledirectories == null)
-                return results;
-
-            List<string> TelemetryRecordDirectories = new List<string>();
-            Regex folder = new Regex("([A-Za-z0-9_]+)-([A-Z0-9]{12})-([A-Za-z0-9-]{36})-([0-9APM_-]{22})");
-            foreach (string s in possibledirectories)
+            try
             {
-                var m = folder.Match(s);
-                if (m.Success)
+                var results = new List<NimbleMeasurementRecord>();
+                if (possibledirectories == null)
+                    return results;
+
+                List<string> TelemetryRecordDirectories = new List<string>();
+                Regex folder = new Regex("([A-Za-z0-9_]+)-([A-Z0-9]{12})-([A-Za-z0-9-]{36})-([0-9APM_-]{22})");
+                foreach (string s in possibledirectories)
                 {
-                    NimbleMeasurementRecord temp = new NimbleMeasurementRecord();
-                    temp.SubjectName = m.Groups[1].Value;
-                    temp.BluetoothAddress = m.Groups[2].Value;
-                    temp.GenGuid = Guid.Parse(m.Groups[3].Value);
-                    string[] timeparts = m.Groups[4].Value.Split(new char[] { '-', '_' });
+                    var m = folder.Match(s);
+                    if (m.Success)
+                    {
+                        NimbleMeasurementRecord temp = new NimbleMeasurementRecord();
+                        temp.SubjectName = m.Groups[1].Value;
+                        temp.BluetoothAddress = m.Groups[2].Value;
+                        temp.GenGuid = Guid.Parse(m.Groups[3].Value);
+                        string[] timeparts = m.Groups[4].Value.Split(new char[] { '-', '_' });
 
-                    int hours = Int32.Parse(timeparts[3]) + (timeparts[6] == "AM" ? 0 : 12);
-                    if (hours == 24)
-                        hours = 12;
-                    var x = new DateTime(
-                        Int32.Parse(timeparts[0]), Int32.Parse(timeparts[1]), Int32.Parse(timeparts[2]),
-                        hours,
-                        Int32.Parse(timeparts[4]), Int32.Parse(timeparts[5]), DateTimeKind.Local);
+                        int hours = Int32.Parse(timeparts[3]) + (timeparts[6] == "AM" ? 0 : 12);
+                        if (hours == 24)
+                            hours = 12;
+                        var x = new DateTime(
+                            Int32.Parse(timeparts[0]), Int32.Parse(timeparts[1]), Int32.Parse(timeparts[2]),
+                            hours,
+                            Int32.Parse(timeparts[4]), Int32.Parse(timeparts[5]), DateTimeKind.Local);
 
-                    temp.Timestamp = x;
-                    temp.RecordDirectory = Path.Combine(containingDirectory, s);
-                    results.Add(temp);
+                        temp.Timestamp = x;
+                        temp.RecordDirectory = Path.Combine(containingDirectory, s);
+                        results.Add(temp);
+                    }
                 }
+
+                return results;
             }
-
-            return results;
-
+            catch (Exception e)
+            {
+                logger.Error(e);
+            }
+            return new List<NimbleMeasurementRecord>();
         }
 
         public NimbleImpedanceRecord ProcessSequenceResponse(NimbleMeasurementRecord measurementRecord)
         {
-            //return ProcessSequenceResponseV2(measurementRecord);
-            DateTime start = DateTime.Now;
-
-            NimbleImpedanceRecord impedanceRecord = new NimbleImpedanceRecord(measurementRecord);
-
-            var x = impedanceRecord.Load();
-            if (x.HasValue)
-                return x.Value;
-
-            var measurements = measurementRecord.GetMeasurments();
-
-            if (CompiledSequences.ContainsKey(measurementRecord.GenGuid.ToString()))
+            try
             {
-                logger.Warn("Calculating impedances for {0} ({1})", measurementRecord, measurementRecord.RecordDirectory);
-                CompiledSequence cs = CompiledSequences[measurementRecord.GenGuid.ToString()];
-                foreach (NimbleSegmentMeasurment m in measurements)
+                //return ProcessSequenceResponseV2(measurementRecord);
+                DateTime start = DateTime.Now;
+
+                NimbleImpedanceRecord impedanceRecord = new NimbleImpedanceRecord(measurementRecord);
+
+                var x = impedanceRecord.Load();
+                if (x.HasValue)
+                    return x.Value;
+
+                var measurements = measurementRecord.GetMeasurments();
+
+                if (CompiledSequences.ContainsKey(measurementRecord.GenGuid.ToString()))
                 {
-                    NimbleSegmentTelemetry segImp = new NimbleSegmentTelemetry
+                    logger.Info("Calculating impedances for {0} ({1})", measurementRecord, measurementRecord.RecordDirectory);
+                    CompiledSequence cs = CompiledSequences[measurementRecord.GenGuid.ToString()];
+                    foreach (NimbleSegmentMeasurment m in measurements)
                     {
-                        SegmentName = m.SegmentName,
-                        RepeateCount = m.RepeatCount,
-                        Impedances = cs.ProcessMeasurementCall(m)
-                    };
-                    impedanceRecord.AddSegmentImpedanceResult(segImp);
+                        NimbleSegmentTelemetry segImp = new NimbleSegmentTelemetry
+                        {
+                            SegmentName = m.SegmentName,
+                            RepeateCount = m.RepeatCount,
+                            Impedances = cs.ProcessMeasurementCall(m)
+                        };
+                        impedanceRecord.AddSegmentImpedanceResult(segImp);
+                    }
                 }
+                else
+                {
+                    logger.Warn("Compiled sequence {0} not found. Probably need to do a scan");
+                }
+                logger.Info("Finished processing sequences response. Took {0}s", (DateTime.Now - start).TotalSeconds);
+
+                impedanceRecord.Save();
+
+                return impedanceRecord;
             }
-            else
+            catch (Exception e)
             {
-                logger.Warn("Compiled sequence {0} not found. Probably need to do a scan");
+                logger.Error(e);
             }
-            logger.Info("Finished processing sequences response. Took {0}s", (DateTime.Now - start).TotalSeconds);
-
-            impedanceRecord.Save();
-
-            return impedanceRecord;
+            return new NimbleImpedanceRecord();
         }
 
         //public NimbleImpedanceRecord ProcessSequenceResponseV2(NimbleMeasurementRecord measurementRecord)

@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.cmbCOMPorts = new System.Windows.Forms.ComboBox();
             this.btnConnect = new System.Windows.Forms.Button();
             this.btnCycle = new System.Windows.Forms.Button();
@@ -38,7 +39,6 @@
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblAutoStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.btnScanForProcessors = new System.Windows.Forms.Button();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.btnConnectToNimble = new System.Windows.Forms.Button();
             this.cklFoundDevices = new System.Windows.Forms.CheckedListBox();
             this.lblDevicesRefreshTime = new System.Windows.Forms.Label();
@@ -56,26 +56,43 @@
             this.label1 = new System.Windows.Forms.Label();
             this.pannel_FoundProcessors = new System.Windows.Forms.Panel();
             this.button2 = new System.Windows.Forms.Button();
+            this.btnUptime = new System.Windows.Forms.Button();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.lblTime = new System.Windows.Forms.Label();
+            this.lblAutoStatus_Measure = new System.Windows.Forms.Label();
+            this.lblAutoStatus_alive = new System.Windows.Forms.Label();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.lstFoundSequences = new System.Windows.Forms.ListBox();
+            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.rtbWarnings = new System.Windows.Forms.RichTextBox();
+            this.tmrAuto = new System.Windows.Forms.Timer(this.components);
             this.statusStrip1.SuspendLayout();
             this.grpManualControl.SuspendLayout();
             this.grpManualActions.SuspendLayout();
             this.grpSettings.SuspendLayout();
             this.pannel_FoundProcessors.SuspendLayout();
+            this.tabPage2.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            this.tabControl1.SuspendLayout();
+            this.tabPage3.SuspendLayout();
+            this.tabPage4.SuspendLayout();
             this.SuspendLayout();
             // 
             // cmbCOMPorts
             // 
             this.cmbCOMPorts.FormattingEnabled = true;
-            this.cmbCOMPorts.Location = new System.Drawing.Point(13, 13);
+            this.cmbCOMPorts.Location = new System.Drawing.Point(19, 116);
             this.cmbCOMPorts.Name = "cmbCOMPorts";
-            this.cmbCOMPorts.Size = new System.Drawing.Size(121, 21);
+            this.cmbCOMPorts.Size = new System.Drawing.Size(158, 21);
             this.cmbCOMPorts.TabIndex = 0;
             this.cmbCOMPorts.MouseClick += new System.Windows.Forms.MouseEventHandler(this.cmbCOMPorts_MouseClick);
             // 
             // btnConnect
             // 
-            this.btnConnect.Location = new System.Drawing.Point(13, 41);
+            this.btnConnect.Location = new System.Drawing.Point(183, 114);
             this.btnConnect.Name = "btnConnect";
             this.btnConnect.Size = new System.Drawing.Size(75, 23);
             this.btnConnect.TabIndex = 1;
@@ -103,7 +120,7 @@
             this.lblAutoStatus});
             this.statusStrip1.Location = new System.Drawing.Point(0, 512);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(964, 24);
+            this.statusStrip1.Size = new System.Drawing.Size(859, 24);
             this.statusStrip1.TabIndex = 4;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -126,7 +143,7 @@
             // toolStripStatusLabel1
             // 
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(703, 19);
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(598, 19);
             this.toolStripStatusLabel1.Spring = true;
             // 
             // lblAutoStatus
@@ -146,11 +163,6 @@
             this.btnScanForProcessors.UseVisualStyleBackColor = true;
             this.btnScanForProcessors.Click += new System.EventHandler(this.btnStartScan_Click);
             // 
-            // timer1
-            // 
-            this.timer1.Interval = 1000;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
-            // 
             // btnConnectToNimble
             // 
             this.btnConnectToNimble.Location = new System.Drawing.Point(6, 27);
@@ -164,8 +176,6 @@
             // cklFoundDevices
             // 
             this.cklFoundDevices.FormattingEnabled = true;
-            this.cklFoundDevices.Items.AddRange(new object[] {
-            "F4B85EB48907"});
             this.cklFoundDevices.Location = new System.Drawing.Point(3, 24);
             this.cklFoundDevices.Name = "cklFoundDevices";
             this.cklFoundDevices.Size = new System.Drawing.Size(223, 109);
@@ -206,7 +216,7 @@
             this.grpManualControl.Controls.Add(this.btnScanFiles);
             this.grpManualControl.Controls.Add(this.btnConnectToNimble);
             this.grpManualControl.Controls.Add(this.btnCycle);
-            this.grpManualControl.Location = new System.Drawing.Point(619, 110);
+            this.grpManualControl.Location = new System.Drawing.Point(518, 112);
             this.grpManualControl.Name = "grpManualControl";
             this.grpManualControl.Size = new System.Drawing.Size(333, 191);
             this.grpManualControl.TabIndex = 12;
@@ -237,9 +247,9 @@
             // btnAutoOperation
             // 
             this.btnAutoOperation.Enabled = false;
-            this.btnAutoOperation.Location = new System.Drawing.Point(42, 153);
+            this.btnAutoOperation.Location = new System.Drawing.Point(19, 155);
             this.btnAutoOperation.Name = "btnAutoOperation";
-            this.btnAutoOperation.Size = new System.Drawing.Size(170, 23);
+            this.btnAutoOperation.Size = new System.Drawing.Size(239, 23);
             this.btnAutoOperation.TabIndex = 13;
             this.btnAutoOperation.Text = "Toggle Automatic Operation";
             this.btnAutoOperation.UseVisualStyleBackColor = true;
@@ -247,20 +257,23 @@
             // 
             // grpSettings
             // 
+            this.grpSettings.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.grpSettings.Controls.Add(this.button1);
             this.grpSettings.Controls.Add(this.btnSetWorkingDir);
             this.grpSettings.Controls.Add(this.txtOutputDir);
             this.grpSettings.Controls.Add(this.txtWorkingDir);
-            this.grpSettings.Location = new System.Drawing.Point(326, 12);
+            this.grpSettings.Location = new System.Drawing.Point(12, 9);
             this.grpSettings.Name = "grpSettings";
-            this.grpSettings.Size = new System.Drawing.Size(626, 92);
+            this.grpSettings.Size = new System.Drawing.Size(839, 92);
             this.grpSettings.TabIndex = 14;
             this.grpSettings.TabStop = false;
             this.grpSettings.Text = "Settings";
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(505, 44);
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.button1.Location = new System.Drawing.Point(721, 44);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(115, 23);
             this.button1.TabIndex = 3;
@@ -270,7 +283,8 @@
             // 
             // btnSetWorkingDir
             // 
-            this.btnSetWorkingDir.Location = new System.Drawing.Point(505, 20);
+            this.btnSetWorkingDir.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSetWorkingDir.Location = new System.Drawing.Point(721, 20);
             this.btnSetWorkingDir.Name = "btnSetWorkingDir";
             this.btnSetWorkingDir.Size = new System.Drawing.Size(115, 23);
             this.btnSetWorkingDir.TabIndex = 2;
@@ -280,21 +294,25 @@
             // 
             // txtOutputDir
             // 
+            this.txtOutputDir.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.txtOutputDir.BackColor = System.Drawing.SystemColors.Window;
             this.txtOutputDir.Location = new System.Drawing.Point(7, 47);
             this.txtOutputDir.Name = "txtOutputDir";
             this.txtOutputDir.ReadOnly = true;
-            this.txtOutputDir.Size = new System.Drawing.Size(492, 20);
+            this.txtOutputDir.Size = new System.Drawing.Size(708, 20);
             this.txtOutputDir.TabIndex = 1;
             this.txtOutputDir.Text = "txtOutputDir";
             // 
             // txtWorkingDir
             // 
+            this.txtWorkingDir.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.txtWorkingDir.BackColor = System.Drawing.SystemColors.Window;
             this.txtWorkingDir.Location = new System.Drawing.Point(7, 20);
             this.txtWorkingDir.Name = "txtWorkingDir";
             this.txtWorkingDir.ReadOnly = true;
-            this.txtWorkingDir.Size = new System.Drawing.Size(492, 20);
+            this.txtWorkingDir.Size = new System.Drawing.Size(708, 20);
             this.txtWorkingDir.TabIndex = 0;
             this.txtWorkingDir.Text = "txtWorkingDir";
             // 
@@ -313,35 +331,163 @@
             this.pannel_FoundProcessors.Controls.Add(this.cklFoundDevices);
             this.pannel_FoundProcessors.Controls.Add(this.lblDevicesRefreshTime);
             this.pannel_FoundProcessors.Controls.Add(this.label1);
-            this.pannel_FoundProcessors.Location = new System.Drawing.Point(326, 110);
+            this.pannel_FoundProcessors.Location = new System.Drawing.Point(264, 112);
             this.pannel_FoundProcessors.Name = "pannel_FoundProcessors";
             this.pannel_FoundProcessors.Size = new System.Drawing.Size(248, 192);
             this.pannel_FoundProcessors.TabIndex = 17;
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(104, 263);
+            this.button2.Location = new System.Drawing.Point(19, 196);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.Size = new System.Drawing.Size(239, 23);
             this.button2.TabIndex = 18;
-            this.button2.Text = "button2";
+            this.button2.Text = "Measurement Viewer";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
+            // btnUptime
+            // 
+            this.btnUptime.Location = new System.Drawing.Point(19, 243);
+            this.btnUptime.Name = "btnUptime";
+            this.btnUptime.Size = new System.Drawing.Size(239, 23);
+            this.btnUptime.TabIndex = 21;
+            this.btnUptime.Text = "Uptime Viewer";
+            this.btnUptime.UseVisualStyleBackColor = true;
+            this.btnUptime.Click += new System.EventHandler(this.btnUptime_Click);
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.lblTime);
+            this.tabPage2.Controls.Add(this.lblAutoStatus_Measure);
+            this.tabPage2.Controls.Add(this.lblAutoStatus_alive);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(851, 155);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "Timers";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // lblTime
+            // 
+            this.lblTime.Location = new System.Drawing.Point(36, 13);
+            this.lblTime.Name = "lblTime";
+            this.lblTime.Size = new System.Drawing.Size(378, 48);
+            this.lblTime.TabIndex = 2;
+            this.lblTime.Text = "label4";
+            // 
+            // lblAutoStatus_Measure
+            // 
+            this.lblAutoStatus_Measure.Location = new System.Drawing.Point(36, 61);
+            this.lblAutoStatus_Measure.Name = "lblAutoStatus_Measure";
+            this.lblAutoStatus_Measure.Size = new System.Drawing.Size(302, 72);
+            this.lblAutoStatus_Measure.TabIndex = 1;
+            this.lblAutoStatus_Measure.Text = "...";
+            this.lblAutoStatus_Measure.Click += new System.EventHandler(this.lblAutoStatus_Measure_Click);
+            // 
+            // lblAutoStatus_alive
+            // 
+            this.lblAutoStatus_alive.Location = new System.Drawing.Point(549, 61);
+            this.lblAutoStatus_alive.Name = "lblAutoStatus_alive";
+            this.lblAutoStatus_alive.Size = new System.Drawing.Size(274, 72);
+            this.lblAutoStatus_alive.TabIndex = 0;
+            this.lblAutoStatus_alive.Text = "...";
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.richTextBox1);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(851, 155);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "Program Log";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
             // richTextBox1
             // 
-            this.richTextBox1.Location = new System.Drawing.Point(326, 357);
+            this.richTextBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.richTextBox1.Location = new System.Drawing.Point(0, 0);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(626, 125);
+            this.richTextBox1.Size = new System.Drawing.Size(851, 155);
             this.richTextBox1.TabIndex = 19;
             this.richTextBox1.Text = "";
+            this.richTextBox1.WordWrap = false;
+            // 
+            // tabControl1
+            // 
+            this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.tabPage3);
+            this.tabControl1.Controls.Add(this.tabPage4);
+            this.tabControl1.Location = new System.Drawing.Point(0, 328);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(859, 181);
+            this.tabControl1.TabIndex = 22;
+            this.tabControl1.Selected += new System.Windows.Forms.TabControlEventHandler(this.tabControl1_Selected);
+            // 
+            // tabPage3
+            // 
+            this.tabPage3.Controls.Add(this.lstFoundSequences);
+            this.tabPage3.Location = new System.Drawing.Point(4, 22);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Size = new System.Drawing.Size(851, 155);
+            this.tabPage3.TabIndex = 2;
+            this.tabPage3.Text = "Sequences";
+            this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // lstFoundSequences
+            // 
+            this.lstFoundSequences.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.lstFoundSequences.FormattingEnabled = true;
+            this.lstFoundSequences.Location = new System.Drawing.Point(3, 3);
+            this.lstFoundSequences.Name = "lstFoundSequences";
+            this.lstFoundSequences.Size = new System.Drawing.Size(845, 147);
+            this.lstFoundSequences.TabIndex = 23;
+            // 
+            // tabPage4
+            // 
+            this.tabPage4.Controls.Add(this.rtbWarnings);
+            this.tabPage4.Location = new System.Drawing.Point(4, 22);
+            this.tabPage4.Name = "tabPage4";
+            this.tabPage4.Size = new System.Drawing.Size(851, 155);
+            this.tabPage4.TabIndex = 3;
+            this.tabPage4.Text = "Warnings";
+            this.tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // rtbWarnings
+            // 
+            this.rtbWarnings.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.rtbWarnings.Location = new System.Drawing.Point(3, 3);
+            this.rtbWarnings.Name = "rtbWarnings";
+            this.rtbWarnings.Size = new System.Drawing.Size(845, 149);
+            this.rtbWarnings.TabIndex = 0;
+            this.rtbWarnings.Text = "";
+            // 
+            // tmrAuto
+            // 
+            this.tmrAuto.Enabled = true;
+            this.tmrAuto.Interval = 1000;
+            this.tmrAuto.Tick += new System.EventHandler(this.tmrAuto_Tick);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(964, 536);
-            this.Controls.Add(this.richTextBox1);
+            this.ClientSize = new System.Drawing.Size(859, 536);
+            this.Controls.Add(this.tabControl1);
+            this.Controls.Add(this.btnUptime);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.pannel_FoundProcessors);
             this.Controls.Add(this.grpSettings);
@@ -350,6 +496,7 @@
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.btnConnect);
             this.Controls.Add(this.cmbCOMPorts);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.Text = "Nimble Monitor";
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -362,6 +509,11 @@
             this.grpSettings.PerformLayout();
             this.pannel_FoundProcessors.ResumeLayout(false);
             this.pannel_FoundProcessors.PerformLayout();
+            this.tabPage2.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.tabControl1.ResumeLayout(false);
+            this.tabPage3.ResumeLayout(false);
+            this.tabPage4.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -375,7 +527,6 @@
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel lblDongleStatus;
         private System.Windows.Forms.Button btnScanForProcessors;
-        private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Button btnConnectToNimble;
         private System.Windows.Forms.CheckedListBox cklFoundDevices;
         private System.Windows.Forms.Label lblDevicesRefreshTime;
@@ -396,7 +547,19 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Panel pannel_FoundProcessors;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button btnUptime;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabPage3;
+        private System.Windows.Forms.ListBox lstFoundSequences;
+        private System.Windows.Forms.TabPage tabPage4;
+        private System.Windows.Forms.RichTextBox rtbWarnings;
+        private System.Windows.Forms.Label lblTime;
+        private System.Windows.Forms.Label lblAutoStatus_Measure;
+        private System.Windows.Forms.Label lblAutoStatus_alive;
+        private System.Windows.Forms.Timer tmrAuto;
     }
 }
 

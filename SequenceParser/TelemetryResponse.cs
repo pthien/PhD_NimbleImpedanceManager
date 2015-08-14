@@ -86,6 +86,8 @@ namespace Nimble.Sequences
             }
         }
 
+        
+
         public override string ToString()
         {
             return String.Format("Caps: {0}. PI:{1} Seq:{2} SeqIdx:{3}", Captures_ticks.Count > 0 ?
