@@ -330,7 +330,7 @@ namespace NimbleBluetoothImpedanceManager
             btDongle.TransmitToRemoteDevice(command);
             if (NimbleCmdRx_xmitTelemFin_WaitHandle.WaitOne(DataChunker.Timeout + 10000))
             {
-                logger.Info("Receive Telem data successful. Sequence {0}, Device {1}", sequence, RemoteDeviceId);
+                logger.Info("Receive Telem data successful. Segment {0}, Device {1}", sequence, RemoteDeviceId);
                 lock (stateLock)
                 {
                     if (State == NimbleState.ConnectedToNimbleAndWorking)
@@ -341,7 +341,7 @@ namespace NimbleBluetoothImpedanceManager
             }
             else
             {
-                logger.Warn("Receive Telem timed out. Sequence {0}, Device {1}", sequence, RemoteDeviceId);
+                logger.Warn("Receive Telem timed out. Segment {0}, Device {1}", sequence, RemoteDeviceId);
                 ProcessData("xmitTelem", "fin");
                 //receivingTelemData = false;
                 lock (stateLock)

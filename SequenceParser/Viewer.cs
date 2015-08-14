@@ -206,15 +206,15 @@ namespace Nimble.Sequences
                     {
                         if (impedanceResult is ImpedanceResult)
                         {
-                            int x = impedanceResult._Electrode + (impedanceResult._Implant == Implant.ImplantA ? 0 : 6);
-                            double y = impedanceResult._Impedance_ohms;
+                            int x = impedanceResult.Electrode + (impedanceResult.Implant == Implant.ImplantA ? 0 : 6);
+                            double y = ((ImpedanceResult)impedanceResult)._Impedance_ohms;
                             DataPoint dp = new DataPoint(x, y);
                             segSeries.Points.Add(dp);
                         }
                         else
                         {
-                            int x = impedanceResult._Electrode + (impedanceResult._Implant == Implant.ImplantA ? 0 : 6);
-                            double y = impedanceResult.InCompliance ? 0 : 1;
+                            int x = impedanceResult.Electrode + (impedanceResult.Implant == Implant.ImplantA ? 0 : 6);
+                            double y = ((ComplianceResult)impedanceResult).InCompliance ? 1 : -1;
                             DataPoint dp = new DataPoint(x, y);
                             segSeries.Points.Add(dp);
                         }

@@ -25,7 +25,7 @@ namespace Nimble.Sequences
         }
 
         /// <summary>
-        /// Scans a folder and all subfolders for Sequence or PulseData .c or .h files.
+        /// Scans a folder and all subfolders for Segment or PulseData .c or .h files.
         /// </summary>
         /// <param name="path"></param>
         public void ScanDirectory(string path)
@@ -205,75 +205,75 @@ namespace Nimble.Sequences
             return impedanceRecord;
         }
 
-        public NimbleImpedanceRecord ProcessSequenceResponseV2(NimbleMeasurementRecord measurementRecord)
-        {
-            DateTime start = DateTime.Now;
+        //public NimbleImpedanceRecord ProcessSequenceResponseV2(NimbleMeasurementRecord measurementRecord)
+        //{
+        //    DateTime start = DateTime.Now;
 
-            NimbleImpedanceRecord impedanceRecord = new NimbleImpedanceRecord(measurementRecord);
+        //    NimbleImpedanceRecord impedanceRecord = new NimbleImpedanceRecord(measurementRecord);
 
-            var x = impedanceRecord.Load();
-            if (x.HasValue)
-                return x.Value;
+        //    var x = impedanceRecord.Load();
+        //    if (x.HasValue)
+        //        return x.Value;
 
-            var measurements = measurementRecord.GetMeasurments();
+        //    var measurements = measurementRecord.GetMeasurments();
 
-            if (CompiledSequences.ContainsKey(measurementRecord.GenGuid.ToString()))
-            {
-                logger.Warn("Calculating impedances for {0} ({1})", measurementRecord, measurementRecord.RecordDirectory);
-                CompiledSequence cs = CompiledSequences[measurementRecord.GenGuid.ToString()];
+        //    if (CompiledSequences.ContainsKey(measurementRecord.GenGuid.ToString()))
+        //    {
+        //        logger.Warn("Calculating impedances for {0} ({1})", measurementRecord, measurementRecord.RecordDirectory);
+        //        CompiledSequence cs = CompiledSequences[measurementRecord.GenGuid.ToString()];
 
-                var superSegments = CollateTelemetryResponses(measurements);
-                
-                foreach (NimbleSegmentMeasurment m in measurements)
-                {
-                    NimbleSegmentTelemetry segImp = new NimbleSegmentTelemetry
-                    {
-                        SegmentName = m.SegmentName,
-                        RepeateCount = m.RepeatCount,
-                        Impedances = cs.ProcessMeasurementCall(m)
-                    };
-                    impedanceRecord.AddSegmentImpedanceResult(segImp);
-                }
-            }
-            else
-            {
-                logger.Warn("Compiled sequence {0} not found. Probably need to do a scan");
-            }
-            logger.Info("Finished processing sequences response. Took {0}s", (DateTime.Now - start).TotalSeconds);
+        //        var superSegments = CollateTelemetryResponses(measurements);
 
-            impedanceRecord.Save();
+        //        foreach (NimbleSegmentMeasurment m in measurements)
+        //        {
+        //            NimbleSegmentTelemetry segImp = new NimbleSegmentTelemetry
+        //            {
+        //                SegmentName = m.SegmentName,
+        //                RepeateCount = m.RepeatCount,
+        //                Impedances = cs.ProcessMeasurementCall(m)
+        //            };
+        //            impedanceRecord.AddSegmentImpedanceResult(segImp);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        logger.Warn("Compiled sequence {0} not found. Probably need to do a scan");
+        //    }
+        //    logger.Info("Finished processing sequences response. Took {0}s", (DateTime.Now - start).TotalSeconds);
 
-            return impedanceRecord;
-        }
+        //    impedanceRecord.Save();
 
-        //collects the telemetry responses of multiple segment repeats into a single super segment
-        private static List<NimbleSegmentMeasurment> CollateTelemetryResponses(List<NimbleSegmentMeasurment> measurements)
-        {
-            var groupedBySegments = measurements.GroupBy(a => a.SegmentName);
+        //    return impedanceRecord;
+        //}
 
-            List<NimbleSegmentMeasurment> superSegments = new List<NimbleSegmentMeasurment>();
-            foreach (var segmentGroup in groupedBySegments)
-            {
-                NimbleSegmentMeasurment superSegment = new NimbleSegmentMeasurment();
-                superSegment.path = "";
-                superSegment.RepeatCount = -1;
-                superSegment.TelemetryResponses = new List<TelemetryResponse>();
-                superSegment.SegmentsRun = new List<int>();
-                superSegment.SegmentName = segmentGroup.Key;
-                foreach (NimbleSegmentMeasurment measurement in segmentGroup)
-                {
-                    superSegment.SegmentsRun.AddRange(measurement.SegmentsRun.ToArray());
-                    superSegment.TelemetryResponses.AddRange(measurement.TelemetryResponses.ToArray());
-                }
-                superSegments.Add(superSegment);
-            }
-            return superSegments;
-        }
+        ////collects the telemetry responses of multiple segment repeats into a single super segment
+        //private static List<NimbleSegmentMeasurment> CollateTelemetryResponses(List<NimbleSegmentMeasurment> measurements)
+        //{
+        //    var groupedBySegments = measurements.GroupBy(a => a.SegmentName);
+
+        //    List<NimbleSegmentMeasurment> superSegments = new List<NimbleSegmentMeasurment>();
+        //    foreach (var segmentGroup in groupedBySegments)
+        //    {
+        //        NimbleSegmentMeasurment superSegment = new NimbleSegmentMeasurment();
+        //        superSegment.path = "";
+        //        superSegment.RepeatCount = -1;
+        //        superSegment.NimbleResponses = new List<TelemetryResponse>();
+        //        superSegment.SegmentsRun = new List<int>();
+        //        superSegment.SegmentName = segmentGroup.Key;
+        //        foreach (NimbleSegmentMeasurment measurement in segmentGroup)
+        //        {
+        //            superSegment.SegmentsRun.AddRange(measurement.SegmentsRun.ToArray());
+        //            superSegment.NimbleResponses.AddRange(measurement.NimbleResponses.ToArray());
+        //        }
+        //        superSegments.Add(superSegment);
+        //    }
+        //    return superSegments;
+        //}
     }
 
     public class FilesForGenerationGUID
     {
-        public string PulseData_c, PulseData_h, Sequence_c, Sequence_h;
+        public string PulseData_c = "", PulseData_h = "", Sequence_c = "", Sequence_h = "";
 
         public bool AllFilesReferenced
         {

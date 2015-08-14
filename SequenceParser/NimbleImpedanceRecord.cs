@@ -157,7 +157,6 @@ namespace Nimble.Sequences
         {
             return string.Format("{0} - {1}uA, {2}us {3} compliance", ElectrodeName, Current_uA, PhaseWidth_us,
                 InCompliance ? "in" : "out of");
-            return base.ToString();
         }
     }
 
@@ -282,7 +281,7 @@ namespace Nimble.Sequences
             sw.WriteLine("Subject, {0}", SubjectName);
             sw.WriteLine("Bluetooth Addr, {0}", BluetoothAddress);
             sw.WriteLine("Timestamp, {0}", Timestamp);
-            sw.WriteLine("Sequence GUID, {0}", GenGuid);
+            sw.WriteLine("Segment GUID, {0}", GenGuid);
             sw.WriteLine("Record Directory, {0}", RecordDirectory);
 
             foreach (NimbleSegmentTelemetry m in SegmentImpedances)

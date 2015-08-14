@@ -10,19 +10,19 @@ namespace Nimble.Sequences
     /// </summary>
     public struct NimbleSegmentMeasurment
     {
-        public List<TelemetryResponse> TelemetryResponses;
+        public List<NimbleResponse> NimbleResponses;
         /// <summary>
         /// The segments used in the producetion of this measurement.
         /// </summary>
-        public List<int> SegmentsRun;
+        //public List<int> SegmentsRun;
         public string SegmentName;
         public int RepeatCount;
         public string path;
 
         public NimbleSegmentMeasurment(string filepath)
         {
-            TelemetryResponses = new List<TelemetryResponse>();
-            SegmentsRun = new List<int>();
+            NimbleResponses = new List<NimbleResponse>();
+            //SegmentsRun = new List<int>();
             SegmentName = "";
             RepeatCount = -1;
             path = "";
@@ -44,22 +44,25 @@ namespace Nimble.Sequences
 
                 foreach (string s in lines)
                 {
-                    var m2 = regex_telemResponse.Match(s);
-                    var m3 = regex_segNum.Match(s);
-                    if (m2.Success)
-                    {
-                        var a = int.Parse(m2.Groups[1].Value);
-                        var b = int.Parse(m2.Groups[2].Value);
-                        var c = int.Parse(m2.Groups[3].Value);
-                        var d = m2.Groups[4].Value;
+                    NimbleResponse resp = NimbleResponse.GetResponse(s);
+                    if (resp != null)
+                        NimbleResponses.Add(resp);
+                    //var m2 = regex_telemResponse.Match(s);
+                    //var m3 = regex_segNum.Match(s);
+                    //if (m2.Success)
+                    //{
+                    //    var a = int.Parse(m2.Groups[1].Value);
+                    //    var b = int.Parse(m2.Groups[2].Value);
+                    //    var c = int.Parse(m2.Groups[3].Value);
+                    //    var d = m2.Groups[4].Value;
 
-                        TelemetryResponse t = new TelemetryResponse(a, b, c, d);
-                        TelemetryResponses.Add(t);
-                    }
-                    else if (m3.Success)
-                    {
-                        SegmentsRun.Add(int.Parse(m3.Groups[1].Value));
-                    }
+                    //    TelemetryResponse t = new TelemetryResponse(a, b, c, d);
+                    //    NimbleResponses.Add(t);
+                    //}
+                    //else if (m3.Success)
+                    //{
+                    //    SegmentsRun.Add(int.Parse(m3.Groups[1].Value));
+                    //}
                 }
             }
 
@@ -88,7 +91,9 @@ namespace Nimble.Sequences
             List<NimbleSegmentMeasurment> output = new List<NimbleSegmentMeasurment>();
             foreach (string file in potentialMeasuremetns)
             {
-                output.Add(new NimbleSegmentMeasurment(file));
+                NimbleSegmentMeasurment s = new NimbleSegmentMeasurment(file);
+                if (s.SegmentName.Length >= 1)
+                    output.Add(new NimbleSegmentMeasurment(file));
             }
             return output;
         }

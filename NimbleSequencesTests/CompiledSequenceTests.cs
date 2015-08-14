@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -146,6 +147,33 @@ const int PulseData[108][12] = {
             //Assert.Fail();
         }
 
+        [TestMethod()]
+        public void ParseSequenceTest2()
+        {
+            string alltext = File.ReadAllText("14_514_PCB1_e0479d64-2134-4a30-aff2-fbd33ac78358\\Sequence.c");
+            var o1 = CompiledSequence_Accessor.ParseSequence(alltext);
+            for (int i = 0; i < o1.Length; i++)
+            {
+                CollectionAssert.AreEqual(output1[i], output1[i]);
+            }
+            //Assert.Fail();
+        }
+
+        [TestMethod()]
+        public void CompiledSequenceTest()
+        {
+            var m = CompiledSequence.sequenceExtractor.Match(test1);
+            Assert.IsTrue(m.Success);
+        }
+
+
+        [TestMethod()]
+        public void CompiledSequenceTest2()
+        {
+            string alltext = File.ReadAllText("14_514_PCB1_e0479d64-2134-4a30-aff2-fbd33ac78358\\Sequence.c");
+            var m = CompiledSequence.sequenceExtractor.Match(alltext);
+            Assert.IsTrue(m.Success);
+        }
 
         [TestMethod()]
         public void ParseSequenceTest_BasicPulseData()
@@ -162,6 +190,26 @@ const int PulseData[108][12] = {
         {
             var output = CompiledSequence.ParsePulseDataClockRate(basicPulseData);
             Assert.AreEqual(20, output);
+        }
+
+
+
+        [TestMethod()]
+        public void ExtractGuidTest()
+        {
+
+        }
+
+        [TestMethod()]
+        public void ParsePulseDataClockRateTest()
+        {
+
+        }
+
+        [TestMethod()]
+        public void ProcessMeasurementCallTest()
+        {
+
         }
     }
 }

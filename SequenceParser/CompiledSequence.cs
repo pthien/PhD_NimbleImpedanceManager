@@ -38,7 +38,7 @@ namespace Nimble.Sequences
             }
             else
             {
-                throw new ArgumentException("Sequence files dont have matching generation guids");
+                throw new ArgumentException("Segment files dont have matching generation guids");
             }
         }
 
@@ -130,10 +130,10 @@ namespace Nimble.Sequences
             }
             return result;
         }
-
+        public static Regex sequenceExtractor = new Regex(@"const int Sequence\[([0-9]+)\]\[([0-9]+)\] = {([0-9{},\s]*)};");
         private static int[][] ParseSequence(string alltext)
         {
-            Regex sequenceExtractor = new Regex(@"const int Sequence\[([0-9]+)\]\[([0-9]+)\] = {([0-9{},\s]*)};");
+            
 
             var m = sequenceExtractor.Match(alltext);
             if (m.Success)
@@ -225,7 +225,7 @@ namespace Nimble.Sequences
 
         public List<TelemetryResult> ProcessMeasurementCall(NimbleSegmentMeasurment m1)
         {
-            if(!m1.path.Contains(this.Guid.ToString()))
+            if (!m1.path.Contains(this.Guid.ToString()))
                 throw new ArgumentException("Must supply a measurement from this sequence");
 
             CICState ImplantA = new CICState();
@@ -233,120 +233,308 @@ namespace Nimble.Sequences
 
             int maxPWMA = -1, maxPWMB = -1, minPWMA = -1, minPWMB = -1;
             List<TelemetryResult> telemetryResults = new List<TelemetryResult>();
-            var telemResponses = m1.TelemetryResponses;
-            foreach (int n in m1.SegmentsRun)
+            var telemResponses = m1.NimbleResponses;
+
+            for (int i = 0; i < m1.NimbleResponses.Count; i++)
             {
-                //if (n <= _HashDefines["NORMAL_SEGMENTS"])
-                //    continue;
-
-                for (int i = 0; i < Sequence[n].Length; i++)
+                NimbleResponse resp = m1.NimbleResponses[i];
+                if (resp is SegmentChangeResponse)
                 {
-                    int pulsenum = Sequence[n][i];
-                    Pulse p = PulseData[pulsenum];
-
-                    ImplantA.ApplyPulse(p.LE, p.LM, p.LA_uA);
-                    ImplantB.ApplyPulse(p.RE, p.RM, p.RA_uA);
-                    bool any =
-                        telemResponses.Any(x => x.Sequence == n && x.SequenceIndex == (i) && x.PulseIndex == pulsenum);
-                    if (p.TelemetryCount > 0 || any)
+                    if (i == m1.NimbleResponses.Count - 1) //at last response
                     {
-                        var resp = telemResponses.Where(x => x.Sequence == n && x.SequenceIndex == (i) && x.PulseIndex == pulsenum);
-                        var list = resp.ToList<TelemetryResponse>();
-
-                        if (list.Count == 1)
+                        //nothing to extract
+                        continue;
+                    }
+                    else
+                    {
+                        NimbleResponse nextresp = m1.NimbleResponses[i + 1];
+                        if (nextresp is SegmentChangeResponse)
                         {
-                            TelemetryResponse telemResp = list[0];
-                            if (telemResp.Captures_ticks.Count > 1)
+                            //extract all meaning, but there will be no telem pulses
+                            int segnum = ((SegmentChangeResponse)resp).NewSegment;
+                            for (int j = 0; j < Sequence[segnum].Length; j++)
                             {
-                                logger.Error("Too many captures. Telemresponse:{2}. Pulse:{0}, measurement:{1}", p, m1.path, telemResp);
-                                continue;
+                                int pulsenum = Sequence[segnum][j];
+                                Pulse p = PulseData[pulsenum];
+                                ImplantA.ApplyPulse(p.LE, p.LM, p.LA_uA);
+                                ImplantB.ApplyPulse(p.RE, p.RM, p.RA_uA);
                             }
-                            if (telemResp.Captures_ticks.Count == 0)
-                            {
-                                logger.Debug("none captured. Telemresponse:{2}. Pulse:{0}, measurement:{1}", p, m1.path, telemResp);
-                                continue;
-                            }
-
-                            if (ImplantA.SetUpToReadMaxPWM)
-                            {
-                                logger.Debug("Got Implant A Max PWM. Measurement:{0}, TelemResponse:{1}", m1, telemResp);
-                                maxPWMA = telemResp.Captures_ticks[0];
-                            }
-                            else if (ImplantB.SetUpToReadMaxPWM)
-                            {
-                                logger.Debug("Got Implant B Max PWM. Measurement:{0}, TelemResponse:{1}", m1, telemResp);
-                                maxPWMB = telemResp.Captures_ticks[0];
-                            }
-                            else if (ImplantA.SetUpToReadMinPWM)
-                            {
-                                logger.Debug("Got Implant A Min PWM. Measurement:{0}, TelemResponse:{1}", m1, telemResp);
-                                minPWMA = telemResp.Captures_ticks[0];
-                            }
-                            else if (ImplantB.SetUpToReadMinPWM)
-                            {
-                                logger.Debug("Got Implant B Min PWM. Measurement:{0}, TelemResponse:{1}", m1, telemResp);
-                                minPWMB = telemResp.Captures_ticks[0];
-                            }
-                            else if (ImplantA.SetUpForImpedanceTelemetry)
-                            {
-                                //double current_uA = CochlearImplantTokenEncoder.CITokenEncoder.AmplitudeToCurrent(p.LA_uA);
-                                if (minPWMA > 0 && maxPWMA > 0 && telemResp.Captures_ticks.Count == 1)
-                                {
-                                    var impRes = new ImpedanceResult(p.LE, p.LM, p.LA_uA, maxPWMA, minPWMA,
-                                         telemResp.Captures_ticks[0], ImplantA.vtel_gain, Implant.ImplantA, p.PW_us);
-                                    telemetryResults.Add(impRes);
-                                }
-                                else
-                                {
-                                    logger.Error("Something missing when trying to calculate impedance. MaxPWM:{0}, MinPWM:{1}, telemResult:{2}, MeasurementRecord:{3}",
-                                        maxPWMA, minPWMA, telemResp, m1);
-                                }
-                            }
-                            else if (ImplantB.SetUpForImpedanceTelemetry)
-                            {
-                                //double current_uA = CochlearImplantTokenEncoder.CITokenEncoder.AmplitudeToCurrent(p.RA_uA);
-                                if (minPWMB > 0 && maxPWMB > 0 && telemResp.Captures_ticks.Count == 1)
-                                {
-                                    var impRes = new ImpedanceResult(p.RE, p.RM, p.RA_uA, maxPWMB, minPWMB,
-                                         telemResp.Captures_ticks[0], ImplantB.vtel_gain, Implant.ImplantB, p.PW_us);
-                                    telemetryResults.Add(impRes);
-                                }
-                                else
-                                {
-                                    logger.Error("Something missing when trying to calculate impedance. MaxPWM:{0}, MinPWM:{1}, telemResult:{2}, MeasurementRecord:{3}",
-                                        maxPWMB, minPWMB, telemResp, m1);
-                                }
-                            }
-                            else if (ImplantA.SetUpForComplianceTelemetry)
-                            {
-                                ComplianceResult cr = new ComplianceResult(p, Implant.ImplantA, telemResp.Captures_ticks[0], ClockRate);
-                                telemetryResults.Add(cr);
-                            }
-                            else if (ImplantB.SetUpForComplianceTelemetry)
-                            {
-                                ComplianceResult cr = new ComplianceResult(p, Implant.ImplantB, telemResp.Captures_ticks[0], ClockRate);
-                                telemetryResults.Add(cr);
-                            }
-                            else
-                            {
-                                logger.Error("Unknown telemetry kind: {0}", m1.path);
-                                throw new ArgumentOutOfRangeException("what kind of telemetry are you doing?!?!");
-                            }
-
                         }
-                        else if (list.Count > 1)
+                        else if (((SegmentChangeResponse)resp).NewSegment != ((TelemetryResponse)nextresp).Segment) //next is telem response of different segment
                         {
-                            logger.Error("More items than I'm expecting. Pulse:{0}, measurement:{1}", p, m1.path);
+                            //extract all meaning, but there will be no telem pulses
                         }
-                        else
+                        else //next is telem response of same segment
                         {
-                            logger.Debug("Telem Response not found. Pulse:{0}, measurement:{1}", p, m1.path);
+                            TelemetryResponse nextresp_t = (TelemetryResponse)nextresp;
+                            int seg = nextresp_t.Segment;
+                            int segIdxToStopAt = nextresp_t.SegmentPulseIndex;
+
+                            //apply meaning up to, but not including next pulse
+                            for (int j = 0; j < segIdxToStopAt; j++)
+                            {
+                                int pulsenum = Sequence[seg][j];
+                                Pulse p = PulseData[pulsenum];
+                                ImplantA.ApplyPulse(p.LE, p.LM, p.LA_uA);
+                                ImplantB.ApplyPulse(p.RE, p.RM, p.RA_uA);
+                            }
+
+
                         }
                     }
                 }
+                else
+                {
+                    TelemetryResponse resp_t = (TelemetryResponse)resp;
 
+                    int pulsenum = Sequence[resp_t.Segment][resp_t.SegmentPulseIndex];
+                    Pulse p = PulseData[pulsenum];
+
+                    if (i == m1.NimbleResponses.Count - 1) //at last response
+                    {
+                        //parse data of current response
+                        ExtractDataOfResponse(m1, resp_t, ImplantA, ref maxPWMA, ImplantB, telemetryResults, ref maxPWMB,
+                            ref minPWMA, ref minPWMB, p);
+                    }
+                    else
+                    {
+                        
+                        //apply current pulse
+                        pulsenum = Sequence[resp_t.Segment][resp_t.SegmentPulseIndex];
+                        p = PulseData[pulsenum];
+                        ImplantA.ApplyPulse(p.LE, p.LM, p.LA_uA);
+                        ImplantB.ApplyPulse(p.RE, p.RM, p.RA_uA);
+
+                        //parse data of current response
+                        ExtractDataOfResponse(m1, resp_t, ImplantA, ref maxPWMA, ImplantB, telemetryResults, ref maxPWMB,
+                            ref minPWMA, ref minPWMB, p);
+                        //apply meaning up to, but not including next pulse
+
+                        NimbleResponse nextresp = m1.NimbleResponses[i + 1];
+                        int segIdxToStopAt;
+                        if (nextresp is SegmentChangeResponse)
+                        {
+                            segIdxToStopAt = Sequence[resp_t.Segment].Length;
+                        }
+                        else
+                        {
+                            TelemetryResponse nextresp_t = (TelemetryResponse)nextresp;
+                            segIdxToStopAt = nextresp_t.SegmentPulseIndex;
+                        }
+                        int segToStartAt = resp_t.SegmentPulseIndex + 1;
+
+                        if(segToStartAt< segIdxToStopAt)
+                        for (int j = segToStartAt; j < segIdxToStopAt; j++)
+                        {
+                            pulsenum = Sequence[resp_t.Segment][j];
+                            p = PulseData[pulsenum];
+                            ImplantA.ApplyPulse(p.LE, p.LM, p.LA_uA);
+                            ImplantB.ApplyPulse(p.RE, p.RM, p.RA_uA);
+                        }
+                    }
+
+                }
             }
+
+            //foreach (int n in m1.SegmentsRun)
+            //{
+            //    //if (n <= _HashDefines["NORMAL_SEGMENTS"])
+            //    //    continue;
+
+            //    for (int i = 0; i < Sequence[n].Length; i++)
+            //    {
+            //        int pulsenum = Sequence[n][i];
+            //        Pulse p = PulseData[pulsenum];
+
+            //        ImplantA.ApplyPulse(p.LE, p.LM, p.LA_uA);
+            //        ImplantB.ApplyPulse(p.RE, p.RM, p.RA_uA);
+            //        bool any =
+            //            telemResponses.Any(x => x.Sequence == n && x.SequenceIndex == (i) && x.PulseIndex == pulsenum);
+            //        if (p.TelemetryCount > 0 || any)
+            //        {
+            //            var resp = telemResponses.Where(x => x.Sequence == n && x.SequenceIndex == (i) && x.PulseIndex == pulsenum);
+            //            var list = resp.ToList<TelemetryResponse>();
+
+            //            if (list.Count == 1)
+            //            {
+            //                TelemetryResponse telemResp = list[0];
+            //                if (telemResp.Captures_ticks.Count > 1)
+            //                {
+            //                    logger.Error("Too many captures. Telemresponse:{2}. Pulse:{0}, measurement:{1}", p, m1.path, telemResp);
+            //                    continue;
+            //                }
+            //                if (telemResp.Captures_ticks.Count == 0)
+            //                {
+            //                    logger.Debug("none captured. Telemresponse:{2}. Pulse:{0}, measurement:{1}", p, m1.path, telemResp);
+            //                    continue;
+            //                }
+
+            //                if (ImplantA.SetUpToReadMaxPWM)
+            //                {
+            //                    logger.Debug("Got Implant A Max PWM. Measurement:{0}, TelemResponse:{1}", m1, telemResp);
+            //                    maxPWMA = telemResp.Captures_ticks[0];
+            //                }
+            //                else if (ImplantB.SetUpToReadMaxPWM)
+            //                {
+            //                    logger.Debug("Got Implant B Max PWM. Measurement:{0}, TelemResponse:{1}", m1, telemResp);
+            //                    maxPWMB = telemResp.Captures_ticks[0];
+            //                }
+            //                else if (ImplantA.SetUpToReadMinPWM)
+            //                {
+            //                    logger.Debug("Got Implant A Min PWM. Measurement:{0}, TelemResponse:{1}", m1, telemResp);
+            //                    minPWMA = telemResp.Captures_ticks[0];
+            //                }
+            //                else if (ImplantB.SetUpToReadMinPWM)
+            //                {
+            //                    logger.Debug("Got Implant B Min PWM. Measurement:{0}, TelemResponse:{1}", m1, telemResp);
+            //                    minPWMB = telemResp.Captures_ticks[0];
+            //                }
+            //                else if (ImplantA.SetUpForImpedanceTelemetry)
+            //                {
+            //                    //double current_uA = CochlearImplantTokenEncoder.CITokenEncoder.AmplitudeToCurrent(p.LA_uA);
+            //                    if (minPWMA > 0 && maxPWMA > 0 && telemResp.Captures_ticks.Count == 1)
+            //                    {
+            //                        var impRes = new ImpedanceResult(p.LE, p.LM, p.LA_uA, maxPWMA, minPWMA,
+            //                             telemResp.Captures_ticks[0], ImplantA.vtel_gain, Implant.ImplantA, p.PW_us);
+            //                        telemetryResults.Add(impRes);
+            //                    }
+            //                    else
+            //                    {
+            //                        logger.Error("Something missing when trying to calculate impedance. MaxPWM:{0}, MinPWM:{1}, telemResult:{2}, MeasurementRecord:{3}",
+            //                            maxPWMA, minPWMA, telemResp, m1);
+            //                    }
+            //                }
+            //                else if (ImplantB.SetUpForImpedanceTelemetry)
+            //                {
+            //                    //double current_uA = CochlearImplantTokenEncoder.CITokenEncoder.AmplitudeToCurrent(p.RA_uA);
+            //                    if (minPWMB > 0 && maxPWMB > 0 && telemResp.Captures_ticks.Count == 1)
+            //                    {
+            //                        var impRes = new ImpedanceResult(p.RE, p.RM, p.RA_uA, maxPWMB, minPWMB,
+            //                             telemResp.Captures_ticks[0], ImplantB.vtel_gain, Implant.ImplantB, p.PW_us);
+            //                        telemetryResults.Add(impRes);
+            //                    }
+            //                    else
+            //                    {
+            //                        logger.Error("Something missing when trying to calculate impedance. MaxPWM:{0}, MinPWM:{1}, telemResult:{2}, MeasurementRecord:{3}",
+            //                            maxPWMB, minPWMB, telemResp, m1);
+            //                    }
+            //                }
+            //                else if (ImplantA.SetUpForComplianceTelemetry)
+            //                {
+            //                    ComplianceResult cr = new ComplianceResult(p, Implant.ImplantA, telemResp.Captures_ticks[0], ClockRate);
+            //                    telemetryResults.Add(cr);
+            //                }
+            //                else if (ImplantB.SetUpForComplianceTelemetry)
+            //                {
+            //                    ComplianceResult cr = new ComplianceResult(p, Implant.ImplantB, telemResp.Captures_ticks[0], ClockRate);
+            //                    telemetryResults.Add(cr);
+            //                }
+            //                else
+            //                {
+            //                    logger.Error("Unknown telemetry kind: {0}", m1.path);
+            //                    throw new ArgumentOutOfRangeException("what kind of telemetry are you doing?!?!");
+            //                }
+
+            //            }
+            //            else if (list.Count > 1)
+            //            {
+            //                logger.Error("More items than I'm expecting. Pulse:{0}, measurement:{1}", p, m1.path);
+            //            }
+            //            else
+            //            {
+            //                logger.Debug("Telem Response not found. Pulse:{0}, measurement:{1}", p, m1.path);
+            //            }
+            //        }
+            //    }
+
+            //}
             return telemetryResults;
+        }
+
+        private void ExtractDataOfResponse(NimbleSegmentMeasurment m1, TelemetryResponse resp_t, CICState ImplantA,
+            ref int maxPWMA, CICState ImplantB, List<TelemetryResult> telemetryResults, ref int maxPWMB, ref int minPWMA, ref int minPWMB, Pulse p)
+        {
+            if (resp_t.Captures_ticks.Count > 0)
+            {
+                if (resp_t.Captures_ticks.Count > 1)
+                {
+                    logger.Error("Too many captures. Telemresponse:{2}. Pulse:{0}, measurement:{1}", p, m1.path, resp_t);
+                }
+                else if (resp_t.Captures_ticks.Count == 0)
+                {
+                    logger.Debug("none captured. Telemresponse:{2}. Pulse:{0}, measurement:{1}", p, m1.path, resp_t);
+                }
+                else
+                {
+                    if (ImplantA.SetUpToReadMaxPWM)
+                    {
+                        logger.Debug("Got Implant A Max PWM. Measurement:{0}, TelemResponse:{1}", m1, resp_t);
+                        maxPWMA = resp_t.Captures_ticks[0];
+                    }
+                    else if (ImplantB.SetUpToReadMaxPWM)
+                    {
+                        logger.Debug("Got Implant B Max PWM. Measurement:{0}, TelemResponse:{1}", m1, resp_t);
+                        maxPWMB = resp_t.Captures_ticks[0];
+                    }
+                    else if (ImplantA.SetUpToReadMinPWM)
+                    {
+                        logger.Debug("Got Implant A Min PWM. Measurement:{0}, TelemResponse:{1}", m1, resp_t);
+                        minPWMA = resp_t.Captures_ticks[0];
+                    }
+                    else if (ImplantB.SetUpToReadMinPWM)
+                    {
+                        logger.Debug("Got Implant B Min PWM. Measurement:{0}, TelemResponse:{1}", m1, resp_t);
+                        minPWMB = resp_t.Captures_ticks[0];
+                    }
+                    else if (ImplantA.SetUpForImpedanceTelemetry)
+                    {
+                        //double current_uA = CochlearImplantTokenEncoder.CITokenEncoder.AmplitudeToCurrent(p.LA_uA);
+                        if (minPWMA > 0 && maxPWMA > 0 && resp_t.Captures_ticks.Count == 1)
+                        {
+                            var impRes = new ImpedanceResult(p.LE, p.LM, p.LA_uA, maxPWMA, minPWMA,
+                                resp_t.Captures_ticks[0], ImplantA.vtel_gain, Implant.ImplantA, p.PW_us);
+                            telemetryResults.Add(impRes);
+                        }
+                        else
+                        {
+                            logger.Error(
+                                "Something missing when trying to calculate impedance. MaxPWM:{0}, MinPWM:{1}, telemResult:{2}, MeasurementRecord:{3}",
+                                maxPWMA, minPWMA, resp_t, m1);
+                        }
+                    }
+                    else if (ImplantB.SetUpForImpedanceTelemetry)
+                    {
+                        //double current_uA = CochlearImplantTokenEncoder.CITokenEncoder.AmplitudeToCurrent(p.RA_uA);
+                        if (minPWMB > 0 && maxPWMB > 0 && resp_t.Captures_ticks.Count == 1)
+                        {
+                            var impRes = new ImpedanceResult(p.RE, p.RM, p.RA_uA, maxPWMB, minPWMB,
+                                resp_t.Captures_ticks[0], ImplantB.vtel_gain, Implant.ImplantB, p.PW_us);
+                            telemetryResults.Add(impRes);
+                        }
+                        else
+                        {
+                            logger.Error(
+                                "Something missing when trying to calculate impedance. MaxPWM:{0}, MinPWM:{1}, telemResult:{2}, MeasurementRecord:{3}",
+                                maxPWMB, minPWMB, resp_t, m1);
+                        }
+                    }
+                    else if (ImplantA.SetUpForComplianceTelemetry)
+                    {
+                        ComplianceResult cr = new ComplianceResult(p, Implant.ImplantA, resp_t.Captures_ticks[0], ClockRate);
+                        telemetryResults.Add(cr);
+                    }
+                    else if (ImplantB.SetUpForComplianceTelemetry)
+                    {
+                        ComplianceResult cr = new ComplianceResult(p, Implant.ImplantB, resp_t.Captures_ticks[0], ClockRate);
+                        telemetryResults.Add(cr);
+                    }
+                    else
+                    {
+                        logger.Error("Unknown telemetry kind: {0}", m1.path);
+                        throw new ArgumentOutOfRangeException("what kind of telemetry are you doing?!?!");
+                    }
+                }
+            }
         }
     }
 
