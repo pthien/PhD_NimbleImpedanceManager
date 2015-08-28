@@ -146,19 +146,7 @@ const int PulseData[108][12] = {
             }
             //Assert.Fail();
         }
-
-        [TestMethod()]
-        public void ParseSequenceTest2()
-        {
-            string alltext = File.ReadAllText("14_514_PCB1_e0479d64-2134-4a30-aff2-fbd33ac78358\\Sequence.c");
-            var o1 = CompiledSequence_Accessor.ParseSequence(alltext);
-            for (int i = 0; i < o1.Length; i++)
-            {
-                CollectionAssert.AreEqual(output1[i], output1[i]);
-            }
-            //Assert.Fail();
-        }
-
+           
         [TestMethod()]
         public void CompiledSequenceTest()
         {
@@ -192,7 +180,8 @@ const int PulseData[108][12] = {
             Assert.AreEqual(20, output);
         }
 
-
+      
+        
 
         [TestMethod()]
         public void ExtractGuidTest()

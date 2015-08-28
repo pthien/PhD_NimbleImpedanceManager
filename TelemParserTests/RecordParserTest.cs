@@ -129,7 +129,7 @@ namespace TelemParserTests
             //var x = seq.ProcessSequenceResponse(rec);
         }
 
-
+      
         [TestMethod]
         public void CompiledSequence_ImpedanceAndCompliance()
         {

@@ -6,7 +6,7 @@ using NLog;
 
 namespace Nimble.Sequences
 {
-    public class CICState
+    public class  CICState
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 

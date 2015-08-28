@@ -1,0 +1,12 @@
+{xmitTelem:set}
+{doComp:set}
+{seg:29}
+{seg:32}
+{seg:19}
+{T:C160S32I0[nc]}
+{T:C51S19I0[99-]}
+{T:C52S19I1[97-]}
+{T:C53S19I2[96-]}
+{T:C54S19I3[100-]}
+{seg:31}
+{seg:32}

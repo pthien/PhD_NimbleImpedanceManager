@@ -120,20 +120,6 @@ extern int SegmentRepeats [27];
             Assert.AreEqual(expected.Count, actual.Count);
         }
 
-
-        /// <summary>
-        ///A test for ParseSequence
-        ///</summary>
-        [TestMethod()]
-        [DeploymentItem("SequenceParser.dll")]
-        public void ParseSequenceTest()
-        {
-            string alltext = string.Empty; // TODO: Initialize to an appropriate value
-            int[][] expected = null; // TODO: Initialize to an appropriate value
-            int[][] actual;
-            actual = CompiledSequence_Accessor.ParseSequence(alltext);
-            Assert.AreEqual(expected, actual);
-            Assert.Inconclusive("Verify the correctness of this test method.");
-        }
+               
     }
 }

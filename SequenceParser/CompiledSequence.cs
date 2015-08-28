@@ -240,6 +240,7 @@ namespace Nimble.Sequences
                 for (int i = 0; i < m1.NimbleResponses.Count; i++)
                 {
                     NimbleResponse resp = m1.NimbleResponses[i];
+
                     if (resp is SegmentChangeResponse)
                     {
                         if (i == m1.NimbleResponses.Count - 1) //at last response
@@ -288,7 +289,11 @@ namespace Nimble.Sequences
                     else
                     {
                         TelemetryResponse resp_t = (TelemetryResponse)resp;
-
+                        //if (resp_t.Segment <= 18)
+                        //{
+                        //    logger.Warn("Impossible response ({0}), must be corrupted in file {1}", resp_t, m1.path);
+                        //    continue;
+                        //}
                         int pulsenum = Sequence[resp_t.Segment][resp_t.SegmentPulseIndex];
                         Pulse p = PulseData[pulsenum];
 
@@ -300,16 +305,31 @@ namespace Nimble.Sequences
                         }
                         else
                         {
+                            if (i == 0) //at start, so need to apply beginning of this segment
+                            {
+                                ApplySegmentRange(ImplantA, ImplantB,
+                                   resp_t.SegmentPulseIndex, 0,
+                                    resp_t.Segment);
+                            }
 
                             //apply current pulse
+                            ApplyPulse(ImplantA, ImplantB, resp_t.SegmentPulseIndex, resp_t.Segment);
                             pulsenum = Sequence[resp_t.Segment][resp_t.SegmentPulseIndex];
                             p = PulseData[pulsenum];
                             ImplantA.ApplyPulse(p.LE, p.LM, p.LA);
                             ImplantB.ApplyPulse(p.RE, p.RM, p.RA);
 
                             //parse data of current response
-                            ExtractDataOfResponse(m1, resp_t, ImplantA, ref maxPWMA, ImplantB, telemetryResults, ref maxPWMB,
-                                ref minPWMA, ref minPWMB, p);
+                            if (resp_t.Segment <= 18)
+                            {
+                                logger.Warn("impossible response ({0}), must be corrupted in file {1}", resp_t, m1.path);
+                                //continue;
+                            }
+                            else
+                            {
+                                ExtractDataOfResponse(m1, resp_t, ImplantA, ref maxPWMA, ImplantB, telemetryResults, ref maxPWMB,
+                                    ref minPWMA, ref minPWMB, p);
+                            }
                             //apply meaning up to, but not including next pulse
 
                             NimbleResponse nextresp = m1.NimbleResponses[i + 1];
@@ -318,29 +338,33 @@ namespace Nimble.Sequences
                             {
                                 //apply rest of segment
                                 segIdxToStopAt = Sequence[resp_t.Segment].Length;
+                                if (segIdxToStopAt > 1)
+                                    ApplySegmentRange(ImplantA, ImplantB,
+                                       segIdxToStopAt, resp_t.SegmentPulseIndex + 1,
+                                        resp_t.Segment);
                             }
                             else
                             {
+                                //apply up to next response
                                 TelemetryResponse nextresp_t = (TelemetryResponse)nextresp;
                                 segIdxToStopAt = nextresp_t.SegmentPulseIndex;
-                            }
-                            int segToStartAt = resp_t.SegmentPulseIndex + 1;
+                                ApplySegmentRange(ImplantA, ImplantB,
+                                   segIdxToStopAt, resp_t.SegmentPulseIndex + 1,
+                                    resp_t.Segment);
 
-                            if (segToStartAt < segIdxToStopAt)
-                                for (int j = segToStartAt; j < segIdxToStopAt; j++)
-                                {
-                                    pulsenum = Sequence[resp_t.Segment][j];
-                                    p = PulseData[pulsenum];
-                                    ImplantA.ApplyPulse(p.LE, p.LM, p.LA);
-                                    ImplantB.ApplyPulse(p.RE, p.RM, p.RA);
-                                }
+                            }
+                            //int segToStartAt = resp_t.SegmentPulseIndex + 1;
+
+                            //int segmentToApply = resp_t.Segment;
+                            //if (segToStartAt < segIdxToStopAt)
+                            //    ApplySegmentRange(ImplantA, ImplantB,  segIdxToStopAt, segToStartAt, segmentToApply);
 
                             if (nextresp is TelemetryResponse)
                             {
                                 if (((TelemetryResponse)nextresp).Segment != resp_t.Segment)
                                 {
                                     //apply start of next segment
-                                    segToStartAt = 0;
+                                    int segToStartAt = 0;
                                     segIdxToStopAt = ((TelemetryResponse)nextresp).SegmentPulseIndex;
 
                                     for (int j = segToStartAt; j < segIdxToStopAt; j++)
@@ -367,6 +391,38 @@ namespace Nimble.Sequences
 
             return new List<TelemetryResult>();
         }
+
+        private void ApplySegmentRange(CICState ImplantA, CICState ImplantB, int segIdxToStopAt, int segIdxToStartAt, int segmentToApply)
+        {
+            Pulse p;
+            int pulsenum;
+            if (segIdxToStopAt < segIdxToStartAt)
+            {
+                logger.Warn("Trying to apply a segment backwards! indicies {0} to {1} in seg {2}",
+                    segIdxToStartAt, segIdxToStopAt, segmentToApply);
+                return;
+            }
+
+            else
+                for (int j = segIdxToStartAt; j < segIdxToStopAt; j++)
+                {
+                    pulsenum = Sequence[segmentToApply][j];
+                    p = PulseData[pulsenum];
+                    ImplantA.ApplyPulse(p.LE, p.LM, p.LA);
+                    ImplantB.ApplyPulse(p.RE, p.RM, p.RA);
+                }
+        }
+
+        private void ApplyPulse(CICState ImplantA, CICState ImplantB, int segIdx, int segmentToApply)
+        {
+
+            int pulsenum = Sequence[segmentToApply][segIdx];
+            Pulse p = PulseData[pulsenum];
+            ImplantA.ApplyPulse(p.LE, p.LM, p.LA);
+            ImplantB.ApplyPulse(p.RE, p.RM, p.RA);
+
+        }
+
 
         private void ExtractDataOfResponse(NimbleSegmentMeasurment m1, TelemetryResponse resp_t, CICState ImplantA,
             ref int maxPWMA, CICState ImplantB, List<TelemetryResult> telemetryResults, ref int maxPWMB, ref int minPWMA, ref int minPWMB, Pulse p)
