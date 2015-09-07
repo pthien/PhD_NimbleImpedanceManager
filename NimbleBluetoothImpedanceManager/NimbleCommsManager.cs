@@ -471,8 +471,9 @@ namespace NimbleBluetoothImpedanceManager
                 //btDongle.TransmitAndLog("endSession\n");
                 for (int i = 0; i < 10; i++)
                 {
+                    btDongle.Dongle_ConnectionLost_WaitHandle.Reset();
                     btDongle.TransmitAndLog("AT");
-                    if (btDongle.Dongle_ConnectionLost_WaitHandle.WaitOne(10000))
+                    if (btDongle.Dongle_ConnectionLost_WaitHandle.WaitOne(DataChunker.Timeout + 1000))
                     {
                         logger.Info("Disconnected from Nimble processor on attempt {0}", i);
                         break;

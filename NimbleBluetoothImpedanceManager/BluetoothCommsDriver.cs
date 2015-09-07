@@ -142,6 +142,7 @@ namespace NimbleBluetoothImpedanceManager
 
         public bool ConnectToRemoteDevice(string Address)
         {
+            Dongle_ConnectionEstablished_WaitHandle.Reset();
             TransmitAndLog("AT+CON" + Address);
             _RemoteDeviceAddr = Address;
             if (Dongle_ConnectionEstablished_WaitHandle.WaitOne(DataChunker.Timeout + 20000))
@@ -291,6 +292,7 @@ namespace NimbleBluetoothImpedanceManager
 
         public bool IsDongleOK()
         {
+            Dongle_ATOK_WaitHandle.Reset();
             TransmitAndLog("AT");
             if (Dongle_ATOK_WaitHandle.WaitOne(DataChunker.Timeout + 500))
             {
