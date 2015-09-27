@@ -49,7 +49,7 @@ namespace Nimble.Sequences
             }
             catch (Exception e)
             {
-              logger.Error(e);
+                logger.Error(e);
             }
         }
         private void DoScanDirectory(string path)
@@ -158,6 +158,9 @@ namespace Nimble.Sequences
                         int hours = Int32.Parse(timeparts[3]) + (timeparts[6] == "AM" ? 0 : 12);
                         if (hours == 24)
                             hours = 12;
+                        else if (hours == 12)
+                            hours = 0;
+
                         var x = new DateTime(
                             Int32.Parse(timeparts[0]), Int32.Parse(timeparts[1]), Int32.Parse(timeparts[2]),
                             hours,

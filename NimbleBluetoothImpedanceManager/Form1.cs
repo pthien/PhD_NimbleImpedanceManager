@@ -27,6 +27,7 @@ namespace NimbleBluetoothImpedanceManager
         private SequenceFileManager filemanager;
         private AutomaticNimbleController autoNimble;
 
+        private bool ManualActionInProgress = false;
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -202,7 +203,8 @@ namespace NimbleBluetoothImpedanceManager
         private void UpdateUI(NimbleState state, bool automaticControl)
         {
             grpManualControl.Enabled = (state == NimbleState.ConnectedToNimbleAndReady ||
-                                       state == NimbleState.ConnectedToDongle) && !automaticControl;
+                                       state == NimbleState.ConnectedToDongle) && !automaticControl && !ManualActionInProgress;
+            btnAutoOperation.Enabled = automaticControl || state == NimbleState.ConnectedToDongle;
             grpManualActions.Enabled = state == NimbleState.ConnectedToNimbleAndReady;
             pannel_FoundProcessors.Enabled = grpManualControl.Enabled;
             btnConnectToNimble.Enabled = state == NimbleState.ConnectedToDongle;
@@ -265,42 +267,73 @@ namespace NimbleBluetoothImpedanceManager
 
         private void btnStartScan_Click(object sender, EventArgs e)
         {
-            var items = autoNimble.AutoAction_DeepScanForProcessors();
-            cklFoundDevices.Items.Clear();
-            foreach (NimbleProcessor nimbleProcessor in items)
+            ManualActionInProgress = true;
+
+            ThreadPool.QueueUserWorkItem(delegate
             {
-                cklFoundDevices.Items.Add(nimbleProcessor, true);
-            }
-            lblDevicesRefreshTime.Text = "Last refresh at " + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString()
-                + string.Format("\r\nPress '{0}' to refresh.", btnScanForProcessors.Text);
-            //var devs = nimble.DiscoverDevices();
-            //cklFoundDevices.Items.Clear();
-            ////txtAddresses.Text = "";
-            //if (devs == null)
-            //    return;
-            //foreach (string s in devs)
-            //{
-            //    cklFoundDevices.Items.Add(s);
-            //    cklFoundDevices.SetItemCheckState(0, CheckState.Indeterminate);
-            //    //txtAddresses.Text = s + "\r\n";
-            //}
+
+                var items = autoNimble.AutoAction_DeepScanForProcessors();
+                if (this.InvokeRequired)
+                    this.BeginInvoke((Action)(() =>
+                    {
+                        cklFoundDevices.Items.Clear();
+                        foreach (NimbleProcessor nimbleProcessor in items)
+                        {
+                            cklFoundDevices.Items.Add(nimbleProcessor, true);
+                        }
+                        lblDevicesRefreshTime.Text = "Last refresh at " + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString()
+                            + string.Format("\r\nPress '{0}' to refresh.", btnScanForProcessors.Text);
+                    }));
+                //var devs = nimble.DiscoverDevices();
+                //cklFoundDevices.Items.Clear();
+                ////txtAddresses.Text = "";
+                //if (devs == null)
+                //    return;
+                //foreach (string s in devs)
+                //{
+                //    cklFoundDevices.Items.Add(s);
+                //    cklFoundDevices.SetItemCheckState(0, CheckState.Indeterminate);
+                //    //txtAddresses.Text = s + "\r\n";
+                //}
+                ManualActionInProgress = false;
+                UpdateStatusStrip();
+            });
+
         }
 
         private void bntCheckCurrent_Click(object sender, EventArgs e)
         {
-            autoNimble.DoMeasurements();
-            //autoNimble.DoComplianceCheck();
+            ManualActionInProgress = true;
+            UpdateStatusStrip();
+            ThreadPool.QueueUserWorkItem(delegate
+            {
+                autoNimble.DoMeasurements();
+
+                ManualActionInProgress = false;
+                UpdateStatusStrip();
+            });
         }
 
 
 
         private void btnDisconnect_Click(object sender, EventArgs e)
         {
-            nimble.DisconnectFromNimble();
+            ManualActionInProgress = true;
+            UpdateStatusStrip();
+            ThreadPool.QueueUserWorkItem(delegate
+            {
+                autoNimble.DoMeasurements();
+
+                nimble.DisconnectFromNimble();
+                ManualActionInProgress = false;
+                UpdateStatusStrip();
+            });
         }
 
         private void btnConnectToNimble_Click(object sender, EventArgs e)
         {
+            ManualActionInProgress = true;
+            UpdateStatusStrip();
             if (cklFoundDevices.SelectedIndex >= 0)
             {
                 var line = cklFoundDevices.Items[cklFoundDevices.SelectedIndex];
@@ -314,6 +347,8 @@ namespace NimbleBluetoothImpedanceManager
             {
                 MessageBox.Show("Please select a device");
             }
+            ManualActionInProgress = false;
+            UpdateStatusStrip();
         }
         #endregion
 
@@ -321,12 +356,25 @@ namespace NimbleBluetoothImpedanceManager
 
         private void cmbCOMPorts_MouseClick(object sender, MouseEventArgs e)
         {
+            ManualActionInProgress = true;
+            UpdateStatusStrip();
+
             RefreshComPorts();
+
+            ManualActionInProgress = false;
+            UpdateStatusStrip();
         }
 
         private void btnScan_Click(object sender, EventArgs e)
         {
-            filemanager.ScanDirectory(Settings.Default.SequenceScanFolder);
+            ManualActionInProgress = true;
+            UpdateStatusStrip();
+            ThreadPool.QueueUserWorkItem(delegate
+            {
+                filemanager.ScanDirectory(Settings.Default.SequenceScanFolder);
+                ManualActionInProgress = false;
+                UpdateStatusStrip();
+            });
         }
 
         private void btnAutoOperation_Click(object sender, EventArgs e)

@@ -31,11 +31,9 @@ namespace NimbleBluetoothImpedanceManager
         public bool AutomaticControlEnabled { get; private set; } //= false;
 
         private readonly TimeSpan MIN_ALIVESCAN_PERIOD = new TimeSpan(0, 0, 5, 0);
-        private readonly TimeSpan MIN_IMPEDANCE_PERIOD = new TimeSpan(0, 0, 60, 0);
+        private readonly TimeSpan MIN_IMPEDANCE_PERIOD = new TimeSpan(0, 0, 20, 0);
 
         private List<NimbleProcessor> processorsToMeasure = new List<NimbleProcessor>();
-
-
 
 
 
@@ -163,7 +161,7 @@ namespace NimbleBluetoothImpedanceManager
             {
                 NextDueAliveScan = DateTime.Now + AliveScanPeriod;
                 logger.Info("Alive scan started");
-                logger.Trace("lock time: {0}s", (start - DateTime.Now).TotalSeconds);
+                logger.Debug("lock time: {0}s", (start - DateTime.Now).TotalSeconds);
                 string[] found = nimble.DiscoverDevices();
                 if (found == null)
                     found = new string[0];
@@ -181,20 +179,22 @@ namespace NimbleBluetoothImpedanceManager
 
         public void AutoAction_ImpedanceMeasurements(object state)
         {
+            NextDueImpedanceMeasure = DateTime.Now + ImpedanceMeasurePeriod;
+            logger.Info("Automatic impedance measurements started");
+           
             List<NimbleProcessor> reallyAliveDevices = new List<NimbleProcessor>();
-            DateTime start = DateTime.Now; ;
-            lock (automaticActionLock)
+           
+            fileManager.ScanDirectory(Settings.Default.SequenceScanFolder);
+
+            List<string> devicesMeasured = new List<string>();
+            int measurementsMade = 0;
+
+            foreach (NimbleProcessor nimbleProcessor in processorsToMeasure)
             {
-                NextDueImpedanceMeasure = DateTime.Now + ImpedanceMeasurePeriod;
-                logger.Info("Automatic impedance measurements started");
-                logger.Trace("lock time: {0}s", (DateTime.Now - start).TotalSeconds);
-                fileManager.ScanDirectory(Settings.Default.SequenceScanFolder);
-
-                List<string> devicesMeasured = new List<string>();
-                int measurementsMade = 0;
-
-                foreach (NimbleProcessor nimbleProcessor in processorsToMeasure)
-                {
+                DateTime start = DateTime.Now; 
+                lock (automaticActionLock)
+                {                   
+                    logger.Debug("lock time: {0}s", (DateTime.Now - start).TotalSeconds);
                     logger.Info("Starting impedance measurement for {0}", nimbleProcessor);
                     if (nimble.ConnectToNimble(nimbleProcessor.BluetoothAddress))
                     {
@@ -208,17 +208,18 @@ namespace NimbleBluetoothImpedanceManager
                     {
                         logger.Warn("Could not connect to {0} for imedance measurement", nimbleProcessor);
                     }
+                    logger.Info("Automatic impedance finished. Took {0}s", (DateTime.Now - start).TotalSeconds);
                 }
-                RecordFoundDevices(reallyAliveDevices, "ReallyAliveDevices.txt");
-                logger.Info("Automatic impedance finished. Took {0}s", (DateTime.Now - start).TotalSeconds);
-
-                OnAutomaticAction(new AutomaticActionEventArgs()
-                {
-                    SuccessfullyMeasuredDevices = devicesMeasured,
-                    SuccessfullMeasurements = measurementsMade,
-                    Type = AutomaticActionEventArgs.ActionType.Measurements
-                });
             }
+            RecordFoundDevices(reallyAliveDevices, "ReallyAliveDevices.txt");
+           
+            OnAutomaticAction(new AutomaticActionEventArgs()
+            {
+                SuccessfullyMeasuredDevices = devicesMeasured,
+                SuccessfullMeasurements = measurementsMade,
+                Type = AutomaticActionEventArgs.ActionType.Measurements
+            });
+
         }
 
         public List<NimbleProcessor> AutoAction_DeepScanForProcessors()
@@ -233,7 +234,7 @@ namespace NimbleBluetoothImpedanceManager
                     logger.Trace("lock time: {0}s", (start - DateTime.Now).TotalSeconds);
                     string[] found = nimble.DiscoverDevices();
 
-                    if(found==null)
+                    if (found == null)
                         found = new string[0];
 
                     logger.Info("Deep scan: now trying to connect to the following processors: {0}",
@@ -257,7 +258,7 @@ namespace NimbleBluetoothImpedanceManager
                 }
                 catch (Exception e)
                 {
-                   logger.Error(e);
+                    logger.Error(e);
                 }
             }
             return new List<NimbleProcessor>();
@@ -366,7 +367,7 @@ namespace NimbleBluetoothImpedanceManager
                             bool res = nimble.CollectTelemetryData(kvp.Key, out telemData);
                             if (!res)
                             {
-                                if (telemData == null || telemData.Length==0)
+                                if (telemData == null || telemData.Length == 0)
                                 {
                                     telemData = new string[] { "Collection failed. no data collected" };
                                     logger.Warn("Measurement failed. No data collected for sequence {0}({1}) on {2}({3})",
