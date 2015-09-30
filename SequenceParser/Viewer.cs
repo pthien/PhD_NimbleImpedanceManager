@@ -150,9 +150,10 @@ namespace Nimble.Sequences
         {
             try
             {
+                int maxRange = 6;
                 chart1.Series.Clear();
                 chart1.Titles.Clear();
-                chart1.ChartAreas[0].AxisX.Maximum = 45;
+                chart1.ChartAreas[0].AxisX.Maximum = 2*maxRange+1;
                 chart1.ChartAreas[0].AxisX.Minimum = 0;
 
 
@@ -165,9 +166,9 @@ namespace Nimble.Sequences
                 bool lockedToCompliance = false;
                 int count = 0;
 
-                chart1.DataManipulator.IsEmptyPointIgnored = true;
+                //chart1.DataManipulator.IsEmptyPointIgnored = true;
 
-                int maxRange = 22;
+               
 
                 foreach (var l in lstSpecificMeasurements.SelectedItems)
                 {
@@ -179,7 +180,7 @@ namespace Nimble.Sequences
                     foreach (NimbleSegmentTelemetry segmentImpedance in theseSegments)
                     {
                         Series segSeries = new Series(segmentImpedance.ToString());
-                        segSeries.IsXValueIndexed = true;
+                        //segSeries.IsXValueIndexed = true;
 
                         for (int i = 1; i <=maxRange; i++)
                         {
@@ -192,7 +193,7 @@ namespace Nimble.Sequences
                                     if (lockedToCompliance)
                                         continue;
                                     lockedToImpedance = true;
-                                    int x = result.Electrode + (result.Implant == Implant.ImplantA ? 0 : 100);
+                                    int x = result.Electrode + (result.Implant == Implant.ImplantA ? 0 : maxRange);
                                     double y = ((ImpedanceResult)result)._Impedance_ohms;
                                     DataPoint dp = new DataPoint(x, y);
                                     dp.MarkerStyle = MarkerStyle.Cross;
@@ -204,7 +205,7 @@ namespace Nimble.Sequences
                                     if (lockedToImpedance)
                                         continue;
                                     lockedToCompliance = true;
-                                    int x = result.Electrode + (result.Implant == Implant.ImplantA ? 0 : 100);
+                                    int x = result.Electrode + (result.Implant == Implant.ImplantA ? 0 : maxRange);
                                     double y = ((ComplianceResult)result).InCompliance ? 1 : -1;
                                     DataPoint dp = new DataPoint(x, y);
                                     segSeries.Points.Add(dp);
@@ -213,9 +214,9 @@ namespace Nimble.Sequences
                             }
                             else
                             {
-                                DataPoint dp = new DataPoint(i, 0);
-                                dp.IsEmpty = true;
-                                segSeries.Points.Add(dp);
+                                //DataPoint dp = new DataPoint(i, 0);
+                                //dp.IsEmpty = true;
+                                //segSeries.Points.Add(dp);
                             }
                         }
 
@@ -230,7 +231,7 @@ namespace Nimble.Sequences
                                     if (lockedToCompliance)
                                         continue;
                                     lockedToImpedance = true;
-                                    int x = result.Electrode + (result.Implant == Implant.ImplantA ? 0 : 22);
+                                    int x = result.Electrode + (result.Implant == Implant.ImplantA ? 0 : maxRange);
                                     double y = ((ImpedanceResult)result)._Impedance_ohms;
                                    
                                     DataPoint dp = new DataPoint(x, y);
@@ -243,7 +244,7 @@ namespace Nimble.Sequences
                                     if (lockedToImpedance)
                                         continue;
                                     lockedToCompliance = true;
-                                    int x = result.Electrode + (result.Implant == Implant.ImplantA ? 0 : 22);
+                                    int x = result.Electrode + (result.Implant == Implant.ImplantA ? 0 : maxRange);
                                   
                                     double y = ((ComplianceResult)result).InCompliance ? 1 : -1;
                                     DataPoint dp = new DataPoint(x, y);
@@ -253,9 +254,9 @@ namespace Nimble.Sequences
                             }
                             else
                             {
-                                DataPoint dp = new DataPoint(i+22, 0);
-                                dp.IsEmpty = true;
-                                segSeries.Points.Add(dp);
+                                //DataPoint dp = new DataPoint(i+22, 0);
+                                //dp.IsEmpty = true;
+                                //segSeries.Points.Add(dp);
                             }
                         }
                         //foreach (TelemetryResult impedanceResult in segmentImpedance.Impedances)
@@ -305,47 +306,47 @@ namespace Nimble.Sequences
                     chart1.ChartAreas[0].AxisX.CustomLabels.Add(3.51, 4.49, "A4");
                     chart1.ChartAreas[0].AxisX.CustomLabels.Add(4.51, 5.49, "A5");
                     chart1.ChartAreas[0].AxisX.CustomLabels.Add(5.51, 6.49, "A6");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(6.51, 7.49, "A7");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(7.51, 8.49, "A8");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(8.51, 9.49, "A9");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(9.51, 10.49, "A10");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(10.51, 11.49, "A11");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(11.51, 12.49, "A12");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(12.51, 13.49, "A13");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(13.51, 14.49, "A14");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(14.51, 15.49, "A15");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(15.51, 16.49, "A16");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(16.51, 17.49, "A17");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(17.51, 18.49, "A18");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(18.51, 19.49, "A19");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(19.51, 20.49, "A20");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(20.51, 21.49, "A21");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(21.51, 22.49, "A22");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(6.51, 7.49, "A7");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(7.51, 8.49, "A8");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(8.51, 9.49, "A9");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(9.51, 10.49, "A10");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(10.51, 11.49, "A11");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(11.51, 12.49, "A12");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(12.51, 13.49, "A13");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(13.51, 14.49, "A14");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(14.51, 15.49, "A15");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(15.51, 16.49, "A16");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(16.51, 17.49, "A17");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(17.51, 18.49, "A18");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(18.51, 19.49, "A19");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(19.51, 20.49, "A20");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(20.51, 21.49, "A21");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(21.51, 22.49, "A22");
 
-                    int offset = 22;
+                    int offset = maxRange;
                     chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 0.51, offset + 1.49, "B1");
                     chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 1.51, offset + 2.49, "B2");
                     chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 2.51, offset + 3.49, "B3");
                     chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 3.51, offset + 4.49, "B4");
                     chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 4.51, offset + 5.49, "B5");
                     chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 5.51, offset + 6.49, "B6");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 6.51, offset + 7.49, "B7");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 7.51, offset + 8.49, "B8");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 8.51, offset + 9.49, "B9");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 9.51, offset + 10.49, "B10");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 10.51, offset + 11.49, "B11");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 11.51, offset + 12.49, "B12");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 12.51, offset + 13.49, "B13");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 13.51, offset + 14.49, "B14");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 14.51, offset + 15.49, "B15");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 15.51, offset + 16.49, "B16");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 16.51, offset + 17.49, "B17");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 17.51, offset + 18.49, "B18");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 18.51, offset + 19.49, "B19");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 19.51, offset + 20.49, "B20");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 20.51, offset + 21.49, "B21");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 21.51, offset + 22.49, "B22");
-                    chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 22.51, offset + 23.49, "B23");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 6.51, offset + 7.49, "B7");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 7.51, offset + 8.49, "B8");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 8.51, offset + 9.49, "B9");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 9.51, offset + 10.49, "B10");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 10.51, offset + 11.49, "B11");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 11.51, offset + 12.49, "B12");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 12.51, offset + 13.49, "B13");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 13.51, offset + 14.49, "B14");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 14.51, offset + 15.49, "B15");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 15.51, offset + 16.49, "B16");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 16.51, offset + 17.49, "B17");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 17.51, offset + 18.49, "B18");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 18.51, offset + 19.49, "B19");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 19.51, offset + 20.49, "B20");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 20.51, offset + 21.49, "B21");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 21.51, offset + 22.49, "B22");
+                    //chart1.ChartAreas[0].AxisX.CustomLabels.Add(offset + 22.51, offset + 23.49, "B23");
 
 
                     //chart1.ChartAreas[0].AxisX.la
@@ -357,8 +358,8 @@ namespace Nimble.Sequences
                         chart1.ChartAreas[0].AxisY.TextOrientation = TextOrientation.Auto;
                         chart1.ChartAreas[0].AxisY.CustomLabels.Clear();
 
-                        chart1.ChartAreas[0].AxisY.Maximum = double.NaN;
-                        chart1.ChartAreas[0].AxisY.Minimum = double.NaN;
+                        //chart1.ChartAreas[0].AxisY.Maximum = 130000;
+                        //chart1.ChartAreas[0].AxisY.Minimum = 0;
 
                         chart1.ChartAreas[0].RecalculateAxesScale();
                     }
@@ -369,8 +370,8 @@ namespace Nimble.Sequences
                         chart1.ChartAreas[0].AxisY.CustomLabels.Add(-1.1, -.9, "Out of compliance");
                         chart1.ChartAreas[0].AxisY.TextOrientation = TextOrientation.Auto;
 
-                        chart1.ChartAreas[0].AxisY.Maximum = 2;
-                        chart1.ChartAreas[0].AxisY.Minimum = -2;
+                        //chart1.ChartAreas[0].AxisY.Maximum = 2;
+                        //chart1.ChartAreas[0].AxisY.Minimum = -2;
                     }
                 }
             }

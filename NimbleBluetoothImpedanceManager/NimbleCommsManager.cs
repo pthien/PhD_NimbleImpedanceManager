@@ -351,7 +351,7 @@ namespace NimbleBluetoothImpedanceManager
                 logger.Error("Called collectTelemData when state was {0}", State);
                 //State = NimbleState.ConnectingToNimble;
                 return false;
-            }
+           } 
             //receivingTelemData = true;
             string command = string.Format("\nsetXmitTelem {0}\n", sequence);
             NimbleCmdRx_xmitTelemFin_WaitHandle.Reset();
