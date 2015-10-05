@@ -31,7 +31,7 @@ namespace NimbleBluetoothImpedanceManager
         public bool AutomaticControlEnabled { get; private set; } //= false;
 
         private readonly TimeSpan MIN_ALIVESCAN_PERIOD = new TimeSpan(0, 0, 5, 0);
-        private readonly TimeSpan MIN_IMPEDANCE_PERIOD = new TimeSpan(0, 0, 20, 0);
+        private readonly TimeSpan MIN_IMPEDANCE_PERIOD = new TimeSpan(0, 0, 60, 0);
 
         private List<NimbleProcessor> processorsToMeasure = new List<NimbleProcessor>();
 
