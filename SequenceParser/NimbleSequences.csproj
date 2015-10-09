@@ -61,6 +61,7 @@
   <ItemGroup>
     <Compile Include="CICState.cs" />
     <Compile Include="CompiledSequence.cs" />
+    <Compile Include="MeasurementSummary.cs" />
     <Compile Include="NimbleImpedanceRecord.cs" />
     <Compile Include="NimbleMeasurementRecord.cs" />
     <Compile Include="SequenceFileManager.cs" />
