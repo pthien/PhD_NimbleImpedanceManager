@@ -373,8 +373,9 @@ namespace NimbleBluetoothImpedanceManager
                                     logger.Warn("Measurement failed. No data collected for sequence {0}({1}) on {2}({3})",
                                         kvp.Value, kvp.Key, nimble.NimbleName, nimble.RemoteDeviceId);
                                 }
-                                //logger.Error("Measurement failed. but telem data still collected? Segment {0}({1}) on {2}({3})",
-                                //       kvp.Value, kvp.Key, nimble.NimbleName, nimble.RemoteDeviceId);
+                                logger.Info("Receive Timeout. Colleted {5} lines on segment {0}({1}), repeat {2} on {3}({4})",
+                                    kvp.Value, kvp.Key, i, nimble.NimbleName, nimble.RemoteDeviceId, telemData.Length);
+                                    measurementsMade++;
                             }
                             else
                             {

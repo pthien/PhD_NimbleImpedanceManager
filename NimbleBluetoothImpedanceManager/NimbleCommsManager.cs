@@ -252,7 +252,7 @@ namespace NimbleBluetoothImpedanceManager
                         {
                             receivingTelemData = false;
                             telemData_temp = new List<string>();
-                            _telemData = telemData_temp.ToArray(); 
+                            _telemData = telemData_temp.ToArray();
                             logger.Info("Recieving telem failed because a coil is disconnected, {0}", RemoteNimbleProcessor);
                             NimbleCmdRx_xmitTelemFin_WaitHandle.Set();
                         }
@@ -260,7 +260,7 @@ namespace NimbleBluetoothImpedanceManager
                     }
                     break;
                 case "BothConnected":
-                    if(data=="n")
+                    if (data == "n")
                         logger.Error("Nimble processor {0} has 1 or more coils detached", RemoteNimbleProcessor);
                     if (data == "y")
                         logger.Info("Nimble processor {0} has all coils attached", RemoteNimbleProcessor);
@@ -306,7 +306,7 @@ namespace NimbleBluetoothImpedanceManager
                 }
             }
 
-          
+
 
             logger.Info("Initialisation successful");
             State = NimbleState.ConnectedToDongle;
@@ -351,7 +351,7 @@ namespace NimbleBluetoothImpedanceManager
                 logger.Error("Called collectTelemData when state was {0}", State);
                 //State = NimbleState.ConnectingToNimble;
                 return false;
-           } 
+            }
             //receivingTelemData = true;
             string command = string.Format("\nsetXmitTelem {0}\n", sequence);
             NimbleCmdRx_xmitTelemFin_WaitHandle.Reset();
@@ -361,30 +361,57 @@ namespace NimbleBluetoothImpedanceManager
                 _telemData = null;
             }
             btDongle.TransmitToRemoteDevice(command);
-            if (NimbleCmdRx_xmitTelemFin_WaitHandle.WaitOne(DataChunker.Timeout + 10000))
+
+            while ((DateTime.Now - btDongle.TimeOfMostRecentlyReceivedChunk).TotalSeconds < 5)
             {
-                logger.Info("Receive Telem data successful. Sequence {0}, Device {1}", sequence, RemoteDeviceId);
-                lock (stateLock)
+                if (NimbleCmdRx_xmitTelemFin_WaitHandle.WaitOne(100))
                 {
-                    if (State == NimbleState.ConnectedToNimbleAndWorking)
-                        State = NimbleState.ConnectedToNimbleAndReady;
+                    logger.Info("Receive Telem data successful. Sequence {0}, Device {1}", sequence, RemoteDeviceId);
+                    lock (stateLock)
+                    {
+                        if (State == NimbleState.ConnectedToNimbleAndWorking)
+                            State = NimbleState.ConnectedToNimbleAndReady;
+                    }
+                    data = (string[])TelemetryData.Clone();
+                    return true;
                 }
-                data = (string[])TelemetryData.Clone();
-                return true;
             }
-            else
+
+            logger.Info("Receive Telem timed out. Sequence {0}, Device {1}", sequence, RemoteDeviceId);
+            ProcessData("xmitTelem", "fin");
+            //receivingTelemData = false;
+            lock (stateLock)
             {
-                logger.Info("Receive Telem timed out. Sequence {0}, Device {1}", sequence, RemoteDeviceId);
-                ProcessData("xmitTelem", "fin");
-                //receivingTelemData = false;
-                lock (stateLock)
-                {
-                    if (State == NimbleState.ConnectedToNimbleAndWorking)
-                        State = NimbleState.ConnectedToNimbleAndReady;
-                }
-                data = (string[])TelemetryData.Clone();
-                return false;
+                if (State == NimbleState.ConnectedToNimbleAndWorking)
+                    State = NimbleState.ConnectedToNimbleAndReady;
             }
+            data = (string[])TelemetryData.Clone();
+            return false;
+
+            //if (NimbleCmdRx_xmitTelemFin_WaitHandle.WaitOne(DataChunker.Timeout + 10000))
+            //{
+            //    logger.Info("Receive Telem data successful. Sequence {0}, Device {1}", sequence, RemoteDeviceId);
+            //    lock (stateLock)
+            //    {
+            //        if (State == NimbleState.ConnectedToNimbleAndWorking)
+            //            State = NimbleState.ConnectedToNimbleAndReady;
+            //    }
+            //    data = (string[])TelemetryData.Clone();
+            //    return true;
+            //}
+            //else
+            //{
+            //    logger.Info("Receive Telem timed out. Sequence {0}, Device {1}", sequence, RemoteDeviceId);
+            //    ProcessData("xmitTelem", "fin");
+            //    //receivingTelemData = false;
+            //    lock (stateLock)
+            //    {
+            //        if (State == NimbleState.ConnectedToNimbleAndWorking)
+            //            State = NimbleState.ConnectedToNimbleAndReady;
+            //    }
+            //    data = (string[])TelemetryData.Clone();
+            //    return false;
+            //}
         }
 
         private bool GetNimbleName()
@@ -496,7 +523,7 @@ namespace NimbleBluetoothImpedanceManager
                 else
                 {
                     logger.Info("Disconnection completed successfuly", i);
-                    State= NimbleState.ConnectedToDongle;
+                    State = NimbleState.ConnectedToDongle;
                     break;
                 }
             }

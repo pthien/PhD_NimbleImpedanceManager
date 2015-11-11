@@ -62,6 +62,7 @@ namespace NimbleBluetoothImpedanceManager
         }
 
 
+        public DateTime TimeOfMostRecentlyReceivedChunk { get; private set; }
         private string[] MostRecentlyRecievedData = new string[] { };
 
         private object knownDevicesLock = new object();
@@ -136,7 +137,7 @@ namespace NimbleBluetoothImpedanceManager
             //logger.Debug("Got a chunk {0}", e.Chunk.Replace("\n", "\\n").Replace("\r", "\\r"));
             dataLoggerRX.Info("[{0}] {1}", e.Reason.ToString(), e.Chunk.EscapeWhiteSpace());
             MostRecentlyRecievedData = ChunkParser.ParseChunk(e.Chunk).ToArray();
-
+            TimeOfMostRecentlyReceivedChunk = DateTime.Now;
             ProcessData(MostRecentlyRecievedData);
         }
 

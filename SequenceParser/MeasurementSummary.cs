@@ -23,7 +23,8 @@ namespace Nimble.Sequences
             subjectName = "15_520_DINAH";
             //string folder = @"C:\Users\Patrick\Dropbox\Preitaly\NimbleBluetoothImpedanceManager\NimbleBluetoothImpedanceManager\bin\Debug\Output";
             //string folder = @"S:\Dropbox\Preitaly\NimbleBluetoothImpedanceManager\NimbleBluetoothImpedanceManager\bin\Debug\Output";
-            string folder = @"C:\Users\thienp\Desktop\Kraken processor test\Real DAta\Nimble Logs";
+            //string folder = @"C:\Users\thienp\Desktop\Kraken processor test\Real DAta\Nimble Logs";
+            string folder = @"C:\Users\thienp\Desktop\chronics v2.2\20151001\20151001\Active Chronic Laptop Backups\20150825\Nimble Logs";
             List<NimbleMeasurementRecord> recordsall = SequenceFileManager.GetTelemetryRecords(folder);
 
             var myrecs = recordsall.Where(x => x.SubjectName == subjectName).OrderBy(x => x.Timestamp);
@@ -117,12 +118,12 @@ namespace Nimble.Sequences
             for (int i = 1; i < 23; i++)
                 sw.Write("B{0}, ", i);
             sw.WriteLine();
-
+        
             foreach (NimbleMeasurementRecord record in records.OrderBy(r => r.Timestamp))
             {
                 NimbleImpedanceRecord impedanceRec = fileMan.ProcessSequenceResponse(record);
 
-                var concatted = impedanceRec.SegmentImpedances.Select(x => x.Impedances);
+                var concatted = impedanceRec.SegmentImpedances.Where(x=>!x.SegmentName.StartsWith("IMPEDANCE_MP25")).Select(x => x.Impedances);
                 var con = concatted.SelectMany(x => x).ToArray();
 
                 if (measure.measurementType == typeof(ImpedanceResult))
