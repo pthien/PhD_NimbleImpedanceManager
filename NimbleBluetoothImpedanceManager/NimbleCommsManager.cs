@@ -81,6 +81,11 @@ namespace NimbleBluetoothImpedanceManager
             {
                 lock (receivingTelemDataLock)
                 {
+                    if (_telemData == null)
+                    {
+                        logger.Error("Hey, there's a bug! Don't trust this data. Restart Me!");
+                        _telemData = new string[0];
+                    }
                     string[] copy = (string[])_telemData.Clone();
                     return copy;
                 }
@@ -360,9 +365,11 @@ namespace NimbleBluetoothImpedanceManager
                 telemData_temp = new List<string>();
                 _telemData = null;
             }
+
+            DateTime collectionStartedTime = DateTime.Now;  //ensure a minimum timeout if the 
             btDongle.TransmitToRemoteDevice(command);
 
-            while ((DateTime.Now - btDongle.TimeOfMostRecentlyReceivedChunk).TotalSeconds < 5)
+            while ((DateTime.Now - btDongle.TimeOfMostRecentlyReceivedChunk).TotalSeconds < 5 || (DateTime.Now - collectionStartedTime).TotalSeconds < 5)
             {
                 if (NimbleCmdRx_xmitTelemFin_WaitHandle.WaitOne(100))
                 {

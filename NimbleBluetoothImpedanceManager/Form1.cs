@@ -322,8 +322,6 @@ namespace NimbleBluetoothImpedanceManager
             UpdateStatusStrip();
             ThreadPool.QueueUserWorkItem(delegate
             {
-                //autoNimble.DoMeasurements();
-
                 nimble.DisconnectFromNimble();
                 ManualActionInProgress = false;
                 UpdateStatusStrip();

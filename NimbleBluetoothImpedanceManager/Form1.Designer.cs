@@ -158,7 +158,7 @@
             this.btnScanForProcessors.Enabled = false;
             this.btnScanForProcessors.Location = new System.Drawing.Point(6, 113);
             this.btnScanForProcessors.Name = "btnScanForProcessors";
-            this.btnScanForProcessors.Size = new System.Drawing.Size(159, 23);
+            this.btnScanForProcessors.Size = new System.Drawing.Size(151, 23);
             this.btnScanForProcessors.TabIndex = 5;
             this.btnScanForProcessors.Text = "Scan for Nimble Processors";
             this.btnScanForProcessors.UseVisualStyleBackColor = true;
@@ -202,7 +202,7 @@
             // 
             // bntCheckCurrent
             // 
-            this.bntCheckCurrent.Location = new System.Drawing.Point(6, 24);
+            this.bntCheckCurrent.Location = new System.Drawing.Point(6, 106);
             this.bntCheckCurrent.Name = "bntCheckCurrent";
             this.bntCheckCurrent.Size = new System.Drawing.Size(132, 24);
             this.bntCheckCurrent.TabIndex = 11;
@@ -217,9 +217,9 @@
             this.grpManualControl.Controls.Add(this.btnScanFiles);
             this.grpManualControl.Controls.Add(this.btnConnectToNimble);
             this.grpManualControl.Controls.Add(this.btnCycle);
-            this.grpManualControl.Location = new System.Drawing.Point(518, 112);
+            this.grpManualControl.Location = new System.Drawing.Point(502, 112);
             this.grpManualControl.Name = "grpManualControl";
-            this.grpManualControl.Size = new System.Drawing.Size(333, 191);
+            this.grpManualControl.Size = new System.Drawing.Size(349, 191);
             this.grpManualControl.TabIndex = 12;
             this.grpManualControl.TabStop = false;
             this.grpManualControl.Text = "Manual Control";
@@ -228,16 +228,16 @@
             // 
             this.grpManualActions.Controls.Add(this.bntCheckCurrent);
             this.grpManualActions.Controls.Add(this.btnDisconnect);
-            this.grpManualActions.Location = new System.Drawing.Point(171, 19);
+            this.grpManualActions.Location = new System.Drawing.Point(163, 17);
             this.grpManualActions.Name = "grpManualActions";
-            this.grpManualActions.Size = new System.Drawing.Size(153, 137);
+            this.grpManualActions.Size = new System.Drawing.Size(180, 168);
             this.grpManualActions.TabIndex = 14;
             this.grpManualActions.TabStop = false;
             this.grpManualActions.Text = "Actions";
             // 
             // btnDisconnect
             // 
-            this.btnDisconnect.Location = new System.Drawing.Point(6, 54);
+            this.btnDisconnect.Location = new System.Drawing.Point(6, 136);
             this.btnDisconnect.Name = "btnDisconnect";
             this.btnDisconnect.Size = new System.Drawing.Size(132, 23);
             this.btnDisconnect.TabIndex = 13;
@@ -258,8 +258,8 @@
             // 
             // grpSettings
             // 
-            this.grpSettings.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.grpSettings.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.grpSettings.Controls.Add(this.button1);
             this.grpSettings.Controls.Add(this.btnSetWorkingDir);
             this.grpSettings.Controls.Add(this.txtOutputDir);
@@ -295,8 +295,8 @@
             // 
             // txtOutputDir
             // 
-            this.txtOutputDir.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtOutputDir.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.txtOutputDir.BackColor = System.Drawing.SystemColors.Window;
             this.txtOutputDir.Location = new System.Drawing.Point(7, 47);
             this.txtOutputDir.Name = "txtOutputDir";
@@ -307,8 +307,8 @@
             // 
             // txtWorkingDir
             // 
-            this.txtWorkingDir.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtWorkingDir.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.txtWorkingDir.BackColor = System.Drawing.SystemColors.Window;
             this.txtWorkingDir.Location = new System.Drawing.Point(7, 20);
             this.txtWorkingDir.Name = "txtWorkingDir";
@@ -334,7 +334,7 @@
             this.pannel_FoundProcessors.Controls.Add(this.label1);
             this.pannel_FoundProcessors.Location = new System.Drawing.Point(264, 112);
             this.pannel_FoundProcessors.Name = "pannel_FoundProcessors";
-            this.pannel_FoundProcessors.Size = new System.Drawing.Size(248, 192);
+            this.pannel_FoundProcessors.Size = new System.Drawing.Size(232, 192);
             this.pannel_FoundProcessors.TabIndex = 17;
             // 
             // button2
@@ -408,9 +408,9 @@
             // 
             // richTextBox1
             // 
-            this.richTextBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.richTextBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.richTextBox1.Location = new System.Drawing.Point(0, 0);
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.Size = new System.Drawing.Size(851, 155);
@@ -420,9 +420,9 @@
             // 
             // tabControl1
             // 
-            this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Controls.Add(this.tabPage3);
@@ -446,9 +446,9 @@
             // 
             // lstFoundSequences
             // 
-            this.lstFoundSequences.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lstFoundSequences.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.lstFoundSequences.FormattingEnabled = true;
             this.lstFoundSequences.Location = new System.Drawing.Point(3, 3);
             this.lstFoundSequences.Name = "lstFoundSequences";
@@ -467,9 +467,9 @@
             // 
             // rtbWarnings
             // 
-            this.rtbWarnings.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.rtbWarnings.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.rtbWarnings.Location = new System.Drawing.Point(3, 3);
             this.rtbWarnings.Name = "rtbWarnings";
             this.rtbWarnings.Size = new System.Drawing.Size(845, 149);
