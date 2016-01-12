@@ -488,7 +488,7 @@ namespace NimbleBluetoothImpedanceManager
                     if (!fatalTriggered)
                     {
                         fatalTriggered = true;
-                        logger.Fatal("Apparent deadlock condition. Please restart program.");
+                        logger.Fatal("Apparent deadlock condition. Please restart program. Ingore this if you were just manually checking impedances");
                     }
                 }
             }

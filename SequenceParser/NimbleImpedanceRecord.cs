@@ -4,6 +4,7 @@ using NLog;
 using PIC_Sequence;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Nimble.Sequences
@@ -289,9 +290,10 @@ namespace Nimble.Sequences
                 
                 sw.Write(m + ",");
 
-                for (int i = 1; i < 7; i++)
+                for (int i = 1; i < 23; i++)
                 {
-                    var one = m.Impedances.Where(x => x.Implant == Implant.ImplantA && x.Electrode == i).OfType<ImpedanceResult>();
+                    int copy = i;
+                    var one = m.Impedances.Where(x => x.Implant == Implant.ImplantA && x.Electrode == copy).OfType<ImpedanceResult>();
                     if (one.Any())
                     {
                         var first = one.First();
@@ -303,7 +305,7 @@ namespace Nimble.Sequences
                     }
 
                 }
-                for (int i = 1; i < 7; i++)
+                for (int i = 1; i < 23; i++)
                 {
                     var one = m.Impedances.Where(x => x.Implant == Implant.ImplantB && x.Electrode == i).OfType<ImpedanceResult>();
                     if (one.Any())

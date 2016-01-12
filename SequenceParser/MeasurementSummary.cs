@@ -20,11 +20,12 @@ namespace Nimble.Sequences
     {
         static public void GenerateSummaryForSubject(string subjectName)
         {
-            subjectName = "15_520_DINAH";
+            subjectName = "15_519_KRAKEN";
             //string folder = @"C:\Users\Patrick\Dropbox\Preitaly\NimbleBluetoothImpedanceManager\NimbleBluetoothImpedanceManager\bin\Debug\Output";
             //string folder = @"S:\Dropbox\Preitaly\NimbleBluetoothImpedanceManager\NimbleBluetoothImpedanceManager\bin\Debug\Output";
             //string folder = @"C:\Users\thienp\Desktop\Kraken processor test\Real DAta\Nimble Logs";
-            string folder = @"C:\Users\thienp\Desktop\chronics v2.2\20151001\20151001\Active Chronic Laptop Backups\20150825\Nimble Logs";
+            //string folder = @"C:\Users\thienp\Desktop\chronics v2.2\20151001\20151001\Active Chronic Laptop Backups\20150825\Nimble Logs";
+            string folder = @"C:\Users\thienp\Desktop\logs";
             List<NimbleMeasurementRecord> recordsall = SequenceFileManager.GetTelemetryRecords(folder);
 
             var myrecs = recordsall.Where(x => x.SubjectName == subjectName).OrderBy(x => x.Timestamp);

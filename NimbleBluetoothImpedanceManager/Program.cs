@@ -15,7 +15,7 @@ namespace NimbleBluetoothImpedanceManager
         static void Main()
         {
 
-            Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
+            //Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
