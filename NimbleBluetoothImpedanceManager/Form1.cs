@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design.Serialization;
 using System.Data.SqlTypes;
 using System.Drawing;
 using System.IO;
@@ -33,6 +34,7 @@ namespace NimbleBluetoothImpedanceManager
         {
             logger = LogManager.GetCurrentClassLogger();
 
+            logger.Info("Nimble monitor started. Version {0}", System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
             logger.Warn("Test warning. Program started. Please ignore");
 
             RefreshComPorts();
@@ -54,6 +56,8 @@ namespace NimbleBluetoothImpedanceManager
                 Settings.Default.SequenceScanFolder = Directory.GetCurrentDirectory();
             txtWorkingDir.Text = Settings.Default.SequenceScanFolder;
 
+            logger.Debug("impedance period: {0}", Settings.Default.ImpedanceScanPeriod);
+            logger.Debug("alive scan period: {0}", Settings.Default.AliveScanPeriod);
             //LoggingConfiguration logConfig = new LoggingConfiguration();
 
             //RichTextBoxTarget rtbTarget = new RichTextBoxTarget();
@@ -66,6 +70,32 @@ namespace NimbleBluetoothImpedanceManager
             //LogManager.Configuration.LoggingRules.Add(lr);
 
             //.Configuration.
+
+            ContextMenuStrip cmsSegmentsToMeasure = new ContextMenuStrip();
+            cmsSegmentsToMeasure.Items.Add("Select all");
+            cmsSegmentsToMeasure.Items.Add("Deselect all");
+            cmsSegmentsToMeasure.ItemClicked += new ToolStripItemClickedEventHandler(cmsSegmentsToMeasure_ItemClicked);
+            chkCheckSegments.ContextMenuStrip = cmsSegmentsToMeasure;
+        }
+
+        void cmsSegmentsToMeasure_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            ToolStripItem item = e.ClickedItem;
+            switch (item.Text)
+            {
+                case "Select all":
+                    for (int i = 0; i < chkCheckSegments.Items.Count; i++)
+                        chkCheckSegments.SetItemChecked(i, true);
+                    break;
+                case "Deselect all":
+                    for (int i = 0; i < chkCheckSegments.Items.Count; i++)
+                        chkCheckSegments.SetItemChecked(i, false);
+                    break;
+                default:
+                    logger.Error("Impossible cms selection");
+                    break;
+            }
+            //throw new NotImplementedException();
         }
 
         void autoNimble_AutomaticActionHappened(object sender, AutomaticNimbleController.AutomaticActionEventArgs e)
@@ -184,6 +214,7 @@ namespace NimbleBluetoothImpedanceManager
                    lblDongleStatus.BackColor = colourCon;
                    lblAutoStatus.Text = "Automatic Impedance Collection is " +
                                         (autoNimble.AutomaticControlEnabled ? "On" : "Off");
+                   lblAutoStatus.BackColor = autoNimble.AutomaticControlEnabled ? clrReady : clrNotReady;
 
                    UpdateUI(state, autoNimble.AutomaticControlEnabled);
                    logger.Trace("Update ui from {0}", Thread.CurrentThread.Name);
@@ -196,6 +227,8 @@ namespace NimbleBluetoothImpedanceManager
                 lblDongleStatus.BackColor = colourCon;
                 lblAutoStatus.Text = "Automatic Impedance Collection is " +
                                      (autoNimble.AutomaticControlEnabled ? "On" : "Off");
+                lblAutoStatus.BackColor = autoNimble.AutomaticControlEnabled ? clrReady : clrNotReady;
+
                 UpdateUI(state, autoNimble.AutomaticControlEnabled);
             }
         }
@@ -208,6 +241,7 @@ namespace NimbleBluetoothImpedanceManager
             grpManualActions.Enabled = state == NimbleState.ConnectedToNimbleAndReady;
             pannel_FoundProcessors.Enabled = grpManualControl.Enabled;
             btnConnectToNimble.Enabled = state == NimbleState.ConnectedToDongle;
+            btnScanFiles.Enabled = state == NimbleState.ConnectedToDongle;
             btnScanForProcessors.Enabled = state == NimbleState.ConnectedToDongle;
 
             grpSettings.Enabled = !autoNimble.AutomaticControlEnabled && state <= NimbleState.ConnectedToDongle;
@@ -307,7 +341,26 @@ namespace NimbleBluetoothImpedanceManager
             UpdateStatusStrip();
             ThreadPool.QueueUserWorkItem(delegate
             {
-                autoNimble.DoMeasurements();
+                //autoNimble.DoMeasurements();
+
+                string guid = nimble.GetSequenceGUID();
+
+                List<int> segIDsToCheck = new List<int>();
+
+                foreach (object d in chkCheckSegments.CheckedItems)
+                {
+                    if (d is MeasurementSegmentDisplayItem)
+                    {
+                        MeasurementSegmentDisplayItem d2 = (MeasurementSegmentDisplayItem)d;
+                        segIDsToCheck.Add(d2.SegmentID);
+                        logger.Debug("Will check {0}({1})", d2.SegmentName, d2.SegmentID);
+                    }
+                }
+
+                if (segIDsToCheck.Count > 0)
+                    autoNimble.MeasureSubset(guid, segIDsToCheck.ToArray());
+                else
+                    logger.Info("No segments selected to measure");
 
                 ManualActionInProgress = false;
                 UpdateStatusStrip();
@@ -319,6 +372,7 @@ namespace NimbleBluetoothImpedanceManager
         private void btnDisconnect_Click(object sender, EventArgs e)
         {
             ManualActionInProgress = true;
+            chkCheckSegments.Items.Clear();
             UpdateStatusStrip();
             ThreadPool.QueueUserWorkItem(delegate
             {
@@ -332,6 +386,17 @@ namespace NimbleBluetoothImpedanceManager
         {
             ManualActionInProgress = true;
             UpdateStatusStrip();
+
+            var resetEvent = new ManualResetEvent(false);
+            //update compiled sequences
+            filemanager.ScanDirectory(Settings.Default.SequenceScanFolder);
+            ThreadPool.QueueUserWorkItem(delegate
+            {
+                filemanager.ScanDirectory(Settings.Default.SequenceScanFolder);
+                resetEvent.Set();
+            });
+            resetEvent.WaitOne();
+
             if (cklFoundDevices.SelectedIndex >= 0)
             {
                 var line = cklFoundDevices.Items[cklFoundDevices.SelectedIndex];
@@ -339,6 +404,22 @@ namespace NimbleBluetoothImpedanceManager
                 {
                     string addr = ((NimbleProcessor)line).BluetoothAddress;
                     nimble.ConnectToNimble(addr);
+
+                    //update impedance segments that can be checked
+                    chkCheckSegments.Items.Clear();
+                    var guid = nimble.GetSequenceGUID();
+                    if (filemanager.CompiledSequences.ContainsKey(guid))
+                    {
+                        var compiledsequence = filemanager.CompiledSequences[guid];
+
+                        var displayItems = new List<MeasurementSegmentDisplayItem>();
+
+                        foreach (var kvp in compiledsequence.MeasurementSegments)
+                        {
+                            displayItems.Add(new MeasurementSegmentDisplayItem(kvp.Value, kvp.Key));
+                        }
+                        chkCheckSegments.Items.AddRange(displayItems.ToArray());
+                    }
                 }
             }
             else
@@ -347,6 +428,21 @@ namespace NimbleBluetoothImpedanceManager
             }
             ManualActionInProgress = false;
             UpdateStatusStrip();
+        }
+
+        private class MeasurementSegmentDisplayItem
+        {
+            public MeasurementSegmentDisplayItem(string SegName, int SegID)
+            {
+                SegmentName = SegName;
+                SegmentID = SegID;
+            }
+            public string SegmentName;
+            public int SegmentID;
+            public override string ToString()
+            {
+                return SegmentName;
+            }
         }
         #endregion
 
@@ -446,7 +542,7 @@ namespace NimbleBluetoothImpedanceManager
         private Nimble.Sequences.Viewer x;
         private void button2_Click(object sender, EventArgs e)
         {
-            x = new Viewer();
+            x = new Viewer(filemanager);
             x.ImpedanceDirectory = Settings.Default.ImpedanceOutputFolder;
             x.SequenceDirectory = Settings.Default.SequenceScanFolder;
             x.Show();

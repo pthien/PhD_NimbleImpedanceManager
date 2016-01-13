@@ -30,8 +30,8 @@ namespace NimbleBluetoothImpedanceManager
 
         public bool AutomaticControlEnabled { get; private set; } //= false;
 
-        private readonly TimeSpan MIN_ALIVESCAN_PERIOD = new TimeSpan(0, 0, 5, 0);
-        private readonly TimeSpan MIN_IMPEDANCE_PERIOD = new TimeSpan(0, 0, 60, 0);
+        private readonly TimeSpan MIN_ALIVESCAN_PERIOD = new TimeSpan(0, 0, 1, 0);
+        private readonly TimeSpan MIN_IMPEDANCE_PERIOD = new TimeSpan(0, 0, 20, 0);
 
         private List<NimbleProcessor> processorsToMeasure = new List<NimbleProcessor>();
 
@@ -78,7 +78,8 @@ namespace NimbleBluetoothImpedanceManager
         /// </summary>
         public void StartAutomaticControl()
         {
-            StartAutomaticControl(MIN_ALIVESCAN_PERIOD, MIN_IMPEDANCE_PERIOD);
+
+            StartAutomaticControl(Settings.Default.AliveScanPeriod, Settings.Default.ImpedanceScanPeriod);
         }
 
         /// <summary>
@@ -181,9 +182,9 @@ namespace NimbleBluetoothImpedanceManager
         {
             NextDueImpedanceMeasure = DateTime.Now + ImpedanceMeasurePeriod;
             logger.Info("Automatic impedance measurements started");
-           
+
             List<NimbleProcessor> reallyAliveDevices = new List<NimbleProcessor>();
-           
+
             fileManager.ScanDirectory(Settings.Default.SequenceScanFolder);
 
             List<string> devicesMeasured = new List<string>();
@@ -191,9 +192,9 @@ namespace NimbleBluetoothImpedanceManager
 
             foreach (NimbleProcessor nimbleProcessor in processorsToMeasure)
             {
-                DateTime start = DateTime.Now; 
+                DateTime start = DateTime.Now;
                 lock (automaticActionLock)
-                {                   
+                {
                     logger.Debug("lock time: {0}s", (DateTime.Now - start).TotalSeconds);
                     logger.Info("Starting impedance measurement for {0}", nimbleProcessor);
                     if (nimble.ConnectToNimble(nimbleProcessor.BluetoothAddress))
@@ -201,7 +202,11 @@ namespace NimbleBluetoothImpedanceManager
                         var tmp = new NimbleProcessor { Name = nimble.NimbleName, BluetoothAddress = nimbleProcessor.BluetoothAddress };
                         reallyAliveDevices.Add(tmp);
                         devicesMeasured.Add(tmp.ToString());
-                        measurementsMade += DoMeasurements();
+
+                        var guid = nimble.GetSequenceGUID();
+                        logger.Debug("got sequence id: {0}", guid);
+
+                        measurementsMade += DoMeasurements(guid);
                         nimble.DisconnectFromNimble();
                     }
                     else
@@ -212,7 +217,7 @@ namespace NimbleBluetoothImpedanceManager
                 }
             }
             RecordFoundDevices(reallyAliveDevices, "ReallyAliveDevices.txt");
-           
+
             OnAutomaticAction(new AutomaticActionEventArgs()
             {
                 SuccessfullyMeasuredDevices = devicesMeasured,
@@ -343,47 +348,102 @@ namespace NimbleBluetoothImpedanceManager
         /// Returns the number of measurements made
         /// </summary>
         /// <returns></returns>
-        public int DoMeasurements()
+        public int DoMeasurements(string sequenceGUID)
+        {
+            if (fileManager.CompiledSequences.ContainsKey(sequenceGUID))
+            {
+                var cs = fileManager.CompiledSequences[sequenceGUID];
+                int[] segIDs = cs.MeasurementSegments.Keys.ToArray();
+                return MeasureSubset(sequenceGUID, segIDs);
+            }
+            logger.Warn("Bad sequence guid: {0}", sequenceGUID);
+            return 0;
+
+            //int measurementsMade = 0;
+            //DateTime start = DateTime.Now;
+            //lock (automaticActionLock)
+            //{
+            //    var guid = nimble.GetSequenceGUID();
+            //    logger.Debug("got sequence id: {0}", guid);
+
+            //    if (fileManager.CompiledSequences.ContainsKey(guid))
+            //    {
+            //        logger.Info("Collecting telem data for sequence {0} on {1}({2})", guid, nimble.NimbleName,
+            //            nimble.RemoteDeviceId);
+            //        CompiledSequence compseq = fileManager.CompiledSequences[guid];
+
+            //        var fullSavePath = GetTelemSavePath(nimble.RemoteDeviceId, nimble.NimbleName, guid);
+            //        foreach (KeyValuePair<int, string> kvp in compseq.MeasurementSegments)
+            //        {
+            //            measurementsMade += MeasureSegment(kvp.Value, kvp.Key, fullSavePath);
+            //        }
+            //        ThreadPool.QueueUserWorkItem(Preprocess, fullSavePath);
+            //    }
+            //    else
+            //    {
+            //        logger.Warn("Guid not found {0}, perhaps try a scan?", guid);
+            //    }
+            //}
+            //logger.Info("Doing measurements finished. Took {0}s", (DateTime.Now - start).TotalSeconds);
+            //return measurementsMade;
+        }
+
+        private int MeasureSegment(string segmentName, int segmentNumber, string fullSavePath)
+        {
+            int measurementsMade = 0;
+            for (int i = 0; i < 6; i++)
+            {
+                string[] telemData;
+                bool res = nimble.CollectTelemetryData(segmentNumber, out telemData);
+                if (!res)
+                {
+                    if (telemData == null || telemData.Length == 0)
+                    {
+                        telemData = new string[] { "Collection failed. no data collected" };
+                        logger.Warn("Measurement failed. No data collected for sequence {0}({1}) on {2}({3})",
+                            segmentName, segmentNumber, nimble.NimbleName, nimble.RemoteDeviceId);
+                    }
+                    logger.Info("Receive Timeout. Colleted {5} lines on segment {0}({1}), repeat {2} on {3}({4})",
+                        segmentName, segmentNumber, i, nimble.NimbleName, nimble.RemoteDeviceId, telemData.Length);
+                    measurementsMade++;
+                }
+                else
+                {
+                    logger.Info("Colleted {5} lines on segment {0}({1}), repeat {2} on {3}({4})",
+                        segmentName, segmentNumber, i, nimble.NimbleName, nimble.RemoteDeviceId, telemData.Length);
+                    measurementsMade++;
+                }
+                SaveTelemData(telemData, segmentName, fullSavePath);
+            }
+            return measurementsMade;
+        }
+
+        public int MeasureSubset(string sequenceGuid, int[] subsetToMeasure)
         {
             int measurementsMade = 0;
             DateTime start = DateTime.Now;
             lock (automaticActionLock)
             {
-                var guid = nimble.GetSequenceGUID();
-                logger.Debug("got sequence id: {0}", guid);
+                var guid = sequenceGuid;
+                //logger.Debug("subset got sequence id: {0}", guid);
 
                 if (fileManager.CompiledSequences.ContainsKey(guid))
                 {
                     logger.Info("Collecting telem data for sequence {0} on {1}({2})", guid, nimble.NimbleName,
-                        nimble.RemoteDeviceId);
+                       nimble.RemoteDeviceId);
                     CompiledSequence compseq = fileManager.CompiledSequences[guid];
-
                     var fullSavePath = GetTelemSavePath(nimble.RemoteDeviceId, nimble.NimbleName, guid);
-                    foreach (KeyValuePair<int, string> kvp in compseq.MeasurementSegments)
+
+                    foreach (int segID in subsetToMeasure)
                     {
-                        for (int i = 0; i < 6; i++)
+                        if (compseq.MeasurementSegments.ContainsKey(segID))
                         {
-                            string[] telemData;
-                            bool res = nimble.CollectTelemetryData(kvp.Key, out telemData);
-                            if (!res)
-                            {
-                                if (telemData == null || telemData.Length == 0)
-                                {
-                                    telemData = new string[] { "Collection failed. no data collected" };
-                                    logger.Warn("Measurement failed. No data collected for sequence {0}({1}) on {2}({3})",
-                                        kvp.Value, kvp.Key, nimble.NimbleName, nimble.RemoteDeviceId);
-                                }
-                                logger.Info("Receive Timeout. Colleted {5} lines on segment {0}({1}), repeat {2} on {3}({4})",
-                                    kvp.Value, kvp.Key, i, nimble.NimbleName, nimble.RemoteDeviceId, telemData.Length);
-                                    measurementsMade++;
-                            }
-                            else
-                            {
-                                logger.Info("Colleted {5} lines on segment {0}({1}), repeat {2} on {3}({4})",
-                                kvp.Value, kvp.Key, i, nimble.NimbleName, nimble.RemoteDeviceId, telemData.Length);
-                                measurementsMade++;
-                            }
-                            SaveTelemData(telemData, kvp.Value, fullSavePath);
+                            var segName = compseq.MeasurementSegments[segID];
+                            measurementsMade += MeasureSegment(segName, segID, fullSavePath);
+                        }
+                        else
+                        {
+                            logger.Warn("Segment ID {0} not found in sequence with guid {1}", segID, guid);
                         }
                     }
                     ThreadPool.QueueUserWorkItem(Preprocess, fullSavePath);

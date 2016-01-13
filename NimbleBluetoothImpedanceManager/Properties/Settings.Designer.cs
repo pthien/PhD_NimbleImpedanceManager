@@ -58,5 +58,29 @@ namespace NimbleBluetoothImpedanceManager.Properties {
                 this["ImpedanceOutputFolder"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("01:00:00")]
+        public global::System.TimeSpan ImpedanceScanPeriod {
+            get {
+                return ((global::System.TimeSpan)(this["ImpedanceScanPeriod"]));
+            }
+            set {
+                this["ImpedanceScanPeriod"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("00:05:00")]
+        public global::System.TimeSpan AliveScanPeriod {
+            get {
+                return ((global::System.TimeSpan)(this["AliveScanPeriod"]));
+            }
+            set {
+                this["AliveScanPeriod"] = value;
+            }
+        }
     }
 }

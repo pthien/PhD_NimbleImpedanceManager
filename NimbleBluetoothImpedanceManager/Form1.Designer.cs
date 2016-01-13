@@ -70,6 +70,7 @@
             this.rtbWarnings = new System.Windows.Forms.RichTextBox();
             this.tmrAuto = new System.Windows.Forms.Timer(this.components);
             this.button3 = new System.Windows.Forms.Button();
+            this.chkCheckSegments = new System.Windows.Forms.CheckedListBox();
             this.statusStrip1.SuspendLayout();
             this.grpManualControl.SuspendLayout();
             this.grpManualActions.SuspendLayout();
@@ -106,7 +107,7 @@
             this.btnCycle.Enabled = false;
             this.btnCycle.Location = new System.Drawing.Point(6, 56);
             this.btnCycle.Name = "btnCycle";
-            this.btnCycle.Size = new System.Drawing.Size(132, 23);
+            this.btnCycle.Size = new System.Drawing.Size(151, 23);
             this.btnCycle.TabIndex = 3;
             this.btnCycle.Text = "Check All Devices";
             this.btnCycle.UseVisualStyleBackColor = true;
@@ -121,7 +122,7 @@
             this.lblAutoStatus});
             this.statusStrip1.Location = new System.Drawing.Point(0, 512);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(859, 24);
+            this.statusStrip1.Size = new System.Drawing.Size(915, 24);
             this.statusStrip1.TabIndex = 4;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -144,7 +145,7 @@
             // toolStripStatusLabel1
             // 
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(598, 19);
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(654, 19);
             this.toolStripStatusLabel1.Spring = true;
             // 
             // lblAutoStatus
@@ -168,7 +169,7 @@
             // 
             this.btnConnectToNimble.Location = new System.Drawing.Point(6, 27);
             this.btnConnectToNimble.Name = "btnConnectToNimble";
-            this.btnConnectToNimble.Size = new System.Drawing.Size(132, 23);
+            this.btnConnectToNimble.Size = new System.Drawing.Size(151, 23);
             this.btnConnectToNimble.TabIndex = 7;
             this.btnConnectToNimble.Text = "Connect to Nimble";
             this.btnConnectToNimble.UseVisualStyleBackColor = true;
@@ -194,7 +195,7 @@
             // 
             this.btnScanFiles.Location = new System.Drawing.Point(6, 84);
             this.btnScanFiles.Name = "btnScanFiles";
-            this.btnScanFiles.Size = new System.Drawing.Size(132, 23);
+            this.btnScanFiles.Size = new System.Drawing.Size(151, 23);
             this.btnScanFiles.TabIndex = 10;
             this.btnScanFiles.Text = "Scan for data files";
             this.btnScanFiles.UseVisualStyleBackColor = true;
@@ -202,7 +203,7 @@
             // 
             // bntCheckCurrent
             // 
-            this.bntCheckCurrent.Location = new System.Drawing.Point(6, 106);
+            this.bntCheckCurrent.Location = new System.Drawing.Point(6, 209);
             this.bntCheckCurrent.Name = "bntCheckCurrent";
             this.bntCheckCurrent.Size = new System.Drawing.Size(132, 24);
             this.bntCheckCurrent.TabIndex = 11;
@@ -212,32 +213,34 @@
             // 
             // grpManualControl
             // 
+            this.grpManualControl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.grpManualControl.Controls.Add(this.grpManualActions);
             this.grpManualControl.Controls.Add(this.btnScanForProcessors);
             this.grpManualControl.Controls.Add(this.btnScanFiles);
             this.grpManualControl.Controls.Add(this.btnConnectToNimble);
             this.grpManualControl.Controls.Add(this.btnCycle);
-            this.grpManualControl.Location = new System.Drawing.Point(502, 112);
+            this.grpManualControl.Location = new System.Drawing.Point(502, 9);
             this.grpManualControl.Name = "grpManualControl";
-            this.grpManualControl.Size = new System.Drawing.Size(349, 191);
+            this.grpManualControl.Size = new System.Drawing.Size(405, 307);
             this.grpManualControl.TabIndex = 12;
             this.grpManualControl.TabStop = false;
             this.grpManualControl.Text = "Manual Control";
             // 
             // grpManualActions
             // 
+            this.grpManualActions.Controls.Add(this.chkCheckSegments);
             this.grpManualActions.Controls.Add(this.bntCheckCurrent);
             this.grpManualActions.Controls.Add(this.btnDisconnect);
             this.grpManualActions.Location = new System.Drawing.Point(163, 17);
             this.grpManualActions.Name = "grpManualActions";
-            this.grpManualActions.Size = new System.Drawing.Size(180, 168);
+            this.grpManualActions.Size = new System.Drawing.Size(236, 273);
             this.grpManualActions.TabIndex = 14;
             this.grpManualActions.TabStop = false;
             this.grpManualActions.Text = "Actions";
             // 
             // btnDisconnect
             // 
-            this.btnDisconnect.Location = new System.Drawing.Point(6, 136);
+            this.btnDisconnect.Location = new System.Drawing.Point(6, 239);
             this.btnDisconnect.Name = "btnDisconnect";
             this.btnDisconnect.Size = new System.Drawing.Size(132, 23);
             this.btnDisconnect.TabIndex = 13;
@@ -266,7 +269,7 @@
             this.grpSettings.Controls.Add(this.txtWorkingDir);
             this.grpSettings.Location = new System.Drawing.Point(12, 9);
             this.grpSettings.Name = "grpSettings";
-            this.grpSettings.Size = new System.Drawing.Size(839, 92);
+            this.grpSettings.Size = new System.Drawing.Size(484, 92);
             this.grpSettings.TabIndex = 14;
             this.grpSettings.TabStop = false;
             this.grpSettings.Text = "Settings";
@@ -274,7 +277,7 @@
             // button1
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(721, 44);
+            this.button1.Location = new System.Drawing.Point(366, 44);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(115, 23);
             this.button1.TabIndex = 3;
@@ -285,7 +288,7 @@
             // btnSetWorkingDir
             // 
             this.btnSetWorkingDir.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSetWorkingDir.Location = new System.Drawing.Point(721, 20);
+            this.btnSetWorkingDir.Location = new System.Drawing.Point(366, 20);
             this.btnSetWorkingDir.Name = "btnSetWorkingDir";
             this.btnSetWorkingDir.Size = new System.Drawing.Size(115, 23);
             this.btnSetWorkingDir.TabIndex = 2;
@@ -301,7 +304,7 @@
             this.txtOutputDir.Location = new System.Drawing.Point(7, 47);
             this.txtOutputDir.Name = "txtOutputDir";
             this.txtOutputDir.ReadOnly = true;
-            this.txtOutputDir.Size = new System.Drawing.Size(708, 20);
+            this.txtOutputDir.Size = new System.Drawing.Size(353, 20);
             this.txtOutputDir.TabIndex = 1;
             this.txtOutputDir.Text = "txtOutputDir";
             // 
@@ -313,7 +316,7 @@
             this.txtWorkingDir.Location = new System.Drawing.Point(7, 20);
             this.txtWorkingDir.Name = "txtWorkingDir";
             this.txtWorkingDir.ReadOnly = true;
-            this.txtWorkingDir.Size = new System.Drawing.Size(708, 20);
+            this.txtWorkingDir.Size = new System.Drawing.Size(353, 20);
             this.txtWorkingDir.TabIndex = 0;
             this.txtWorkingDir.Text = "txtWorkingDir";
             // 
@@ -401,7 +404,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(851, 155);
+            this.tabPage1.Size = new System.Drawing.Size(907, 155);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Program Log";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -413,7 +416,7 @@
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.richTextBox1.Location = new System.Drawing.Point(0, 0);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(851, 155);
+            this.richTextBox1.Size = new System.Drawing.Size(907, 155);
             this.richTextBox1.TabIndex = 19;
             this.richTextBox1.Text = "";
             this.richTextBox1.WordWrap = false;
@@ -430,7 +433,7 @@
             this.tabControl1.Location = new System.Drawing.Point(0, 328);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(859, 181);
+            this.tabControl1.Size = new System.Drawing.Size(915, 181);
             this.tabControl1.TabIndex = 22;
             this.tabControl1.Selected += new System.Windows.Forms.TabControlEventHandler(this.tabControl1_Selected);
             // 
@@ -484,7 +487,7 @@
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(554, 322);
+            this.button3.Location = new System.Drawing.Point(378, 319);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(50, 16);
             this.button3.TabIndex = 23;
@@ -492,11 +495,20 @@
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
+            // chkCheckSegments
+            // 
+            this.chkCheckSegments.CheckOnClick = true;
+            this.chkCheckSegments.FormattingEnabled = true;
+            this.chkCheckSegments.Location = new System.Drawing.Point(6, 19);
+            this.chkCheckSegments.Name = "chkCheckSegments";
+            this.chkCheckSegments.Size = new System.Drawing.Size(224, 184);
+            this.chkCheckSegments.TabIndex = 14;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(859, 536);
+            this.ClientSize = new System.Drawing.Size(915, 536);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.btnUptime);
@@ -573,6 +585,7 @@
         private System.Windows.Forms.Label lblAutoStatus_alive;
         private System.Windows.Forms.Timer tmrAuto;
         private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.CheckedListBox chkCheckSegments;
     }
 }
 
