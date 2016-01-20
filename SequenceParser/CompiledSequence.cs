@@ -104,7 +104,7 @@ namespace Nimble.Sequences
 
                 for (int i = 0; i < commentsSplit.Length; i++)
                 {
-                    if (commentsSplit[i].StartsWith("IMPEDANCE") || commentsSplit[i].StartsWith("COMPLIANCEON_"))
+                    if (commentsSplit[i].StartsWith("IMPEDANCE") || commentsSplit[i].StartsWith("SPECIAL_") || commentsSplit[i].StartsWith("COMPLIANCEON_"))
                     {
                         MeasurementSegments.Add(i, commentsSplit[i].ToString());
                     }

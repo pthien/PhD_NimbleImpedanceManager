@@ -46,6 +46,7 @@
             this.bntCheckCurrent = new System.Windows.Forms.Button();
             this.grpManualControl = new System.Windows.Forms.GroupBox();
             this.grpManualActions = new System.Windows.Forms.GroupBox();
+            this.chkCheckSegments = new System.Windows.Forms.CheckedListBox();
             this.btnDisconnect = new System.Windows.Forms.Button();
             this.btnAutoOperation = new System.Windows.Forms.Button();
             this.grpSettings = new System.Windows.Forms.GroupBox();
@@ -70,7 +71,6 @@
             this.rtbWarnings = new System.Windows.Forms.RichTextBox();
             this.tmrAuto = new System.Windows.Forms.Timer(this.components);
             this.button3 = new System.Windows.Forms.Button();
-            this.chkCheckSegments = new System.Windows.Forms.CheckedListBox();
             this.statusStrip1.SuspendLayout();
             this.grpManualControl.SuspendLayout();
             this.grpManualActions.SuspendLayout();
@@ -238,6 +238,15 @@
             this.grpManualActions.TabStop = false;
             this.grpManualActions.Text = "Actions";
             // 
+            // chkCheckSegments
+            // 
+            this.chkCheckSegments.CheckOnClick = true;
+            this.chkCheckSegments.FormattingEnabled = true;
+            this.chkCheckSegments.Location = new System.Drawing.Point(6, 19);
+            this.chkCheckSegments.Name = "chkCheckSegments";
+            this.chkCheckSegments.Size = new System.Drawing.Size(224, 184);
+            this.chkCheckSegments.TabIndex = 14;
+            // 
             // btnDisconnect
             // 
             this.btnDisconnect.Location = new System.Drawing.Point(6, 239);
@@ -368,7 +377,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(851, 155);
+            this.tabPage2.Size = new System.Drawing.Size(907, 155);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Timers";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -442,7 +451,7 @@
             this.tabPage3.Controls.Add(this.lstFoundSequences);
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(851, 155);
+            this.tabPage3.Size = new System.Drawing.Size(907, 155);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Sequences";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -463,7 +472,7 @@
             this.tabPage4.Controls.Add(this.rtbWarnings);
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Size = new System.Drawing.Size(851, 155);
+            this.tabPage4.Size = new System.Drawing.Size(907, 155);
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "Warnings";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -487,22 +496,14 @@
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(378, 319);
+            this.button3.Location = new System.Drawing.Point(362, 310);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(50, 16);
+            this.button3.Size = new System.Drawing.Size(66, 25);
             this.button3.TabIndex = 23;
             this.button3.Text = "button3";
             this.button3.UseVisualStyleBackColor = true;
+            this.button3.Visible = false;
             this.button3.Click += new System.EventHandler(this.button3_Click);
-            // 
-            // chkCheckSegments
-            // 
-            this.chkCheckSegments.CheckOnClick = true;
-            this.chkCheckSegments.FormattingEnabled = true;
-            this.chkCheckSegments.Location = new System.Drawing.Point(6, 19);
-            this.chkCheckSegments.Name = "chkCheckSegments";
-            this.chkCheckSegments.Size = new System.Drawing.Size(224, 184);
-            this.chkCheckSegments.TabIndex = 14;
             // 
             // Form1
             // 
