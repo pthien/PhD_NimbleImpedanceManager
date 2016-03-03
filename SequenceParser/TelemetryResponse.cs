@@ -57,6 +57,8 @@ namespace Nimble.Sequences
     /// </summary>
     public class TelemetryResponse : NimbleResponse
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         public List<int> Captures_ticks;
 
         public int PulseIndex { get; private set; }
@@ -78,11 +80,22 @@ namespace Nimble.Sequences
                 return;
             else
             {
-                var capparts = caps.Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (string s in capparts)
+                try
                 {
-                    Captures_ticks.Add(int.Parse(s));
+                    var capparts = caps.Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (string s in capparts)
+                    {
+
+                        Captures_ticks.Add(int.Parse(s));
+                    }
                 }
+                catch (Exception ex)
+                {
+                    logger.Error(ex);
+                    logger.Error("Ignoring all and any caps");
+                    Captures_ticks.Clear();
+                }
+                
             }
         }
 

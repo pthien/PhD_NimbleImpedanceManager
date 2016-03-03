@@ -20,12 +20,12 @@ namespace Nimble.Sequences
     {
         static public void GenerateSummaryForSubject(string subjectName)
         {
-            subjectName = "15_519_KRAKEN";
+            subjectName = "15_520_DINAH";
             //string folder = @"C:\Users\Patrick\Dropbox\Preitaly\NimbleBluetoothImpedanceManager\NimbleBluetoothImpedanceManager\bin\Debug\Output";
             //string folder = @"S:\Dropbox\Preitaly\NimbleBluetoothImpedanceManager\NimbleBluetoothImpedanceManager\bin\Debug\Output";
             //string folder = @"C:\Users\thienp\Desktop\Kraken processor test\Real DAta\Nimble Logs";
             //string folder = @"C:\Users\thienp\Desktop\chronics v2.2\20151001\20151001\Active Chronic Laptop Backups\20150825\Nimble Logs";
-            string folder = @"C:\Users\thienp\Desktop\logs";
+            string folder = @"C:\Users\thienp\Desktop\Active chronics backup 20151119\Active Chronics V2.2\Nimble Logs";
             List<NimbleMeasurementRecord> recordsall = SequenceFileManager.GetTelemetryRecords(folder);
 
             var myrecs = recordsall.Where(x => x.SubjectName == subjectName).OrderBy(x => x.Timestamp);
@@ -96,13 +96,13 @@ namespace Nimble.Sequences
                 measurementType = typeof(ComplianceResult),
             };
 
-            GeneratesummaryForMeasure(myrecs, mp580, fileMan);
+            //GeneratesummaryForMeasure(myrecs, mp580, fileMan);
             GeneratesummaryForMeasure(myrecs, mp400, fileMan);
-            GeneratesummaryForMeasure(myrecs, mp290, fileMan);
-            GeneratesummaryForMeasure(myrecs, mp145, fileMan);
-            GeneratesummaryForMeasure(myrecs, mp25, fileMan);
-            GeneratesummaryForMeasure(myrecs, cg25, fileMan);
-            GeneratesummaryForMeasure(myrecs, compliance, fileMan);
+            //GeneratesummaryForMeasure(myrecs, mp290, fileMan);
+            //GeneratesummaryForMeasure(myrecs, mp145, fileMan);
+            //GeneratesummaryForMeasure(myrecs, mp25, fileMan);
+            //GeneratesummaryForMeasure(myrecs, cg25, fileMan);
+            //GeneratesummaryForMeasure(myrecs, compliance, fileMan);
 
         }
 
