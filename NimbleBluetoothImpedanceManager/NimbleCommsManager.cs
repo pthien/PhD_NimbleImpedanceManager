@@ -53,6 +53,8 @@ namespace NimbleBluetoothImpedanceManager
         private EventWaitHandle NimbleCmdRx_xmitTelemFin_WaitHandle = new AutoResetEvent(false);
         private EventWaitHandle NimbleCmdRx_WDTO_WaitHandle = new AutoResetEvent(false);
 
+        private EventWaitHandle NimbleCmdRx_dataReceived_WaitHandle = new AutoResetEvent(false);
+
         public string RemoteDeviceId
         {
             get { return btDongle.RemoteDeviceAddr; }
@@ -91,6 +93,8 @@ namespace NimbleBluetoothImpedanceManager
                 }
             }
         }
+
+        Queue<string> receivedData = new Queue<string>();
 
         public delegate void StateChangedEventHandler(object sender, StateChangedEventArgs e);
         public event StateChangedEventHandler StateChanged;
@@ -196,6 +200,7 @@ namespace NimbleBluetoothImpedanceManager
         {
             logger.Debug("Received nimble command response: {0}", e.RecievedData);
             ParseCommandResponse(e.RecievedData);
+            receivedData.Enqueue(e.RecievedData);
         }
 
         static Regex regex_ID = new Regex(@"{([A-Za-z0-9]+):([ A-Z0-9a-z-:_|()]+)}");
@@ -336,7 +341,6 @@ namespace NimbleBluetoothImpedanceManager
         }
 
 
-        //TODO: make this thread safe, add a lock around accessing receivngTelemData
         public bool CollectTelemetryData(int sequence, out string[] data)
         {
             data = null;
@@ -462,6 +466,86 @@ namespace NimbleBluetoothImpedanceManager
             //return true;
         }
 
+
+        private bool NimbleGet(out string response, string ParamToGet, string[] args)
+        {
+            string[] responses;
+            bool result = NimbleTransact(out responses, TransactionTypes.Get, ParamToGet, args);
+            response = responses.Length > 0 ? responses[0] : "";
+            return result; 
+        }
+
+        private bool NimbleTransact(out string[] response, TransactionTypes TransactionType, string Method, string[] args)
+        {
+            response = new string[0];
+            List<string> responses = new List<string>();
+            NimbleState entryState;
+            lock (stateLock)
+            {
+                if (State == NimbleState.ConnectingToNimble || State == NimbleState.ConnectedToNimbleAndReady)
+                {
+                    entryState = State;
+                    State = NimbleState.ConnectedToNimbleAndWorking;
+                }
+                else
+                    return false;
+            }
+
+            try
+            {
+                string transaction;
+                switch (TransactionType)
+                {
+                    case TransactionTypes.Get:
+                        transaction = "Get";
+                        break;
+                    case TransactionTypes.Set:
+                        transaction = "Set";
+                        break;
+                    case TransactionTypes.Do:
+                        transaction = "Do";
+                        break;
+                    default:
+                        transaction = "";
+                        break;
+                }
+
+                string command = string.Format("\n{0}{1} {2}\n", transaction, Method, string.Join(" ", args));
+                string expectedResponseStart = string.Format("{{0}{1}: ", transaction, Method);
+
+                receivedData.Clear();
+                NimbleCmdRx_dataReceived_WaitHandle.Reset();
+
+                btDongle.TransmitToRemoteDevice(command);
+
+                DateTime requestStart = DateTime.Now;
+                while (DateTime.Now + TimeSpan.FromMilliseconds(DataChunker.Timeout + 1000) > requestStart)
+                {
+                    NimbleCmdRx_dataReceived_WaitHandle.WaitOne();
+                    while (receivedData.Count > 0)
+                    {                        
+                        string line = receivedData.Dequeue();
+                        responses.Add(line);
+                        if (line.StartsWith(expectedResponseStart))
+                        {
+                            response = response.ToArray();
+                            return true;
+                        }
+                    }
+                }
+                State = entryState;
+                return false;
+            }
+            catch (Exception ex)
+            {
+                State = entryState;
+                logger.Error(ex.Message);
+                //throw ex;
+                return false;
+            }
+
+        }
+
         public string GetSequenceGUID()
         {
             lock (stateLock)
@@ -536,6 +620,13 @@ namespace NimbleBluetoothImpedanceManager
             }
             return res;
 
+        }
+
+        private enum TransactionTypes
+        {
+            Get,
+            Set,
+            Do
         }
     }
 

@@ -25,5 +25,12 @@ namespace NimbleBluetoothImpedanceManager
         bool CollectTelemetryData(int sequence, out string[] data);
         string GetSequenceGUID();
         bool DisconnectFromNimble();
+
+        //Wireless ramp
+        bool IsStimOn();
+        bool SetStimActivity();
+        int GetRampLevel();
+        int GetRampProgress();
+        void SetRampLevel();
     }
 }
