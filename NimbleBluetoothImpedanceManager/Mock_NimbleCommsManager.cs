@@ -118,7 +118,7 @@ namespace NimbleBluetoothImpedanceManager
                 if (State == NimbleState.ConnectedToNimbleAndWorking)
                     State = NimbleState.ConnectedToNimbleAndReady;
             }
-            data =  alltext.Replace("\r\n", "\r").Split('\r');
+            data = alltext.Replace("\r\n", "\r").Split('\r');
             return true;
         }
 
@@ -140,10 +140,66 @@ namespace NimbleBluetoothImpedanceManager
 
         public bool DisconnectFromNimble()
         {
+            FakeWork();
             ConnectedToRemoteDevice = false;
             State = NimbleState.ConnectedToDongle;
             return true;
             //throw new NotImplementedException();
+        }
+
+
+        //Stim State Vars
+        bool StimOn = false;
+        int CurrentRampProgress = 0;
+        int RampMax;
+        int RampMin;
+
+
+
+        public bool IsStimOn()
+        {
+            FakeWork();
+            return true;
+        }
+        public bool SetStimActivity(bool stimOn)
+        {
+            FakeWork();
+            return true;
+        }
+        public int GetRampLevel()
+        {
+            FakeWork();
+            return 0;
+        }
+        public int GetRampProgress()
+        {
+            FakeWork();
+            return 0;
+        }
+        public bool SetRampLevel()
+        {
+            FakeWork();
+            return true;
+        }
+
+        bool FakeWork()
+        {
+            lock (stateLock)
+            {
+                if (State == NimbleState.ConnectedToNimbleAndReady)
+                {
+                    State = NimbleState.ConnectedToNimbleAndWorking;
+                }
+                else
+                    return false;
+            }
+            System.Threading.Thread.Sleep(500);
+            lock (stateLock)
+            {
+                if (State == NimbleState.ConnectedToNimbleAndWorking)
+                    State = NimbleState.ConnectedToNimbleAndReady;
+            }
+            return true;
         }
     }
 }

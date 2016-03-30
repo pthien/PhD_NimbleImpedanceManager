@@ -15,7 +15,9 @@ namespace Nimble.Sequences
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
         private Dictionary<string, FilesForGenerationGUID> FilesByGenGUID;
-        public Dictionary<string, CompiledSequence> CompiledSequences;
+
+
+        public Dictionary<string, CompiledSequence> CompiledSequences { get; private set; }
 
         Regex regex_guid = new Regex("{GenerationGUID: ([A-Za-z0-9-]+)}");
         public SequenceFileManager()

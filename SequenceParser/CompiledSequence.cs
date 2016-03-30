@@ -56,6 +56,10 @@ namespace Nimble.Sequences
 
         public readonly string[] SequenceComments;
 
+        public int GetMaxStimLevel() { return 0; }
+        public int ConvertStimLevelToSegNumber() { return 0; }
+        public string ConvertSegNumber2StimLevel() { return "0"; }
+
         #region constructor functions
         /// <summary>
         /// Extracts the generation guid from a .c or .h sequence file

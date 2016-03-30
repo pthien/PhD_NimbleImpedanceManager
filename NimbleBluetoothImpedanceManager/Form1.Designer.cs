@@ -71,6 +71,7 @@
             this.rtbWarnings = new System.Windows.Forms.RichTextBox();
             this.tmrAuto = new System.Windows.Forms.Timer(this.components);
             this.button3 = new System.Windows.Forms.Button();
+            this.btnSetLevel = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.grpManualControl.SuspendLayout();
             this.grpManualActions.SuspendLayout();
@@ -203,9 +204,9 @@
             // 
             // bntCheckCurrent
             // 
-            this.bntCheckCurrent.Location = new System.Drawing.Point(6, 209);
+            this.bntCheckCurrent.Location = new System.Drawing.Point(6, 169);
             this.bntCheckCurrent.Name = "bntCheckCurrent";
-            this.bntCheckCurrent.Size = new System.Drawing.Size(132, 24);
+            this.bntCheckCurrent.Size = new System.Drawing.Size(113, 24);
             this.bntCheckCurrent.TabIndex = 11;
             this.bntCheckCurrent.Text = "Check Impedances";
             this.bntCheckCurrent.UseVisualStyleBackColor = true;
@@ -228,6 +229,7 @@
             // 
             // grpManualActions
             // 
+            this.grpManualActions.Controls.Add(this.btnSetLevel);
             this.grpManualActions.Controls.Add(this.chkCheckSegments);
             this.grpManualActions.Controls.Add(this.bntCheckCurrent);
             this.grpManualActions.Controls.Add(this.btnDisconnect);
@@ -244,14 +246,14 @@
             this.chkCheckSegments.FormattingEnabled = true;
             this.chkCheckSegments.Location = new System.Drawing.Point(6, 19);
             this.chkCheckSegments.Name = "chkCheckSegments";
-            this.chkCheckSegments.Size = new System.Drawing.Size(224, 184);
+            this.chkCheckSegments.Size = new System.Drawing.Size(224, 139);
             this.chkCheckSegments.TabIndex = 14;
             // 
             // btnDisconnect
             // 
-            this.btnDisconnect.Location = new System.Drawing.Point(6, 239);
+            this.btnDisconnect.Location = new System.Drawing.Point(125, 170);
             this.btnDisconnect.Name = "btnDisconnect";
-            this.btnDisconnect.Size = new System.Drawing.Size(132, 23);
+            this.btnDisconnect.Size = new System.Drawing.Size(105, 23);
             this.btnDisconnect.TabIndex = 13;
             this.btnDisconnect.Text = "Disconnect";
             this.btnDisconnect.UseVisualStyleBackColor = true;
@@ -505,6 +507,16 @@
             this.button3.Visible = false;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
+            // btnSetLevel
+            // 
+            this.btnSetLevel.Location = new System.Drawing.Point(125, 239);
+            this.btnSetLevel.Name = "btnSetLevel";
+            this.btnSetLevel.Size = new System.Drawing.Size(105, 23);
+            this.btnSetLevel.TabIndex = 15;
+            this.btnSetLevel.Text = "Set Level";
+            this.btnSetLevel.UseVisualStyleBackColor = true;
+            this.btnSetLevel.Click += new System.EventHandler(this.btnSetLevel_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -587,6 +599,7 @@
         private System.Windows.Forms.Timer tmrAuto;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.CheckedListBox chkCheckSegments;
+        private System.Windows.Forms.Button btnSetLevel;
     }
 }
 

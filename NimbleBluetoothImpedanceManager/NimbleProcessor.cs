@@ -5,10 +5,11 @@ using System.Text;
 
 namespace NimbleBluetoothImpedanceManager
 {
-    struct NimbleProcessor
+    class NimbleProcessor
     {
         public string Name { get; set; }
         public string BluetoothAddress { get; set; }
+        public string GenGUID { get; set; }
 
         public override string ToString()
         {

@@ -1,3 +1,5 @@
+using Nimble.Sequences;
+
 namespace NimbleBluetoothImpedanceManager
 {
     internal interface INimbleCommsManager
@@ -28,9 +30,24 @@ namespace NimbleBluetoothImpedanceManager
 
         //Wireless ramp
         bool IsStimOn();
-        bool SetStimActivity();
+
+        /// <summary>
+        /// Enables or disables stimulation on the connected nimble processor
+        /// </summary>
+        /// <param name="stimOn">True to enable stimulation, false to disable it</param>
+        /// <returns>Returns true if the command succeeded</returns>
+        bool SetStimActivity(bool stimOn);
+
         int GetRampLevel();
         int GetRampProgress();
-        void SetRampLevel();
+
+        /// <summary>
+        /// Sets the upper ramp level of stimulation
+        /// </summary>
+        /// <param name="RampLevel"></param>
+        /// <returns>Returns true if the command succeeded</returns>
+        bool SetRampLevel(int RampLevel);
+
+        int GetMaxRampLevel(SequenceFileManager sfm);
     }
 }

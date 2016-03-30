@@ -85,6 +85,10 @@ namespace NimbleBluetoothImpedanceManager
         private bool _connectedToRemoteDevice = false;
 
         private string _RemoteDeviceAddr = "";
+
+        /// <summary>
+        /// The bluetooth address of the remote device
+        /// </summary>
         public string RemoteDeviceAddr
         {
             get { return _RemoteDeviceAddr; }

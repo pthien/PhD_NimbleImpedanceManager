@@ -6,7 +6,7 @@ using System.Threading;
 using NLog;
 using System.Text.RegularExpressions;
 using System.Windows.Forms.DataVisualization.Charting;
-
+using Nimble.Sequences;
 
 namespace NimbleBluetoothImpedanceManager
 {
@@ -66,10 +66,7 @@ namespace NimbleBluetoothImpedanceManager
             get { return _NimbleName; }
         }
 
-        public NimbleProcessor RemoteNimbleProcessor
-        {
-            get { return new NimbleProcessor() { Name = NimbleName, BluetoothAddress = RemoteDeviceId }; }
-        }
+        public NimbleProcessor RemoteNimbleProcessor { get; private set; }
 
         private string remoteDeviceGenGUID;
 
@@ -172,14 +169,35 @@ namespace NimbleBluetoothImpedanceManager
                     if (NimbleCmdRx_WDTO_WaitHandle.WaitOne(100))
                     {
                         logger.Warn("Not connecting to remote device due to watchdog timeout.");
-                        State = NimbleState.ConnectedToDongle;
+                        State = NimbleState.ConnectedToNimbleAndError;
+                        DisconnectFromNimble();
                         return false;
                     }
                     else
                     {
-                        logger.Info("Successfully connected to {0}", address);
-                        State = NimbleState.ConnectedToNimbleAndReady;
-                        return true;
+                        string genGUID = GetSequenceGUID();
+
+                        if (genGUID != null && genGUID.Length > 1)
+                        {
+                            logger.Info("Successfully connected to {0}", address);
+                            State = NimbleState.ConnectedToNimbleAndReady;
+                            RemoteNimbleProcessor = new NimbleProcessor()
+                            {
+                                GenGUID = genGUID,
+                                BluetoothAddress = btDongle.RemoteDeviceAddr,
+                                Name = _NimbleName
+                            };
+
+                            return true;
+                        }
+                        else
+                        {
+                            logger.Warn("Not connecting to remote device due to bad genguid.");
+                            State = NimbleState.ConnectedToNimbleAndError;
+                            DisconnectFromNimble();
+                            return false;
+                        }
+
                     }
                 }
                 else
@@ -472,7 +490,7 @@ namespace NimbleBluetoothImpedanceManager
             string[] responses;
             bool result = NimbleTransact(out responses, TransactionTypes.Get, ParamToGet, args);
             response = responses.Length > 0 ? responses[0] : "";
-            return result; 
+            return result;
         }
 
         private bool NimbleTransact(out string[] response, TransactionTypes TransactionType, string Method, string[] args)
@@ -493,25 +511,25 @@ namespace NimbleBluetoothImpedanceManager
 
             try
             {
-                string transaction;
+                string transactionType;
                 switch (TransactionType)
                 {
                     case TransactionTypes.Get:
-                        transaction = "Get";
+                        transactionType = "Get";
                         break;
                     case TransactionTypes.Set:
-                        transaction = "Set";
+                        transactionType = "Set";
                         break;
                     case TransactionTypes.Do:
-                        transaction = "Do";
+                        transactionType = "Do";
                         break;
                     default:
-                        transaction = "";
+                        transactionType = "";
                         break;
                 }
 
-                string command = string.Format("\n{0}{1} {2}\n", transaction, Method, string.Join(" ", args));
-                string expectedResponseStart = string.Format("{{0}{1}: ", transaction, Method);
+                string command = string.Format("\n{0}{1} {2}\n", transactionType, Method, string.Join(" ", args));
+                string expectedResponseStart = string.Format("{{0}{1}: ", transactionType, Method);
 
                 receivedData.Clear();
                 NimbleCmdRx_dataReceived_WaitHandle.Reset();
@@ -523,7 +541,7 @@ namespace NimbleBluetoothImpedanceManager
                 {
                     NimbleCmdRx_dataReceived_WaitHandle.WaitOne();
                     while (receivedData.Count > 0)
-                    {                        
+                    {
                         string line = receivedData.Dequeue();
                         responses.Add(line);
                         if (line.StartsWith(expectedResponseStart))
@@ -544,6 +562,22 @@ namespace NimbleBluetoothImpedanceManager
                 return false;
             }
 
+        }
+
+        public bool IsStimOn() { return true; }
+        public bool SetStimActivity(bool stimOn) { return true; }
+        public int GetRampLevel() { return 0; }
+        public int GetRampProgress() { return 0; }
+        public bool SetRampLevel() { return true; }
+
+        int GetMaxRampLevel(SequenceFileManager sfm)
+        {
+            if(sfm.CompiledSequences.ContainsKey(RemoteNimbleProcessor.GenGUID))
+            {
+                var compiledSequence = sfm.CompiledSequences[RemoteNimbleProcessor.GenGUID];
+
+            }
+            return 0;
         }
 
         public string GetSequenceGUID()
@@ -582,6 +616,7 @@ namespace NimbleBluetoothImpedanceManager
         public bool DisconnectFromNimble()
         {
             logger.Info("Disconnecting from nimble {0}", RemoteNimbleProcessor);
+            RemoteNimbleProcessor = null;
             if (btDongle.ConnectedToRemoteDevice)
             {
                 //btDongle.TransmitToRemoteDevice("\nclearXmitTelem\n");

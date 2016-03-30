@@ -38,8 +38,8 @@ namespace NimbleBluetoothImpedanceManager
             logger.Warn("Test warning. Program started. Please ignore");
 
             RefreshComPorts();
-            nimble = new NimbleCommsManager();
-            //nimble = new Mock_NimbleCommsManager();
+            //nimble = new NimbleCommsManager();
+            nimble = new Mock_NimbleCommsManager();
             filemanager = new SequenceFileManager();
             autoNimble = new AutomaticNimbleController(nimble, filemanager);
             autoNimble.AutomaticActionHappened += new AutomaticNimbleController.AutomaticActionHappenedEventHandler(autoNimble_AutomaticActionHappened);
@@ -602,6 +602,12 @@ namespace NimbleBluetoothImpedanceManager
         private void button3_Click(object sender, EventArgs e)
         {
             MeasurementSummary.GenerateSummaryForSubject("");
+        }
+
+        private void btnSetLevel_Click(object sender, EventArgs e)
+        {
+            LevelControl l = new LevelControl(nimble);
+            l.Show();
         }
     }
 }
