@@ -278,7 +278,8 @@ namespace NimbleBluetoothImpedanceManager
                 {
                     processorsToMeasure.Add(p);
                 }
-                logger.Info("Set processor to monitor: {0}", string.Join(", ", processors.ToArray()));
+                NimbleProcessor[] plist = processors.ToArray();
+                logger.Info("Set processor to monitor: {0}", string.Join<NimbleProcessor>(", ", plist));
             }
         }
 

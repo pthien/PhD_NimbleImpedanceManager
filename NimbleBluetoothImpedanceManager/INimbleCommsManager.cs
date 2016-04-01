@@ -29,7 +29,7 @@ namespace NimbleBluetoothImpedanceManager
         bool DisconnectFromNimble();
 
         //Wireless ramp
-        bool IsStimOn();
+        bool IsStimOn(out bool StimOn);
 
         /// <summary>
         /// Enables or disables stimulation on the connected nimble processor

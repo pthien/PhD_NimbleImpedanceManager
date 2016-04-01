@@ -38,8 +38,8 @@ namespace NimbleBluetoothImpedanceManager
             logger.Warn("Test warning. Program started. Please ignore");
 
             RefreshComPorts();
-            //nimble = new NimbleCommsManager();
-            nimble = new Mock_NimbleCommsManager();
+            nimble = new NimbleCommsManager();
+            //nimble = new Mock_NimbleCommsManager();
             filemanager = new SequenceFileManager();
             autoNimble = new AutomaticNimbleController(nimble, filemanager);
             autoNimble.AutomaticActionHappened += new AutomaticNimbleController.AutomaticActionHappenedEventHandler(autoNimble_AutomaticActionHappened);
@@ -182,19 +182,19 @@ namespace NimbleBluetoothImpedanceManager
                     colourStatus = clrNotReady;
                     break;
                 case NimbleState.ConnectedToNimbleAndReady:
-                    textCon = string.Format("Connected to nimble processor {0}({1}) via {2}", nimble.NimbleName, nimble.RemoteDeviceId, nimble.Comport);
+                    textCon = string.Format("Connected to nimble processor {0}({1}) via {2}", nimble.RemoteNimbleProcessor.Name, nimble.RemoteDeviceId, nimble.Comport);
                     textStatus = "Ready";
                     colourCon = clrReady;
                     colourStatus = clrReady;
                     break;
                 case NimbleState.ConnectedToNimbleAndError:
-                    textCon = string.Format("Connected to nimble processor {0}({1}) via {2}", nimble.NimbleName, nimble.RemoteDeviceId, nimble.Comport);
+                    textCon = string.Format("Connected to nimble processor {0}({1}) via {2}", nimble.RemoteNimbleProcessor.Name, nimble.RemoteDeviceId, nimble.Comport);
                     textStatus = "Error";
                     colourCon = clrReady;
                     colourStatus = clrNotReady;
                     break;
                 case NimbleState.ConnectedToNimbleAndWorking:
-                    textCon = string.Format("Connected to nimble processor {0}({1}) via {2}", nimble.NimbleName, nimble.RemoteDeviceId, nimble.Comport);
+                    textCon = string.Format("Connected to nimble processor {0}({1}) via {2}", nimble.RemoteNimbleProcessor.Name, nimble.RemoteDeviceId, nimble.Comport);
                     textStatus = "Working...";
                     colourCon = clrReady;
                     colourStatus = clrWorking;

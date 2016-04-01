@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using NLog;
+using Nimble.Sequences;
 
 namespace NimbleBluetoothImpedanceManager
 {
@@ -156,8 +157,9 @@ namespace NimbleBluetoothImpedanceManager
 
 
 
-        public bool IsStimOn()
+        public bool IsStimOn(out bool StimOn)
         {
+            StimOn = true;
             FakeWork();
             return true;
         }
@@ -176,10 +178,15 @@ namespace NimbleBluetoothImpedanceManager
             FakeWork();
             return 0;
         }
-        public bool SetRampLevel()
+        public bool SetRampLevel(int RampLevel)
         {
             FakeWork();
             return true;
+        }
+
+        public int GetMaxRampLevel(SequenceFileManager sfm)
+        {
+            return 10;
         }
 
         bool FakeWork()
@@ -193,7 +200,7 @@ namespace NimbleBluetoothImpedanceManager
                 else
                     return false;
             }
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(100);
             lock (stateLock)
             {
                 if (State == NimbleState.ConnectedToNimbleAndWorking)
