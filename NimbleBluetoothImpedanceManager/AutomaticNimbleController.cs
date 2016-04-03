@@ -203,6 +203,8 @@ namespace NimbleBluetoothImpedanceManager
                         reallyAliveDevices.Add(tmp);
                         devicesMeasured.Add(tmp.ToString());
 
+                        LogRampLevel();
+
                         var guid = nimble.RemoteNimbleProcessor.GenGUID;
                         logger.Debug("got sequence id: {0}", guid);
 
@@ -225,6 +227,26 @@ namespace NimbleBluetoothImpedanceManager
                 Type = AutomaticActionEventArgs.ActionType.Measurements
             });
 
+        }
+
+        private void LogRampLevel()
+        {
+            CompiledSequence cs = fileManager.CompiledSequences[nimble.RemoteNimbleProcessor.GenGUID];
+
+            bool stimOn;
+            int rampprogress;
+            int setLevel;
+            bool res = nimble.GetStimSummary(out stimOn, out rampprogress, out setLevel, cs);
+            string filename = nimble.RemoteNimbleProcessor.Name + ".txt";
+            string fullpath = Path.Combine(Settings.Default.ImpedanceOutputFolder, filename);
+            using (FileStream fs = new FileStream(fullpath, FileMode.Append))
+            {
+                using (StreamWriter sw = new StreamWriter(fs))
+                {
+                    sw.WriteLine("{0}|{1}\t{2}\t{3}", DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss.ffff"), stimOn ? "on" : "off", rampprogress, setLevel);
+                    sw.Flush();
+                }
+            }
         }
 
         public List<NimbleProcessor> AutoAction_DeepScanForProcessors()

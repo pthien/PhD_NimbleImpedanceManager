@@ -32,7 +32,6 @@ namespace Nimble.Sequences
         /// <param name="path"></param>
         public void ScanDirectory(string path)
         {
-
             try
             {
                 DoScanDirectory(path);
