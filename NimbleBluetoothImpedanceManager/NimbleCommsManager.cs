@@ -75,8 +75,6 @@ namespace NimbleBluetoothImpedanceManager
 
         public NimbleProcessor RemoteNimbleProcessor { get; private set; }
 
-        private string remoteDeviceGenGUID;
-
         private object receivingTelemDataLock = new object();
         private string[] _telemData = new string[10];
         private List<string> telemData_temp = new List<string>();
@@ -135,6 +133,7 @@ namespace NimbleBluetoothImpedanceManager
         {
             lock (stateLock)
             {
+                RemoteNimbleProcessor = null;
                 State = NimbleState.ConnectedToDongle;
             }
         }
@@ -371,7 +370,7 @@ namespace NimbleBluetoothImpedanceManager
 
                 //Get coil status status
                 bool coilSuccess = false;
-                bool coilsOK = false; 
+                bool coilsOK = false;
                 for (int i = 0; i < 3; i++)
                 {
                     coilSuccess = GetNimbleCoilStatus(out coilsOK);
@@ -606,7 +605,7 @@ namespace NimbleBluetoothImpedanceManager
             if (NimbleGet(out response, "GenGUID", null))
             {
                 GenGUID = response;
-                remoteDeviceGenGUID = response;
+                //remoteDeviceGenGUID = response;
                 logger.Info("Got GenGUID {0} from {1}", response, btDongle.RemoteDeviceAddr);
                 return true;
             }
@@ -641,6 +640,11 @@ namespace NimbleBluetoothImpedanceManager
             return false;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="BothCoilsConnected">True if both the coils are connected, false otherwise</param>
+        /// <returns></returns>
         private bool GetNimbleCoilStatus(out bool BothCoilsConnected)
         {
             string response;
@@ -663,6 +667,11 @@ namespace NimbleBluetoothImpedanceManager
             return false;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="StimOn">True if the stimulation is set to be on</param>
+        /// <returns></returns>
         public bool IsStimOn(out bool StimOn)
         {
             StimOn = false;
@@ -680,6 +689,36 @@ namespace NimbleBluetoothImpedanceManager
                 }
                 return true;
             }
+            return false;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="stimOn"></param>
+        /// <returns></returns>
+        public bool SetStimActivity(bool stimOn)
+        {
+            string response;
+            bool res = NimbleSet(out response, "Stim",
+                new string[] { stimOn ? "on" : "off" }
+                    );
+
+            if (res)
+            {
+                if ((response == "off" && !stimOn) ||
+                    (response == "on" && stimOn))
+                {
+                    logger.Info("Stim set to {0}", response);
+                    return true;
+                }
+                else
+                {
+                    logger.Error("Set stim failed with response {0}", response);
+                    return false;
+                }
+            }
+            logger.Error("Set stim failed");
             return false;
         }
 
@@ -716,7 +755,7 @@ namespace NimbleBluetoothImpedanceManager
             {
                 logger.Info("Got level response {0} from {1}", response, btDongle.RemoteDeviceAddr);
 
-                string[] parts = response.Split(',');
+                string[] parts = response.Split(' ');
 
                 if (parts.Length == 2)
                 {
@@ -729,6 +768,12 @@ namespace NimbleBluetoothImpedanceManager
             return false;
         }
 
+        /// <summary>
+        /// Sets the loop segments. Call should come from function aware of the stimulation "level"
+        /// </summary>
+        /// <param name="StartLoopSegment"></param>
+        /// <param name="EndLoopSegment"></param>
+        /// <returns></returns>
         private bool SetLoopSegments(int StartLoopSegment, int EndLoopSegment)
         {
             string response;
@@ -738,6 +783,23 @@ namespace NimbleBluetoothImpedanceManager
                     EndLoopSegment.ToString(),
                     ((StartLoopSegment+EndLoopSegment)%256).ToString() }
                     );
+
+            if (res)
+            {
+                switch (response)
+                {
+                    case "missing_args":
+                    case "bad args":
+                    case "bad hash":
+                        logger.Error("Set stim loop segmets failed with response  {0}", response);
+                        return false;
+                    case "Levels set":
+                        logger.Debug("Set stim loop segments to {0}-{1} successful", StartLoopSegment, EndLoopSegment);
+                        return true;
+                        logger.Error("Set stim loop segmets failed with response  {0}", response);
+                    default: break;
+                }
+            }
             return false;
         }
 
@@ -745,24 +807,122 @@ namespace NimbleBluetoothImpedanceManager
         /// Gets the current level of the ramp. (i.e. converts current segment to a level)
         /// </summary>
         /// <returns></returns>
-        public int GetRampProgress()
+        public int GetRampProgress(CompiledSequence c)
         {
             int currentSeg;
             bool res = GetCurrentSegment(out currentSeg);
 
-            return 0;
+            if (res)
+                return c.ConvertSegNumber2StimLevel(currentSeg);
+
+            return -1;
         }
 
-        public int GetRampLevel()
+        /// <summary>
+        /// Gets the currently set level of stimulation. A value of -1 indicates an error
+        /// </summary>
+        /// <returns></returns>
+        public int GetRampLevel(CompiledSequence c)
         {
-            return 0;
+            if (c.Guid.ToString() != RemoteNimbleProcessor.GenGUID)
+            {
+                logger.Error("compiled sequence ({0}) does not match remote processer ({1})", c.Guid, RemoteNimbleProcessor.GenGUID);
+                throw new ArgumentException("compiled sequence does not match connected processor");
+            }
+
+            int start, end;
+            GetLoopSegments(out start, out end);
+            int startlvl = c.ConvertSegNumber2StimLevel(start);
+            int endlvl = c.ConvertSegNumber2StimLevel(end);
+
+            if (startlvl != endlvl)
+                logger.Error("Start and end ramp levels for loop segments {0}, {1} are different. Sequence ID: {2}",
+                    start, end, c.Guid);
+
+            return endlvl;
         }
 
-        public bool SetStimActivity(bool stimOn) { return true; }
+        /// <summary>
+        /// Sets the level of stimulation
+        /// </summary>
+        /// <param name="RampLevel"></param>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        public bool SetRampLevel(int RampLevel, CompiledSequence c)
+        {
+            try
+            {
+                if (c.Guid.ToString() != RemoteNimbleProcessor.GenGUID)
+                {
+                    logger.Error("compiled sequence ({0}) does not match remote processer ({1})", c.Guid, RemoteNimbleProcessor.GenGUID);
+                    throw new ArgumentException("compiled sequence does not match connected processor");
+                }
+                if (RampLevel > c.GetMaxStimLevel())
+                    return false;
+
+                int start, end;
+                c.ConvertStimLevel2SegNumbers(RampLevel, out start, out end);
+                return SetLoopSegments(start, end);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+                return false;
+            }
+        }
+
+        public bool GetStimSummary(out bool StimOn, out int CurrentSeg, out int StartLoopSeg, out int EndLoopSeg)
+        {
+            StartLoopSeg = 0;
+            EndLoopSeg = 0;
+            StimOn = false;
+            CurrentSeg = 0;
+            string response;
+            if (NimbleGet(out response, "StimSummary", null))
+            {
+                logger.Info("Got StimSummary response {0} from {1}", response, btDongle.RemoteDeviceAddr);
+
+                string[] parts = response.Split(' ');
+
+                if (parts.Length == 2)
+                {
+                    bool res1 = parts[0] == "on" || parts[0] == "off";
+                    bool res2 = int.TryParse(parts[1], out CurrentSeg);
+                    bool res3 = int.TryParse(parts[2], out StartLoopSeg);
+                    bool res4 = int.TryParse(parts[3], out EndLoopSeg);
+
+                    StimOn = parts[0] == "on" ? true : false;
+
+                    return res1 & res2 & res3 & res4;
+                }
+                return false;
+            }
+            return false;
+        }
+
+        public bool GetStimSummary(out bool StimOn, out int RampProgress, out int RampLevel, CompiledSequence c)
+        {
+            int CurrentSeg, StartLoopSeg, EndLoopSeg;
+            bool res = GetStimSummary(out StimOn, out CurrentSeg, out StartLoopSeg, out EndLoopSeg);
+
+            RampProgress = 0;
+            RampLevel = 0;
+
+            if (!res)
+                return false;
+
+            RampProgress = c.ConvertSegNumber2StimLevel(CurrentSeg);
 
 
-        public bool SetRampLevel(int RampLevel) { return true; }
+            int startlvl = c.ConvertSegNumber2StimLevel(StartLoopSeg);
+            int endlvl = c.ConvertSegNumber2StimLevel(EndLoopSeg);
 
+            if (startlvl != endlvl)
+                logger.Error("Start and end ramp levels for loop segments {0}, {1} are different. Sequence ID: {2}",
+                    StartLoopSeg, EndLoopSeg, c.Guid);
+            RampLevel = endlvl;
+            return false;
+        }
 
         private bool NimbleGet(out string[] response, string ParamToGet, string[] args)
         {
@@ -799,7 +959,8 @@ namespace NimbleBluetoothImpedanceManager
             string command, command_data;
             if (ParseCommandResponse(response, out command, out command_data))
             {
-                if (command == ParamToGet)
+                if (type == TransactionTypes.Get && command == ParamToGet ||
+                    type == TransactionTypes.Set && command == ("Set" + ParamToGet))
                 {
                     responseData = command_data;
                     return true;
@@ -955,28 +1116,28 @@ namespace NimbleBluetoothImpedanceManager
             return 0;
         }
 
-        public string GetSequenceGUID()
-        {
-            lock (stateLock)
-            {
-                if (State == NimbleState.ConnectedToNimbleAndReady)
-                {
-                    State = NimbleState.ConnectedToNimbleAndWorking;
-                }
-                else
-                    return "";
-            }
+        //public string GetSequenceGUID()
+        //{
+        //    lock (stateLock)
+        //    {
+        //        if (State == NimbleState.ConnectedToNimbleAndReady)
+        //        {
+        //            State = NimbleState.ConnectedToNimbleAndWorking;
+        //        }
+        //        else
+        //            return "";
+        //    }
 
-            NimbleCmdRx_GenGUID_WaitHandle.Reset();
-            btDongle.TransmitToRemoteDevice("\ngetGenGUID\n");
-            if (NimbleCmdRx_GenGUID_WaitHandle.WaitOne(DataChunker.Timeout + 2000))
-            {
-                State = NimbleState.ConnectedToNimbleAndReady;
-                return remoteDeviceGenGUID;
-            }
-            State = NimbleState.ConnectedToNimbleAndReady;
-            return "";
-        }
+        //    NimbleCmdRx_GenGUID_WaitHandle.Reset();
+        //    btDongle.TransmitToRemoteDevice("\ngetGenGUID\n");
+        //    if (NimbleCmdRx_GenGUID_WaitHandle.WaitOne(DataChunker.Timeout + 2000))
+        //    {
+        //        State = NimbleState.ConnectedToNimbleAndReady;
+        //        return remoteDeviceGenGUID;
+        //    }
+        //    State = NimbleState.ConnectedToNimbleAndReady;
+        //    return "";
+        //}
 
         //public void StartTelemCapture()
         //{
@@ -1001,7 +1162,7 @@ namespace NimbleBluetoothImpedanceManager
                 {
                     btDongle.Dongle_ConnectionLost_WaitHandle.Reset();
                     btDongle.TransmitAndLog("AT");
-                    if (btDongle.Dongle_ConnectionLost_WaitHandle.WaitOne(DataChunker.Timeout + 1000))
+                    if (btDongle.Dongle_ConnectionLost_WaitHandle.WaitOne(DataChunker.Timeout + 2000))
                     {
                         logger.Info("Disconnected from Nimble processor on attempt {0}", i);
                         break;

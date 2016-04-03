@@ -203,7 +203,7 @@ namespace NimbleBluetoothImpedanceManager
                         reallyAliveDevices.Add(tmp);
                         devicesMeasured.Add(tmp.ToString());
 
-                        var guid = nimble.GetSequenceGUID();
+                        var guid = nimble.RemoteNimbleProcessor.GenGUID;
                         logger.Debug("got sequence id: {0}", guid);
 
                         measurementsMade += DoMeasurements(guid);

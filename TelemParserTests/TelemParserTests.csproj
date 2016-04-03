@@ -66,10 +66,39 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Data\14_514_Kingston_608e3568-59c1-408d-a53b-34203648716e\PulseData.c" />
-    <Content Include="Data\14_514_Kingston_608e3568-59c1-408d-a53b-34203648716e\PulseData.h" />
-    <Content Include="Data\14_514_Kingston_608e3568-59c1-408d-a53b-34203648716e\Sequence.c" />
-    <Content Include="Data\14_514_Kingston_608e3568-59c1-408d-a53b-34203648716e\Sequence.h" />
+    <Content Include="Data\14_514_Kingston_608e3568-59c1-408d-a53b-34203648716e\PulseData.c">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_Kingston_608e3568-59c1-408d-a53b-34203648716e\PulseData.h">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_Kingston_608e3568-59c1-408d-a53b-34203648716e\Sequence.c">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_Kingston_608e3568-59c1-408d-a53b-34203648716e\Sequence.h">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\COMPLIANCEON_A_0.txt" />
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\COMPLIANCEON_A_1.txt" />
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\COMPLIANCEON_A_2.txt" />
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\COMPLIANCEON_B_0.txt" />
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\COMPLIANCEON_B_1.txt" />
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\COMPLIANCEON_B_2.txt" />
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_CG25_V10_0.txt" />
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_CG25_V10_1.txt" />
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_CG25_V10_2.txt" />
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP25_V10_0.txt" />
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP25_V10_1.txt" />
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP25_V10_2.txt" />
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP400_V10_0.txt" />
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP400_V10_1.txt" />
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP400_V10_2.txt" />
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP400_V1_0.txt" />
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP400_V1_1.txt" />
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP400_V1_2.txt" />
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP400_V2_0.txt" />
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP400_V2_1.txt" />
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP400_V2_2.txt" />
     <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_CG145_0.txt" />
     <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_CG145_1.txt" />
     <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_CG145_2.txt" />
@@ -88,6 +117,10 @@
   </ItemGroup>
   <ItemGroup>
     <Shadow Include="Test References\SequenceParser.accessor" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\preprocessed.bin" />
+    <None Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\summary.csv" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

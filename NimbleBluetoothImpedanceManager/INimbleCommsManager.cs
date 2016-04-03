@@ -25,7 +25,6 @@ namespace NimbleBluetoothImpedanceManager
         bool Initialise(string COMPort);
         string[] DiscoverDevices();
         bool CollectTelemetryData(int sequence, out string[] data);
-        string GetSequenceGUID();
         bool DisconnectFromNimble();
 
         //Wireless ramp
@@ -38,15 +37,27 @@ namespace NimbleBluetoothImpedanceManager
         /// <returns>Returns true if the command succeeded</returns>
         bool SetStimActivity(bool stimOn);
 
-        int GetRampLevel();
-        int GetRampProgress();
+        /// <summary>
+        /// Gets the currently set level of stimulation. A value of -1 indicates an error
+        /// </summary>
+        /// <returns></returns>
+        int GetRampLevel(CompiledSequence c);
+
+        /// <summary>
+        /// Gets the current level of the ramp. (i.e. converts current segment to a level)
+        /// </summary>
+        /// <returns></returns>
+        int GetRampProgress(CompiledSequence c);
 
         /// <summary>
         /// Sets the upper ramp level of stimulation
         /// </summary>
         /// <param name="RampLevel"></param>
         /// <returns>Returns true if the command succeeded</returns>
-        bool SetRampLevel(int RampLevel);
+        bool SetRampLevel(int RampLevel, CompiledSequence c);
+
+        bool GetStimSummary(out bool StimOn, out int RampProgress, out int RampLevel, CompiledSequence c);
+        bool GetStimSummary(out bool StimOn, out int CurrentSeg, out int StartLoopSeg, out int EndLoopSeg);
 
         int GetMaxRampLevel(SequenceFileManager sfm);
     }

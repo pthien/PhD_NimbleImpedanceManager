@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Nimble.Sequences;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Nimble.Sequences.Tests
 {
     [TestClass()]
@@ -13,7 +7,7 @@ namespace Nimble.Sequences.Tests
         [TestMethod()]
         public void TestIfValidFileTest()
         {
-
+         
         }
     }
 }

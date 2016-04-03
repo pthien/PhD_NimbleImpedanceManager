@@ -19,11 +19,12 @@ namespace Nimble.Sequences
         {
             string alltext_seqh = File.ReadAllText(SequenceFiles.Sequence_h);
             SequenceComments = ExtractSequenceComments(alltext_seqh);
+            SegmentToLevelMap = ExtractSegment2LevelMap(alltext_seqh);
             Guid guid_sh = ExtractGuid(alltext_seqh);
             _HashDefines = ExtractHashDefines(alltext_seqh);
 
             string alltext_seqc = File.ReadAllText(SequenceFiles.Sequence_c);
-            Sequence = ParseSequence(alltext_seqc);
+            Sequence = ParseSequence(alltext_seqc, SequenceComments.Length);
             Guid guid_sc = ExtractGuid(alltext_seqc);
 
 
@@ -43,22 +44,43 @@ namespace Nimble.Sequences
         }
 
         public Guid Guid { get; private set; }
-
         public Dictionary<int, string> MeasurementSegments { get; private set; }
-
         public Pulse[] PulseData { get; private set; }
-
         public int ClockRate { get; private set; }
-
         public int[][] Sequence { get; private set; }
-
+        private Dictionary<int, int> SegmentToLevelMap;
         private readonly Dictionary<string, int> _HashDefines;
-
         public readonly string[] SequenceComments;
 
-        public int GetMaxStimLevel() { return 0; }
-        public int ConvertStimLevelToSegNumber() { return 0; }
-        public string ConvertSegNumber2StimLevel() { return "0"; }
+        public int GetMaxStimLevel()
+        {
+            return SegmentToLevelMap.Values.Max();
+        }
+
+        public void ConvertStimLevel2SegNumbers(int StimLevel, out int StartLoopSeg, out int EndLoopSeg)
+        {
+            StartLoopSeg = int.MaxValue;
+            EndLoopSeg = -1;
+
+            if (!SegmentToLevelMap.ContainsValue(StimLevel))
+                throw new ArgumentOutOfRangeException("Stim level not found");
+
+            foreach (KeyValuePair<int, int> kvp in SegmentToLevelMap)
+            {
+                if (kvp.Value == StimLevel)
+                {
+                    StartLoopSeg = Math.Min(kvp.Key, StartLoopSeg);
+                    EndLoopSeg = Math.Max(kvp.Key, EndLoopSeg);
+
+                }
+            }
+
+
+        }
+        public int ConvertSegNumber2StimLevel(int segNumber)
+        {
+            return SegmentToLevelMap[segNumber];
+        }
 
         #region constructor functions
         /// <summary>
@@ -118,6 +140,27 @@ namespace Nimble.Sequences
             return null;
         }
 
+        private Dictionary<int, int> ExtractSegment2LevelMap(string alltext)
+        {
+            var map = new Dictionary<int, int>();
+            Regex r = new Regex(@"{SegmentLevels: ([ 0-9-_,|()]+)}");
+
+            var match = r.Match(alltext);
+            if (match.Success)
+            {
+                string alllevels = match.Groups[1].Value;
+                string[] levelsSplit = alllevels.Split(',');
+
+                int[] myInts = Array.ConvertAll(levelsSplit, s => int.Parse(s));
+
+                for (int i = 0; i < myInts.Count(); i++)
+                {
+                    map.Add(i, myInts[i]);
+                }
+            }
+            return map;
+        }
+
         private static Dictionary<string, int> ExtractHashDefines(string alltext_seqh)
         {
             Regex defineExtractor = new Regex(@"#define ([A-Za-z_]+) ([0-9]+)");
@@ -134,43 +177,23 @@ namespace Nimble.Sequences
             }
             return result;
         }
+
         public static Regex sequenceExtractor = new Regex(@"const int Sequence\[([0-9]+)\]\[([0-9]+)\] = {([0-9{},\s]*)};");
-        private static int[][] ParseSequence(string alltext)
+
+        public static Regex sequenceRowExtractor = new Regex(@"const int Sequence_row([0-9]+)\[\] = {(.+)};");
+
+        private static int[][] ParseSequence(string alltext, int numSegments)
         {
+            var mc = sequenceRowExtractor.Matches(alltext);
 
-
-            var m = sequenceExtractor.Match(alltext);
-            if (m.Success)
+            int[][] extractedSequence = new int[numSegments][];
+            int count = 0;
+            foreach (Match m in mc)
             {
-                int numSeqs = int.Parse(m.Groups[1].Value);
-                int maxSeqLen = int.Parse(m.Groups[2].Value);
-
-                string seqData = m.Groups[3].Value;
-
-                var extractedSequence = Parse2DArray(numSeqs, seqData);
-
-                return extractedSequence;
-
-
-            }
-            return null;
-        }
-
-        private static int[][] Parse2DArray(int numRows, string seqData)
-        {
-            int[][] extractedSequence = new int[numRows][];
-
-            string[] segments = seqData.Trim().Split(new char[] { '}' }, StringSplitOptions.RemoveEmptyEntries);
-            for (int i = 0; i < segments.Length; i++)
-            {
-                string segment = segments[i].Trim('{', ',', '\r', '\n');
-                string[] segnums = segment.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                List<int> lstsegnums = new List<int>();
-                foreach (string segnum in segnums)
-                {
-                    lstsegnums.Add(int.Parse(segnum));
-                }
-                extractedSequence[i] = lstsegnums.ToArray();
+                int rownum = int.Parse(m.Groups[1].Value);
+                int[] rowData = Array.ConvertAll<string, int>(m.Groups[2].Value.Split(','), int.Parse);
+                extractedSequence[count] = rowData;
+                count++;
             }
             return extractedSequence;
         }

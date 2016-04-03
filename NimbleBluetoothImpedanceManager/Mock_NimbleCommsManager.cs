@@ -168,17 +168,17 @@ namespace NimbleBluetoothImpedanceManager
             FakeWork();
             return true;
         }
-        public int GetRampLevel()
+        public int GetRampLevel(CompiledSequence c)
         {
             FakeWork();
             return 0;
         }
-        public int GetRampProgress()
+        public int GetRampProgress(CompiledSequence c)
         {
             FakeWork();
             return 0;
         }
-        public bool SetRampLevel(int RampLevel)
+        public bool SetRampLevel(int RampLevel, CompiledSequence c)
         {
             FakeWork();
             return true;
@@ -187,6 +187,22 @@ namespace NimbleBluetoothImpedanceManager
         public int GetMaxRampLevel(SequenceFileManager sfm)
         {
             return 10;
+        }
+
+        public bool GetStimSummary(out bool StimOn, out int RampProgress, out int RampLevel, CompiledSequence c)
+        {
+            StimOn = false;
+            RampLevel = 0;
+            RampProgress = 0;
+            return false;
+        }
+        public bool GetStimSummary(out bool StimOn, out int CurrentSeg, out int StartLoopSeg, out int EndLoopSeg)
+        {
+            StimOn = false;
+            CurrentSeg = 0;
+            StartLoopSeg = 0;
+            EndLoopSeg = 0;
+            return false;
         }
 
         bool FakeWork()

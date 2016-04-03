@@ -34,7 +34,8 @@ namespace NimbleBluetoothImpedanceManager
         {
             logger = LogManager.GetCurrentClassLogger();
 
-            logger.Info("Nimble monitor started. Version {0}", System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
+            var ver =System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            logger.Info("Nimble monitor started. Version {0}", ver);
             logger.Warn("Test warning. Program started. Please ignore");
 
             RefreshComPorts();
@@ -343,7 +344,7 @@ namespace NimbleBluetoothImpedanceManager
             {
                 //autoNimble.DoMeasurements();
 
-                string guid = nimble.GetSequenceGUID();
+                string guid = nimble.RemoteNimbleProcessor.GenGUID;
 
                 List<int> segIDsToCheck = new List<int>();
 
@@ -407,7 +408,7 @@ namespace NimbleBluetoothImpedanceManager
 
                     //update impedance segments that can be checked
                     chkCheckSegments.Items.Clear();
-                    var guid = nimble.GetSequenceGUID();
+                    var guid = nimble.RemoteNimbleProcessor.GenGUID;
                     if (filemanager.CompiledSequences.ContainsKey(guid))
                     {
                         var compiledsequence = filemanager.CompiledSequences[guid];
@@ -606,7 +607,7 @@ namespace NimbleBluetoothImpedanceManager
 
         private void btnSetLevel_Click(object sender, EventArgs e)
         {
-            LevelControl l = new LevelControl(nimble);
+            LevelControl l = new LevelControl(nimble, filemanager);
             l.Show();
         }
     }

@@ -268,6 +268,7 @@ namespace NimbleBluetoothImpedanceManager
                 }
                 else
                 {
+                    logger.Debug("data received from remote device: {0}", s);
                     if (DataReceivedFromRemoteDevice != null)
                         DataReceivedFromRemoteDevice(this, new DataRecievedEventArgs() { RecievedData = s });
                 }
