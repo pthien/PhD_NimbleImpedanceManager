@@ -73,7 +73,23 @@ namespace NimbleBluetoothImpedanceManager
             }
         }
 
-        public NimbleProcessor RemoteNimbleProcessor { get; private set; }
+        NimbleProcessor _RemoteNimbleProcessor;
+        public NimbleProcessor RemoteNimbleProcessor
+        {
+            get
+            {
+                if (_RemoteNimbleProcessor == null)
+                {
+                    NimbleProcessor n = new NimbleProcessor() { BluetoothAddress = "??", GenGUID = "??", Name = "??" };
+                    return n;
+                }
+                return _RemoteNimbleProcessor;
+            }
+            private set
+            {
+                _RemoteNimbleProcessor = value;
+            }
+        }
 
         private object receivingTelemDataLock = new object();
         private string[] _telemData = new string[10];
@@ -114,7 +130,7 @@ namespace NimbleBluetoothImpedanceManager
             {
                 if (value == _State) //do nothing
                     return;
-                logger.Info("State changed from {0} to {1}", _State, value);
+                logger.Debug("State changed from {0} to {1}", _State, value);
                 _State = value;
                 if (StateChanged != null)
                     StateChanged(this, new StateChangedEventArgs() { NewState = _State });
@@ -145,9 +161,6 @@ namespace NimbleBluetoothImpedanceManager
             receivedData.Enqueue(e.RecievedData);
             NimbleCmdRx_dataReceived_WaitHandle.Set();
         }
-
-
-
 
 
         static Regex regex_ID = new Regex(@"{([A-Za-z0-9]+):([ A-Z0-9a-z-:_|()]+)}");
@@ -225,14 +238,14 @@ namespace NimbleBluetoothImpedanceManager
                         if (data == "fin")
                         {
                             receivingTelemData = false;
-                            logger.Info("Recieving telem data finished, btAddr={0}", btDongle.RemoteDeviceAddr);
+                            logger.Info("Receiving telem data finished, btAddr={0}", btDongle.RemoteDeviceAddr);
                             _telemData = telemData_temp.ToArray();
                             NimbleCmdRx_xmitTelemFin_WaitHandle.Set();
                         }
                         if (data == "set")
                         {
                             receivingTelemData = true;
-                            logger.Info("Recieving telem data started, btAddr={0}", btDongle.RemoteDeviceAddr);
+                            logger.Info("Receiving telem data started, btAddr={0}", btDongle.RemoteDeviceAddr);
                             telemData_temp = new List<string>();
                             _telemData = null;
                             NimbleCmdRx_xmitTelemStart_WaitHandle.Set();
@@ -242,22 +255,22 @@ namespace NimbleBluetoothImpedanceManager
                             receivingTelemData = false;
                             telemData_temp = new List<string>();
                             _telemData = telemData_temp.ToArray();
-                            logger.Info("Recieving telem failed because a coil is disconnected, {0}", RemoteNimbleProcessor);
+                            logger.Info("Receiving telem failed because a coil is disconnected, {0}", RemoteNimbleProcessor);
                             NimbleCmdRx_xmitTelemFin_WaitHandle.Set();
                         }
 
                     }
                     break;
-                //case "BothConnected":
-                //    if (data == "n")
-                //        logger.Error("Nimble processor {0} has 1 or more coils detached", RemoteNimbleProcessor);
-                //    if (data == "y")
-                //        logger.Info("Nimble processor {0} has all coils attached", RemoteNimbleProcessor);
-                //    break;
-                //case "WDTO":
-                //    logger.Fatal("Watchdog timer expired on {0}. Disconnect processor from subject and do not reattach, potential for unexpected stimulation. Stimulation has been halted.", RemoteNimbleProcessor);
-                //    NimbleCmdRx_WDTO_WaitHandle.Set();
-                //    break;
+                    //case "BothConnected":
+                    //    if (data == "n")
+                    //        logger.Error("Nimble processor {0} has 1 or more coils detached", RemoteNimbleProcessor);
+                    //    if (data == "y")
+                    //        logger.Info("Nimble processor {0} has all coils attached", RemoteNimbleProcessor);
+                    //    break;
+                    //case "WDTO":
+                    //    logger.Fatal("Watchdog timer expired on {0}. Disconnect processor from subject and do not reattach, potential for unexpected stimulation. Stimulation has been halted.", RemoteNimbleProcessor);
+                    //    NimbleCmdRx_WDTO_WaitHandle.Set();
+                    //    break;
 
             }
             //throw new NotImplementedException();
@@ -353,6 +366,16 @@ namespace NimbleBluetoothImpedanceManager
                         break;
                 }
 
+                //make sure we got a name
+                if (!namesuccess)
+                {
+                    logger.Error("Connected to remote device ({0}) but could not get its name. "
+                       + "Will now attempt to disconnect", address);
+                    State = NimbleState.ConnectedToNimbleAndError;
+                    DisconnectFromNimble();
+                    return false;
+                }
+
                 //Get watchdog status
                 bool watchdogSuccess = false;
                 bool watchdogOK = false;
@@ -407,15 +430,7 @@ namespace NimbleBluetoothImpedanceManager
                     return false;
                 }
 
-                //make sure we got a name
-                if (!namesuccess)
-                {
-                    logger.Error("Connected to remote device ({0}) but could not get its name. "
-                       + "Will now attempt to disconnect", address);
-                    State = NimbleState.ConnectedToNimbleAndError;
-                    DisconnectFromNimble();
-                    return false;
-                }
+
 
                 //ensure coils are connected
                 if (!coilsOK)
@@ -683,7 +698,8 @@ namespace NimbleBluetoothImpedanceManager
                 {
                     case "on": StimOn = true; break;
                     case "off": StimOn = false; break;
-                    default: StimOn = false;
+                    default:
+                        StimOn = false;
                         logger.Error("invalid StimOn response {0} from {1}", response, btDongle.RemoteDeviceAddr);
                         return false;
                 }
@@ -779,7 +795,7 @@ namespace NimbleBluetoothImpedanceManager
             string response;
             bool res = NimbleSet(out response, "Level",
                 new string[3] {
-                    StartLoopSegment.ToString(), 
+                    StartLoopSegment.ToString(),
                     EndLoopSegment.ToString(),
                     ((StartLoopSegment+EndLoopSegment)%256).ToString() }
                     );
@@ -796,8 +812,9 @@ namespace NimbleBluetoothImpedanceManager
                     case "Levels set":
                         logger.Debug("Set stim loop segments to {0}-{1} successful", StartLoopSegment, EndLoopSegment);
                         return true;
+                    default:
                         logger.Error("Set stim loop segmets failed with response  {0}", response);
-                    default: break;
+                        break;
                 }
             }
             return false;
@@ -862,7 +879,12 @@ namespace NimbleBluetoothImpedanceManager
 
                 int start, end;
                 c.ConvertStimLevel2SegNumbers(RampLevel, out start, out end);
-                return SetLoopSegments(start, end);
+                var res = SetLoopSegments(start, end);
+                if (res)
+                    logger.Info("Successfully set ramp level to {0}", RampLevel);
+                else
+                    logger.Debug("Failed to set ramp level to {0}", RampLevel);
+                return res;
             }
             catch (Exception ex)
             {
@@ -880,11 +902,11 @@ namespace NimbleBluetoothImpedanceManager
             string response;
             if (NimbleGet(out response, "StimSummary", null))
             {
-                logger.Info("Got StimSummary response {0} from {1}", response, btDongle.RemoteDeviceAddr);
+                logger.Debug("Got StimSummary response {0} from {1}", response, btDongle.RemoteDeviceAddr);
 
                 string[] parts = response.Split(' ');
 
-                if (parts.Length == 2)
+                if (parts.Length == 4)
                 {
                     bool res1 = parts[0] == "on" || parts[0] == "off";
                     bool res2 = int.TryParse(parts[1], out CurrentSeg);
@@ -921,7 +943,7 @@ namespace NimbleBluetoothImpedanceManager
                 logger.Error("Start and end ramp levels for loop segments {0}, {1} are different. Sequence ID: {2}",
                     StartLoopSeg, EndLoopSeg, c.Guid);
             RampLevel = endlvl;
-            return false;
+            return true;
         }
 
         private bool NimbleGet(out string[] response, string ParamToGet, string[] args)
@@ -1011,7 +1033,7 @@ namespace NimbleBluetoothImpedanceManager
                 btDongle.TransmitToRemoteDevice(command);
 
                 DateTime requestStart = DateTime.Now;
-                while (DateTime.Now < requestStart + TimeSpan.FromMilliseconds(DataChunker.Timeout + 1000))
+                while (DateTime.Now < requestStart + TimeSpan.FromMilliseconds(DataChunker.Timeout + 3000))
                 {
                     NimbleCmdRx_dataReceived_WaitHandle.WaitOne(100);
                     while (receivedData.Count > 0)

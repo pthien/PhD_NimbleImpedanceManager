@@ -16,11 +16,13 @@ namespace NimbleBluetoothImpedanceManager
         private static Logger logger;
         INimbleCommsManager nimbleCommsManager;
         System.Timers.Timer tmrStatus;
-        
+
         bool? StimOn;
         int currentLevel;
         int setLevel;
         CompiledSequence relevantSequence;
+
+        bool ButtonsEnabled = true;
 
         public LevelControl(INimbleCommsManager commsManager, SequenceFileManager filemanager)
         {
@@ -38,7 +40,7 @@ namespace NimbleBluetoothImpedanceManager
 
             setLevel = nimbleCommsManager.GetRampLevel(relevantSequence);
 
-            tmrStatus = new System.Timers.Timer(2000);
+            tmrStatus = new System.Timers.Timer(1200);
             tmrStatus.Elapsed += statusTimer_Tick;
             tmrStatus.Start();
             InitializeComponent();
@@ -49,25 +51,39 @@ namespace NimbleBluetoothImpedanceManager
             if (this.InvokeRequired)
                 this.BeginInvoke((Action)(() =>
                 {
-                    Color clrReady = Color.LimeGreen;
-                    Color clrWorking = Color.Gold;
-                    Color clrNotReady = Color.Firebrick;
-
-                    lblCurrentLevel.Text = string.Format("{0} / {1}", currentLevel, setLevel);
-                    lblTarget.Text = string.Format("{0} / {1}", setLevel.ToString(), relevantSequence.GetMaxStimLevel());
-
-                    if (StimOn.HasValue)
-                    {
-                        statusStimOn.Text = StimOn.Value ? "Stimulation is on" : "Stimulation is off";
-                        statusStimOn.BackColor = StimOn.Value ? clrReady : clrNotReady;
-                    }
-                    else
-                    {
-                        statusStimOn.Text = "Something went wrong";
-                        statusStimOn.BackColor = clrWorking;
-                    }
-
+                    DoInterfaceUpdate();
                 }));
+            else
+                DoInterfaceUpdate();
+        }
+
+        private void DoInterfaceUpdate()
+        {
+            Color clrReady = Color.LimeGreen;
+            Color clrWorking = Color.Gold;
+            Color clrNotReady = Color.Firebrick;
+
+            lblCurrentLevel.Text = string.Format("{0} / {1}", currentLevel, setLevel);
+            lblTarget.Text = string.Format("{0} / {1}", setLevel.ToString(), relevantSequence.GetMaxStimLevel());
+
+            if (StimOn.HasValue)
+            {
+                statusStimOn.Text = StimOn.Value ? "Stimulation is on" : "Stimulation is off";
+                statusStimOn.BackColor = StimOn.Value ? clrReady : clrNotReady;
+            }
+            else
+            {
+                statusStimOn.Text = "Something went wrong";
+                statusStimOn.BackColor = clrWorking;
+            }
+
+            btnDown.Enabled = ButtonsEnabled;
+            btnUp.Enabled = ButtonsEnabled;
+            btnStimOff.Enabled = ButtonsEnabled;
+            btnStimOn.Enabled = ButtonsEnabled;
+            btnEnterValue.Enabled = ButtonsEnabled;
+
+            lblMaxCurrent.Text = string.Format("Max current: {0}", relevantSequence.GetMaxCurrentInRampLevel(currentLevel));
         }
 
         private void statusTimer_Tick(object sender, EventArgs e)
@@ -86,7 +102,7 @@ namespace NimbleBluetoothImpedanceManager
             }
             else
             {
-
+                UpdateInterface();
             }
         }
 
@@ -95,8 +111,16 @@ namespace NimbleBluetoothImpedanceManager
             statusTimer_Tick(null, null);
         }
 
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            tmrStatus.Stop();
+            base.OnClosing(e);
+        }
+
         private void btnDown_Click(object sender, EventArgs e)
         {
+            ButtonsEnabled = false;
+            UpdateInterface();
             if (setLevel <= 1)
                 return;
             var res = nimbleCommsManager.SetRampLevel(setLevel - 1, relevantSequence);
@@ -108,10 +132,14 @@ namespace NimbleBluetoothImpedanceManager
             {
                 logger.Error("Level decrease potentially not completed");
             }
+            ButtonsEnabled = true;
+            UpdateInterface();
         }
 
         private void btnUp_Click(object sender, EventArgs e)
         {
+            ButtonsEnabled = false;
+            UpdateInterface();
             if (setLevel == relevantSequence.GetMaxStimLevel())
                 return;
             var res = nimbleCommsManager.SetRampLevel(setLevel + 1, relevantSequence);
@@ -123,31 +151,40 @@ namespace NimbleBluetoothImpedanceManager
             {
                 logger.Error("Level increase potentially not completed");
             }
+            ButtonsEnabled = true;
+            UpdateInterface();
         }
 
         private void btnStimOn_Click(object sender, EventArgs e)
         {
+            ButtonsEnabled = false;
+            UpdateInterface();
             var res = nimbleCommsManager.SetStimActivity(true);
             if (res)
                 StimOn = true;
             else
                 StimOn = null;
+            ButtonsEnabled = true;
             UpdateInterface();
         }
 
         private void btnStimOff_Click(object sender, EventArgs e)
         {
+            ButtonsEnabled = false;
+            UpdateInterface();
             var res = nimbleCommsManager.SetStimActivity(false);
             if (res)
                 StimOn = false;
             else
                 StimOn = null;
+            ButtonsEnabled = true;
             UpdateInterface();
         }
 
         private void btnEnterValue_Click(object sender, EventArgs e)
         {
-            using (FrmSetLevel setlvl = new FrmSetLevel(relevantSequence.GetMaxStimLevel(), 1))
+            ButtonsEnabled = false;
+            UpdateInterface(); using (FrmSetLevel setlvl = new FrmSetLevel(relevantSequence.GetMaxStimLevel(), 1))
             {
                 var res = setlvl.ShowDialog();
                 if (res == DialogResult.OK)
@@ -167,6 +204,7 @@ namespace NimbleBluetoothImpedanceManager
                     logger.Debug("set stim level to custom value cancelled");
                 }
             }
+            ButtonsEnabled = true;
             UpdateInterface();
         }
 

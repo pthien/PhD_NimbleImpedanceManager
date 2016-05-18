@@ -46,7 +46,7 @@ namespace Nimble.Sequences
             }
         }
 
-        public bool SetUpForImpedanceTelemetry
+        public bool SetUpForVoltageTelemetry_EndPhase1
         {
             get
             {
@@ -54,6 +54,19 @@ namespace Nimble.Sequences
                     vtel_vs == VTEL_VoltageSelect.senseelectrodes &&
                     vtel_ts_tokenclock == VTEL_SampleTime_TokenClock.OnTokenClock &&
                     vtel_ts_tokenpos == VTEL_SampleTime_TokenPos.t6 &&
+                    VoltageTelemetryEnabled && !ComplianceTelemetryEnabled;
+                return x;
+            }
+        }
+
+        public bool SetUpForVoltageTelemetry_StartPhase1
+        {
+            get
+            {
+                bool x = SenseElecs == SenseElectrodes.StimElecs &&
+                    vtel_vs == VTEL_VoltageSelect.senseelectrodes &&
+                    vtel_ts_tokenclock == VTEL_SampleTime_TokenClock.TwoCellsAfterTokenClock &&
+                    vtel_ts_tokenpos == VTEL_SampleTime_TokenPos.t1 &&
                     VoltageTelemetryEnabled && !ComplianceTelemetryEnabled;
                 return x;
             }
@@ -180,12 +193,26 @@ namespace Nimble.Sequences
 
         public enum VTEL_SampleTime_TokenPos
         {
+            /// <summary>
+            /// Onset of Sync1
+            /// </summary>
             t0 = 1,
+
+            /// <summary>
+            /// Onset of DT1
+            /// </summary>
             t1 = 2,
+
+            /// <summary>
+            /// Onset of DT2
+            /// </summary>
             t2 = 3,
             t3 = 4,
             t4 = 5,
             t5 = 6,
+            /// <summary>
+            /// End f PX1
+            /// </summary>
             t6 = 7,
             t7 = 8,
             t8 = 9,

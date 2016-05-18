@@ -16,7 +16,6 @@ namespace Nimble.Sequences
 
         private Dictionary<string, FilesForGenerationGUID> FilesByGenGUID;
 
-
         public Dictionary<string, CompiledSequence> CompiledSequences { get; private set; }
 
         Regex regex_guid = new Regex("{GenerationGUID: ([A-Za-z0-9-]+)}");
@@ -182,7 +181,8 @@ namespace Nimble.Sequences
             return new List<NimbleMeasurementRecord>();
         }
 
-        public NimbleImpedanceRecord ProcessSequenceResponse(NimbleMeasurementRecord measurementRecord)
+        public NimbleImpedanceRecord ProcessSequenceResponse(NimbleMeasurementRecord measurementRecord, 
+            bool LoadPreproccessIfExisting, bool Readonly)
         {
             try
             {
@@ -191,9 +191,12 @@ namespace Nimble.Sequences
 
                 NimbleImpedanceRecord impedanceRecord = new NimbleImpedanceRecord(measurementRecord);
 
-                var x = impedanceRecord.Load();
-                if (x.HasValue)
-                    return x.Value;
+                if (LoadPreproccessIfExisting)
+                {
+                    var x = impedanceRecord.Load();
+                    if (x.HasValue)
+                        return x.Value;
+                }
 
                 var measurements = measurementRecord.GetMeasurments();
 
@@ -218,7 +221,8 @@ namespace Nimble.Sequences
                 }
                 logger.Info("Finished processing sequences response. Took {0}s", (DateTime.Now - start).TotalSeconds);
 
-                impedanceRecord.Save();
+                if (!Readonly)
+                    impedanceRecord.Save();
 
                 return impedanceRecord;
             }
@@ -227,6 +231,11 @@ namespace Nimble.Sequences
                 logger.Error(e);
             }
             return new NimbleImpedanceRecord();
+        }
+
+        public NimbleImpedanceRecord ProcessSequenceResponse(NimbleMeasurementRecord measurementRecord)
+        {
+            return ProcessSequenceResponse(measurementRecord, true, false);
         }
 
         //public NimbleImpedanceRecord ProcessSequenceResponseV2(NimbleMeasurementRecord measurementRecord)

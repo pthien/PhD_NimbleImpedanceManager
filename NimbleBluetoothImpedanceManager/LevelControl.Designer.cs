@@ -41,6 +41,7 @@
             this.statusStimOn = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusRampLevel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.lblMaxCurrent = new System.Windows.Forms.Label();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -66,7 +67,7 @@
             // 
             // btnUp
             // 
-            this.btnUp.Location = new System.Drawing.Point(327, 57);
+            this.btnUp.Location = new System.Drawing.Point(340, 56);
             this.btnUp.Name = "btnUp";
             this.btnUp.Size = new System.Drawing.Size(33, 25);
             this.btnUp.TabIndex = 2;
@@ -76,7 +77,7 @@
             // 
             // btnDown
             // 
-            this.btnDown.Location = new System.Drawing.Point(327, 88);
+            this.btnDown.Location = new System.Drawing.Point(340, 87);
             this.btnDown.Name = "btnDown";
             this.btnDown.Size = new System.Drawing.Size(33, 25);
             this.btnDown.TabIndex = 3;
@@ -88,7 +89,7 @@
             // 
             this.lblTarget.AutoSize = true;
             this.lblTarget.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTarget.Location = new System.Drawing.Point(240, 70);
+            this.lblTarget.Location = new System.Drawing.Point(217, 69);
             this.lblTarget.Name = "lblTarget";
             this.lblTarget.Size = new System.Drawing.Size(48, 26);
             this.lblTarget.TabIndex = 4;
@@ -98,7 +99,7 @@
             // 
             this.lblCurrentLevel.AutoSize = true;
             this.lblCurrentLevel.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCurrentLevel.Location = new System.Drawing.Point(240, 128);
+            this.lblCurrentLevel.Location = new System.Drawing.Point(217, 127);
             this.lblCurrentLevel.Name = "lblCurrentLevel";
             this.lblCurrentLevel.Size = new System.Drawing.Size(36, 26);
             this.lblCurrentLevel.TabIndex = 5;
@@ -108,7 +109,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(21, 70);
+            this.label1.Location = new System.Drawing.Point(7, 69);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(202, 26);
             this.label1.TabIndex = 6;
@@ -118,7 +119,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(21, 128);
+            this.label2.Location = new System.Drawing.Point(7, 127);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(213, 26);
             this.label2.TabIndex = 7;
@@ -126,7 +127,7 @@
             // 
             // btnEnterValue
             // 
-            this.btnEnterValue.Location = new System.Drawing.Point(366, 57);
+            this.btnEnterValue.Location = new System.Drawing.Point(379, 56);
             this.btnEnterValue.Name = "btnEnterValue";
             this.btnEnterValue.Size = new System.Drawing.Size(54, 56);
             this.btnEnterValue.TabIndex = 9;
@@ -142,7 +143,7 @@
             this.statusRampLevel});
             this.statusStrip1.Location = new System.Drawing.Point(0, 180);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(433, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(439, 22);
             this.statusStrip1.TabIndex = 10;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -154,7 +155,7 @@
             // toolStripStatusLabel1
             // 
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(418, 17);
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(424, 17);
             this.toolStripStatusLabel1.Spring = true;
             // 
             // statusRampLevel
@@ -162,11 +163,21 @@
             this.statusRampLevel.Name = "statusRampLevel";
             this.statusRampLevel.Size = new System.Drawing.Size(0, 17);
             // 
+            // lblMaxCurrent
+            // 
+            this.lblMaxCurrent.AutoSize = true;
+            this.lblMaxCurrent.Location = new System.Drawing.Point(151, 156);
+            this.lblMaxCurrent.Name = "lblMaxCurrent";
+            this.lblMaxCurrent.Size = new System.Drawing.Size(69, 13);
+            this.lblMaxCurrent.TabIndex = 11;
+            this.lblMaxCurrent.Text = "Max current: ";
+            // 
             // LevelControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(433, 202);
+            this.ClientSize = new System.Drawing.Size(439, 202);
+            this.Controls.Add(this.lblMaxCurrent);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.btnEnterValue);
             this.Controls.Add(this.label2);
@@ -202,5 +213,6 @@
         private System.Windows.Forms.ToolStripStatusLabel statusStimOn;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.ToolStripStatusLabel statusRampLevel;
+        private System.Windows.Forms.Label lblMaxCurrent;
     }
 }

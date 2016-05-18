@@ -75,6 +75,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AliveDevices.cs" />
     <Compile Include="CICState.cs" />
     <Compile Include="CompiledSequence.cs" />
     <Compile Include="MeasurementSummary.cs" />

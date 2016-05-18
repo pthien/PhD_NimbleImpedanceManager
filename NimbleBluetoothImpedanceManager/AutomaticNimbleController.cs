@@ -243,7 +243,9 @@ namespace NimbleBluetoothImpedanceManager
             {
                 using (StreamWriter sw = new StreamWriter(fs))
                 {
-                    sw.WriteLine("{0}|{1}\t{2}\t{3}", DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss.ffff"), stimOn ? "on" : "off", rampprogress, setLevel);
+                    sw.WriteLine("{0}|{4}\t{5}\t{1}\t{2}\t{3}", DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss.ffff"), 
+                        stimOn ? "on" : "off", rampprogress, setLevel, 
+                        nimble.RemoteNimbleProcessor.BluetoothAddress, nimble.RemoteNimbleProcessor.GenGUID);
                     sw.Flush();
                 }
             }

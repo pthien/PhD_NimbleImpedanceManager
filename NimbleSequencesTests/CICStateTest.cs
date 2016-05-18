@@ -10,6 +10,7 @@ namespace NimbleSequencesTests
     ///This is a test class for CICStateTest and is intended
     ///to contain all CICStateTest Unit Tests
     ///</summary>
+    [DeploymentItem("NimbleSequences.dll")]
     [TestClass()]
     public class CICStateTest
     {
@@ -108,6 +109,7 @@ namespace NimbleSequencesTests
             int E = 0; // TODO: Initialize to an appropriate value
             int M = 5; // TODO: Initialize to an appropriate value
             int A = 3; // TODO: Initialize to an appropriate value
+
             target.ApplyPulse(E, M, A);
             Assert.AreEqual(CICState.SenseElectrodes.StimElecs, target.SenseElecs);
             Assert.AreEqual(CICState.VTEL_AmplifierGain.Gain1on5, target.vtel_gain);
@@ -135,6 +137,9 @@ namespace NimbleSequencesTests
         }
 
 
+        /// <summary>
+        /// Is the implant set up to return the minimum possible value. i.e. shortest possible time between the two spicks.
+        /// </summary>
         [TestMethod()]
         public void ApplyPulseTest_SetupForMinPWM()
         {
@@ -145,9 +150,12 @@ namespace NimbleSequencesTests
             target.ApplyPulse(0, 0, 87);
             Assert.AreEqual(true, target.SetUpToReadMinPWM);
             Assert.IsFalse(target.SetUpToReadMaxPWM);
-            Assert.IsFalse(target.SetUpForImpedanceTelemetry);
+            Assert.IsFalse(target.SetUpForVoltageTelemetry_EndPhase1);
         }
 
+        /// <summary>
+        /// Is the implant set up to return the maximum possible value. i.e. longest possible time between the two spicks.
+        /// </summary>
         [TestMethod()]
         public void ApplyPulseTest_SetupForMaxPWM()
         {
@@ -156,10 +164,11 @@ namespace NimbleSequencesTests
             target.ApplyPulse(0, 5, 0);
             target.ApplyPulse(0, 6, 117);
             target.ApplyPulse(0, 0, 87);
-            Assert.AreEqual(true, target.SetUpToReadMaxPWM);
-            Assert.IsFalse(target.SetUpForImpedanceTelemetry);
+            Assert.IsTrue(target.SetUpToReadMaxPWM);
+            Assert.IsFalse(target.SetUpForVoltageTelemetry_EndPhase1);
             Assert.IsFalse(target.SetUpToReadMinPWM);
         }
+
 
         [TestMethod()]
         public void ApplyPulseTest_SetupForImpedanceTelem()
@@ -169,7 +178,21 @@ namespace NimbleSequencesTests
             target.ApplyPulse(0, 5, 3);
             target.ApplyPulse(0, 6, 118);
             target.ApplyPulse(0, 0, 87);
-            Assert.AreEqual(true, target.SetUpForImpedanceTelemetry);
+            Assert.AreEqual(true, target.SetUpForVoltageTelemetry_EndPhase1);
+            Assert.IsFalse(target.SetUpToReadMaxPWM);
+            Assert.IsFalse(target.SetUpToReadMinPWM);
+        }
+
+        [TestMethod()]
+        public void ApplyPulseTest_SetupForAccessVoltageMeasurement()
+        {
+            CICState target = new CICState(); // TODO: Initialize to an appropriate value
+            target.ApplyPulse(0, 0, 205);
+            target.ApplyPulse(0, 5, 3);
+            target.ApplyPulse(0, 6, 46);
+            target.ApplyPulse(0, 0, 87);
+            Assert.IsTrue(target.SetUpForVoltageTelemetry_StartPhase1);
+            Assert.IsFalse(target.SetUpForVoltageTelemetry_EndPhase1);
             Assert.IsFalse(target.SetUpToReadMaxPWM);
             Assert.IsFalse(target.SetUpToReadMinPWM);
         }

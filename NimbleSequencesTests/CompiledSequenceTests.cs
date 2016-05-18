@@ -138,7 +138,8 @@ const int PulseData[108][12] = {
         [TestMethod()]
         public void ParseSequenceTest()
         {
-            var o1 = CompiledSequence_Accessor.ParseSequence(test1,0);
+            int[] MaxCurrentForEachSeg;
+            var o1 = CompiledSequence_Accessor.ParseSequence(test1,0, out MaxCurrentForEachSeg);
             for (int i = 0; i < o1.Length; i++)
             {
                 CollectionAssert.AreEqual(output1[i], output1[i]);

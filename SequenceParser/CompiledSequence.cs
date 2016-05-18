@@ -24,7 +24,7 @@ namespace Nimble.Sequences
             _HashDefines = ExtractHashDefines(alltext_seqh);
 
             string alltext_seqc = File.ReadAllText(SequenceFiles.Sequence_c);
-            Sequence = ParseSequence(alltext_seqc, SequenceComments.Length);
+            Sequence = ParseSequence(alltext_seqc, SequenceComments.Length, out MaxCurrentuAForEachSegment);
             Guid guid_sc = ExtractGuid(alltext_seqc);
 
 
@@ -48,6 +48,7 @@ namespace Nimble.Sequences
         public Pulse[] PulseData { get; private set; }
         public int ClockRate { get; private set; }
         public int[][] Sequence { get; private set; }
+        private int[] MaxCurrentuAForEachSegment;
         private Dictionary<int, int> SegmentToLevelMap;
         private readonly Dictionary<string, int> _HashDefines;
         public readonly string[] SequenceComments;
@@ -56,6 +57,7 @@ namespace Nimble.Sequences
         {
             return SegmentToLevelMap.Values.Max();
         }
+
 
         public void ConvertStimLevel2SegNumbers(int StimLevel, out int StartLoopSeg, out int EndLoopSeg)
         {
@@ -71,7 +73,6 @@ namespace Nimble.Sequences
                 {
                     StartLoopSeg = Math.Min(kvp.Key, StartLoopSeg);
                     EndLoopSeg = Math.Max(kvp.Key, EndLoopSeg);
-
                 }
             }
 
@@ -79,7 +80,16 @@ namespace Nimble.Sequences
         }
         public int ConvertSegNumber2StimLevel(int segNumber)
         {
-            return SegmentToLevelMap[segNumber];
+            if (SegmentToLevelMap.ContainsKey(segNumber))
+                return SegmentToLevelMap[segNumber];
+            return 0;
+        }
+
+        public int GetMaxCurrentInRampLevel(int RampLevel)
+        {
+            int start, end;
+            ConvertStimLevel2SegNumbers(RampLevel, out start, out end);
+            return MaxCurrentuAForEachSegment[end];
         }
 
         #region constructor functions
@@ -180,19 +190,22 @@ namespace Nimble.Sequences
 
         public static Regex sequenceExtractor = new Regex(@"const int Sequence\[([0-9]+)\]\[([0-9]+)\] = {([0-9{},\s]*)};");
 
-        public static Regex sequenceRowExtractor = new Regex(@"const int Sequence_row([0-9]+)\[\] = {(.+)};");
+        public static Regex sequenceRowExtractor = new Regex(@"const int Sequence_row([0-9]+)\[\] = {(.+)}; //MaxCurrent ([0-9]+)");
 
-        private static int[][] ParseSequence(string alltext, int numSegments)
+        private static int[][] ParseSequence(string alltext, int numSegments, out int[] MaxCurrentuAForEachSegment)
         {
             var mc = sequenceRowExtractor.Matches(alltext);
 
             int[][] extractedSequence = new int[numSegments][];
+            MaxCurrentuAForEachSegment = new int[numSegments];
+
             int count = 0;
             foreach (Match m in mc)
             {
                 int rownum = int.Parse(m.Groups[1].Value);
                 int[] rowData = Array.ConvertAll<string, int>(m.Groups[2].Value.Split(','), int.Parse);
                 extractedSequence[count] = rowData;
+                MaxCurrentuAForEachSegment[count] = int.Parse(m.Groups[3].Value);
                 count++;
             }
             return extractedSequence;
@@ -496,7 +509,7 @@ namespace Nimble.Sequences
                             minPWMB = -1;
                         hiddenLogger.Info("Set minPWMB: {0}  raw:{1}", minPWMB, resp_t.Captures_ticks[0]);
                     }
-                    else if (ImplantA.SetUpForImpedanceTelemetry)
+                    else if (ImplantA.SetUpForVoltageTelemetry_EndPhase1)
                     {
                         //double current_uA = CochlearImplantTokenEncoder.CITokenEncoder.AmplitudeToCurrent(p.LA_uA);
                         if (minPWMA > 0 && maxPWMA > 0 && resp_t.Captures_ticks.Count == 1)
@@ -512,7 +525,7 @@ namespace Nimble.Sequences
                                 maxPWMA, minPWMA, resp_t, m1);
                         }
                     }
-                    else if (ImplantB.SetUpForImpedanceTelemetry)
+                    else if (ImplantB.SetUpForVoltageTelemetry_EndPhase1)
                     {
                         //double current_uA = CochlearImplantTokenEncoder.CITokenEncoder.AmplitudeToCurrent(p.RA_uA);
                         if (minPWMB > 0 && maxPWMB > 0 && resp_t.Captures_ticks.Count == 1)

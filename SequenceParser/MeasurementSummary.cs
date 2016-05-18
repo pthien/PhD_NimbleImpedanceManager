@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using PIC_Sequence;
+using NLog;
+using System.Diagnostics;
 
 namespace Nimble.Sequences
 {
@@ -18,6 +20,8 @@ namespace Nimble.Sequences
 
     public static class MeasurementSummary
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         static public void GenerateSummaryForSubject(string subjectName)
         {
             subjectName = "15_520_DINAH";
@@ -106,6 +110,24 @@ namespace Nimble.Sequences
 
         }
 
+        static public void GenerateSummaryForSubject(string subjectName, string DataFolder, string SequencesFolder, string OutputFolder)
+        {
+            List<NimbleMeasurementRecord> recordsall = SequenceFileManager.GetTelemetryRecords(DataFolder);
+            var myrecs = recordsall.Where(x => x.SubjectName == subjectName).OrderBy(x => x.Timestamp);
+
+            SequenceFileManager fileMan = new SequenceFileManager();
+            fileMan.ScanDirectory(SequencesFolder);
+
+            Stopwatch s = new Stopwatch();
+            foreach (NimbleMeasurementRecord measurementRecord in myrecs)
+            {
+                s.Restart();
+                NimbleImpedanceRecord impedanceRecord = fileMan.ProcessSequenceResponse(measurementRecord, false, true);
+                s.Stop();
+                logger.Debug("Processing impedance record took {0}ms", s.ElapsedMilliseconds);               
+            }
+        }
+
         private static void GeneratesummaryForMeasure(IEnumerable<NimbleMeasurementRecord> records, Measure measure, SequenceFileManager fileMan)
         {
             if (File.Exists(measure.Name + ".csv"))
@@ -119,12 +141,12 @@ namespace Nimble.Sequences
             for (int i = 1; i < 23; i++)
                 sw.Write("B{0}, ", i);
             sw.WriteLine();
-        
+
             foreach (NimbleMeasurementRecord record in records.OrderBy(r => r.Timestamp))
             {
                 NimbleImpedanceRecord impedanceRec = fileMan.ProcessSequenceResponse(record);
 
-                var concatted = impedanceRec.SegmentImpedances.Where(x=>!x.SegmentName.StartsWith("IMPEDANCE_MP25")).Select(x => x.Impedances);
+                var concatted = impedanceRec.SegmentImpedances.Where(x => !x.SegmentName.StartsWith("IMPEDANCE_MP25")).Select(x => x.Impedances);
                 var con = concatted.SelectMany(x => x).ToArray();
 
                 if (measure.measurementType == typeof(ImpedanceResult))
@@ -144,9 +166,9 @@ namespace Nimble.Sequences
                 else if (measure.measurementType == typeof(ComplianceResult))
                 {
                     var measureResults = con.OfType<ComplianceResult>().Where(x =>
-                        //x.Implant == Implant.ImplantA &&
-                        //x.PhaseWidth_us == measure.PhaseWidth_us &&
-                        //x.Current_uA == measure.Current_uA &&
+                      //x.Implant == Implant.ImplantA &&
+                      //x.PhaseWidth_us == measure.PhaseWidth_us &&
+                      //x.Current_uA == measure.Current_uA &&
                       x.Type == measure.ElectrodeConfigType);
 
                     sw.Write("{0} {1}, ", record.Timestamp.ToShortDateString(), record.Timestamp.ToShortTimeString());
@@ -169,7 +191,7 @@ namespace Nimble.Sequences
                     .Select(x => x.InCompliance);
                 if (c.Any())
                 {
-                    compliance = 100*(c.Where(v => v == true).Count() / c.Count());
+                    compliance = 100 * (c.Where(v => v == true).Count() / c.Count());
                     gotVal = true;
                 }
 
