@@ -191,6 +191,7 @@ namespace Nimble.Sequences
 
                 NimbleImpedanceRecord impedanceRecord = new NimbleImpedanceRecord(measurementRecord);
 
+                //Attempt to load previously processed data
                 if (LoadPreproccessIfExisting)
                 {
                     var x = impedanceRecord.Load();
@@ -204,7 +205,9 @@ namespace Nimble.Sequences
                 {
                     logger.Info("Calculating impedances for {0} ({1})", measurementRecord, measurementRecord.RecordDirectory);
                     CompiledSequence cs = CompiledSequences[measurementRecord.GenGuid.ToString()];
-                    foreach (NimbleSegmentMeasurment m in measurements)
+
+                    //Process each segment response.
+                    foreach (NimbleSegmentResponse m in measurements)
                     {
                         NimbleSegmentTelemetry segImp = new NimbleSegmentTelemetry
                         {

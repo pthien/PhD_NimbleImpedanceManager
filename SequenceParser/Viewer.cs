@@ -127,11 +127,11 @@ namespace Nimble.Sequences
                 object o = cmbMeasurementRecord.SelectedItem;
                 NimbleMeasurementRecord r = (NimbleMeasurementRecord)o;
 
-                List<NimbleSegmentMeasurment> segmentMeasurments = r.GetMeasurments();
+                List<NimbleSegmentResponse> segmentMeasurments = r.GetMeasurments();
 
                 var uniqeSegments = segmentMeasurments.GroupBy(x => x.SegmentName).Select(g => g.First()).ToList();
 
-                foreach (NimbleSegmentMeasurment segment in uniqeSegments)
+                foreach (NimbleSegmentResponse segment in uniqeSegments)
                 {
                     lstSpecificMeasurements.Items.Add(segment.SegmentName);
                 }
@@ -161,7 +161,7 @@ namespace Nimble.Sequences
                 object o = cmbMeasurementRecord.SelectedItem;
                 NimbleMeasurementRecord r = (NimbleMeasurementRecord)o;
                 NimbleImpedanceRecord imprec = fileman.ProcessSequenceResponse(r);
-                List<NimbleSegmentMeasurment> measurments = r.GetMeasurments();
+                List<NimbleSegmentResponse> measurments = r.GetMeasurments();
 
                 bool lockedToImpedance = false;
                 bool lockedToCompliance = false;

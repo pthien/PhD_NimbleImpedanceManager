@@ -36,6 +36,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.3.4\lib\net40\NLog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="PIC_Sequence, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\PIC_Sequence.dll</HintPath>
@@ -50,7 +54,9 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework">
+          <Private>False</Private>
+        </Reference>
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -58,6 +64,7 @@
     <Compile Include="RealTelemDataTests.cs" />
     <Compile Include="RecordParserTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="KYE_RealDataTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SequenceParser\NimbleSequences.csproj">
@@ -78,49 +85,835 @@
     <Content Include="Data\14_514_Kingston_608e3568-59c1-408d-a53b-34203648716e\Sequence.h">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\COMPLIANCEON_A_0.txt" />
-    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\COMPLIANCEON_A_1.txt" />
-    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\COMPLIANCEON_A_2.txt" />
-    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\COMPLIANCEON_B_0.txt" />
-    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\COMPLIANCEON_B_1.txt" />
-    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\COMPLIANCEON_B_2.txt" />
-    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_CG25_V10_0.txt" />
-    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_CG25_V10_1.txt" />
-    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_CG25_V10_2.txt" />
-    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP25_V10_0.txt" />
-    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP25_V10_1.txt" />
-    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP25_V10_2.txt" />
-    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP400_V10_0.txt" />
-    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP400_V10_1.txt" />
-    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP400_V10_2.txt" />
-    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP400_V1_0.txt" />
-    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP400_V1_1.txt" />
-    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP400_V1_2.txt" />
-    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP400_V2_0.txt" />
-    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP400_V2_1.txt" />
-    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP400_V2_2.txt" />
-    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_CG145_0.txt" />
-    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_CG145_1.txt" />
-    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_CG145_2.txt" />
-    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_MP145_0.txt" />
-    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_MP145_1.txt" />
-    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_MP145_2.txt" />
-    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_MP25_0.txt" />
-    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_MP25_1.txt" />
-    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_MP25_2.txt" />
-    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_MP290_0.txt" />
-    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_MP290_1.txt" />
-    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_MP290_2.txt" />
-    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_MP580_0.txt" />
-    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_MP580_1.txt" />
-    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_MP580_2.txt" />
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\COMPLIANCEON_A_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\COMPLIANCEON_A_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\COMPLIANCEON_A_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\COMPLIANCEON_B_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\COMPLIANCEON_B_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\COMPLIANCEON_B_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_CG25_V10_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_CG25_V10_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_CG25_V10_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP25_V10_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP25_V10_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP25_V10_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP400_V10_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP400_V10_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP400_V10_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP400_V1_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP400_V1_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP400_V1_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP400_V2_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP400_V2_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\IMPEDANCE_MP400_V2_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_CG145_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_CG145_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_CG145_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_MP145_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_MP145_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_MP145_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_MP25_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_MP25_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_MP25_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_MP290_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_MP290_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_MP290_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_MP580_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_MP580_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-608e3568-59c1-408d-a53b-34203648716e-2015-07-17_12-17-32-PM\IMPEDANCE_MP580_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-bacd73be-60b4-49e3-ba31-e0903738cc93-2015-08-03_01-04-50-PM\COMPLIANCEON_A_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-bacd73be-60b4-49e3-ba31-e0903738cc93-2015-08-03_01-04-50-PM\COMPLIANCEON_A_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-bacd73be-60b4-49e3-ba31-e0903738cc93-2015-08-03_01-04-50-PM\COMPLIANCEON_A_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-bacd73be-60b4-49e3-ba31-e0903738cc93-2015-08-03_01-04-50-PM\COMPLIANCEON_B_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-bacd73be-60b4-49e3-ba31-e0903738cc93-2015-08-03_01-04-50-PM\COMPLIANCEON_B_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-bacd73be-60b4-49e3-ba31-e0903738cc93-2015-08-03_01-04-50-PM\COMPLIANCEON_B_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-bacd73be-60b4-49e3-ba31-e0903738cc93-2015-08-03_01-04-50-PM\IMPEDANCE_CG145_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-bacd73be-60b4-49e3-ba31-e0903738cc93-2015-08-03_01-04-50-PM\IMPEDANCE_CG145_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-bacd73be-60b4-49e3-ba31-e0903738cc93-2015-08-03_01-04-50-PM\IMPEDANCE_CG145_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-bacd73be-60b4-49e3-ba31-e0903738cc93-2015-08-03_01-04-50-PM\IMPEDANCE_MP145_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-bacd73be-60b4-49e3-ba31-e0903738cc93-2015-08-03_01-04-50-PM\IMPEDANCE_MP145_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-bacd73be-60b4-49e3-ba31-e0903738cc93-2015-08-03_01-04-50-PM\IMPEDANCE_MP145_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-bacd73be-60b4-49e3-ba31-e0903738cc93-2015-08-03_01-04-50-PM\IMPEDANCE_MP25_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-bacd73be-60b4-49e3-ba31-e0903738cc93-2015-08-03_01-04-50-PM\IMPEDANCE_MP25_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-bacd73be-60b4-49e3-ba31-e0903738cc93-2015-08-03_01-04-50-PM\IMPEDANCE_MP25_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-bacd73be-60b4-49e3-ba31-e0903738cc93-2015-08-03_01-04-50-PM\IMPEDANCE_MP290_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-bacd73be-60b4-49e3-ba31-e0903738cc93-2015-08-03_01-04-50-PM\IMPEDANCE_MP290_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-bacd73be-60b4-49e3-ba31-e0903738cc93-2015-08-03_01-04-50-PM\IMPEDANCE_MP290_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-bacd73be-60b4-49e3-ba31-e0903738cc93-2015-08-03_01-04-50-PM\IMPEDANCE_MP580_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-bacd73be-60b4-49e3-ba31-e0903738cc93-2015-08-03_01-04-50-PM\IMPEDANCE_MP580_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1-F4B85EB48907-bacd73be-60b4-49e3-ba31-e0903738cc93-2015-08-03_01-04-50-PM\IMPEDANCE_MP580_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1_bacd73be-60b4-49e3-ba31-e0903738cc93\PulseData.c">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1_bacd73be-60b4-49e3-ba31-e0903738cc93\PulseData.h">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1_bacd73be-60b4-49e3-ba31-e0903738cc93\Sequence.c">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\14_514_PCB1_bacd73be-60b4-49e3-ba31-e0903738cc93\Sequence.h">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\COMPLIANCEON_A_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\COMPLIANCEON_A_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\COMPLIANCEON_A_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\COMPLIANCEON_A_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\COMPLIANCEON_A_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\COMPLIANCEON_A_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\COMPLIANCEON_B_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\COMPLIANCEON_B_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\COMPLIANCEON_B_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\COMPLIANCEON_B_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\COMPLIANCEON_B_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\COMPLIANCEON_B_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_CG25_V10_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_CG25_V10_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_CG25_V10_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_CG25_V10_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_CG25_V10_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_CG25_V10_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP145_V10_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP145_V10_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP145_V10_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP145_V10_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP145_V10_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP145_V10_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP25_V10_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP25_V10_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP25_V10_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP25_V10_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP25_V10_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP25_V10_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP25_V2_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP25_V2_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP25_V2_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP25_V2_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP25_V2_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP25_V2_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP290_V10_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP290_V10_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP290_V10_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP290_V10_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP290_V10_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP290_V10_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP400_V10_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP400_V10_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP400_V10_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP400_V10_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP400_V10_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP400_V10_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP580_V10_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP580_V10_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP580_V10_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP580_V10_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP580_V10_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\IMPEDANCE_MP580_V10_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\COMPLIANCEON_A_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\COMPLIANCEON_A_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\COMPLIANCEON_A_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\COMPLIANCEON_A_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\COMPLIANCEON_A_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\COMPLIANCEON_A_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\COMPLIANCEON_B_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\COMPLIANCEON_B_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\COMPLIANCEON_B_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\COMPLIANCEON_B_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\COMPLIANCEON_B_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\COMPLIANCEON_B_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_CG25_V10_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_CG25_V10_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_CG25_V10_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_CG25_V10_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_CG25_V10_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_CG25_V10_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP145_V10_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP145_V10_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP145_V10_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP145_V10_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP145_V10_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP145_V10_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP25_V10_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP25_V10_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP25_V10_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP25_V10_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP25_V10_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP25_V10_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP25_V2_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP25_V2_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP25_V2_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP25_V2_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP25_V2_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP25_V2_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP290_V10_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP290_V10_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP290_V10_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP290_V10_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP290_V10_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP290_V10_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP400_V10_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP400_V10_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP400_V10_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP400_V10_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP400_V10_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP400_V10_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP580_V10_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP580_V10_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP580_V10_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP580_V10_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP580_V10_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\IMPEDANCE_MP580_V10_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY_7e4254d7-5f13-4358-ab35-627c5c47baf7\PulseData.c">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY_7e4254d7-5f13-4358-ab35-627c5c47baf7\PulseData.h">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY_7e4254d7-5f13-4358-ab35-627c5c47baf7\Sequence.c">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_518_MARY_7e4254d7-5f13-4358-ab35-627c5c47baf7\Sequence.h">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_CG25_V10_AONLY_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_CG25_V10_AONLY_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_CG25_V10_AONLY_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_CG25_V10_AONLY_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_CG25_V10_AONLY_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_CG25_V10_AONLY_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_CG25_V10_BONLY_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_CG25_V10_BONLY_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_CG25_V10_BONLY_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_CG25_V10_BONLY_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_CG25_V10_BONLY_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_CG25_V10_BONLY_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_COMPLIANCE_AONLY_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_COMPLIANCE_AONLY_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_COMPLIANCE_AONLY_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_COMPLIANCE_AONLY_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_COMPLIANCE_AONLY_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_COMPLIANCE_AONLY_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_COMPLIANCE_BONLY_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_COMPLIANCE_BONLY_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_COMPLIANCE_BONLY_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_COMPLIANCE_BONLY_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_COMPLIANCE_BONLY_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_COMPLIANCE_BONLY_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP145_V10_AONLY_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP145_V10_AONLY_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP145_V10_AONLY_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP145_V10_AONLY_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP145_V10_AONLY_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP145_V10_AONLY_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP145_V10_BONLY_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP145_V10_BONLY_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP145_V10_BONLY_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP145_V10_BONLY_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP145_V10_BONLY_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP145_V10_BONLY_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP25_V10_AONLY_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP25_V10_AONLY_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP25_V10_AONLY_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP25_V10_AONLY_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP25_V10_AONLY_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP25_V10_AONLY_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP25_V10_BONLY_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP25_V10_BONLY_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP25_V10_BONLY_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP25_V10_BONLY_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP25_V10_BONLY_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP25_V10_BONLY_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP280_V10_AONLY_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP280_V10_AONLY_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP280_V10_AONLY_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP280_V10_AONLY_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP280_V10_AONLY_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP280_V10_AONLY_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP280_V10_BONLY_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP280_V10_BONLY_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP280_V10_BONLY_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP280_V10_BONLY_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP280_V10_BONLY_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP280_V10_BONLY_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP400_V10_AONLY_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP400_V10_AONLY_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP400_V10_AONLY_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP400_V10_AONLY_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP400_V10_AONLY_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP400_V10_AONLY_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP400_V10_BONLY_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP400_V10_BONLY_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP400_V10_BONLY_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP400_V10_BONLY_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP400_V10_BONLY_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_MP400_V10_BONLY_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\SPECIAL_SENTRY_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\SPECIAL_SENTRY_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\SPECIAL_SENTRY_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\SPECIAL_SENTRY_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\SPECIAL_SENTRY_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\SPECIAL_SENTRY_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\SEQ_15_523_KYE_0e81180e-a80d-4168-9b9b-b36615b6e07a\PulseData.c">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\SEQ_15_523_KYE_0e81180e-a80d-4168-9b9b-b36615b6e07a\PulseData.h">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\SEQ_15_523_KYE_0e81180e-a80d-4168-9b9b-b36615b6e07a\Sequence.c">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\SEQ_15_523_KYE_0e81180e-a80d-4168-9b9b-b36615b6e07a\Sequence.h">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\TEST_Dainty_dbb6c4e9-fb72-4d8d-a695-a5c058778693\PulseData.c">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\TEST_Dainty_dbb6c4e9-fb72-4d8d-a695-a5c058778693\PulseData.h">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\TEST_Dainty_dbb6c4e9-fb72-4d8d-a695-a5c058778693\Sequence.c">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\TEST_Dainty_dbb6c4e9-fb72-4d8d-a695-a5c058778693\Sequence.h">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Shadow Include="Test References\SequenceParser.accessor" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\preprocessed.bin" />
-    <None Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\summary.csv" />
+    <None Include="App.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\preprocessed.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\14_514_PCB1-84EB1877AF2A-a968c4bc-5de2-44e1-837c-319e0875c6db-2015-08-07_01-28-02-PM\summary.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\14_514_PCB1_bacd73be-60b4-49e3-ba31-e0903738cc93\input.dat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\preprocessed.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM\summary.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\preprocessed.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM\summary.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\15_518_MARY_7e4254d7-5f13-4358-ab35-627c5c47baf7\input.dat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\preprocessed.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\summary.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\SEQ_15_523_KYE_0e81180e-a80d-4168-9b9b-b36615b6e07a\input.dat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\TEST_Dainty_dbb6c4e9-fb72-4d8d-a695-a5c058778693\input.dat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="NLog.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

@@ -8,9 +8,9 @@ namespace Nimble.Sequences
     /// <summary>
     /// The result of a single XmitTelem Command.
     /// </summary>
-    public struct NimbleSegmentMeasurment
+    public struct NimbleSegmentResponse
     {
-        public List<NimbleResponse> NimbleResponses;
+        public List<NimbleResponse> TelemetryResponses;
         /// <summary>
         /// The segments used in the producetion of this measurement.
         /// </summary>
@@ -19,9 +19,9 @@ namespace Nimble.Sequences
         public int RepeatCount;
         public string path;
 
-        public NimbleSegmentMeasurment(string filepath)
+        public NimbleSegmentResponse(string filepath)
         {
-            NimbleResponses = new List<NimbleResponse>();
+            TelemetryResponses = new List<NimbleResponse>();
             //SegmentsRun = new List<int>();
             SegmentName = "";
             RepeatCount = -1;
@@ -39,14 +39,11 @@ namespace Nimble.Sequences
                 string alltext = File.ReadAllText(filepath);
                 string[] lines = alltext.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
-                Regex regex_telemResponse = new Regex(@"{T:C([0-9]+)S([0-9]+)I([0-9]+)\[([0-9nc-]+)\]}");
-                Regex regex_segNum = new Regex(@"{seg:([0-9]+)");
-
                 foreach (string s in lines)
                 {
                     NimbleResponse resp = NimbleResponse.GetResponse(s);
                     if (resp != null)
-                        NimbleResponses.Add(resp);
+                        TelemetryResponses.Add(resp);
                     //var m2 = regex_telemResponse.Match(s);
                     //var m3 = regex_segNum.Match(s);
                     //if (m2.Success)
@@ -85,15 +82,19 @@ namespace Nimble.Sequences
         public Guid GenGuid { get; set; }
         public string RecordDirectory { get; set; }
 
-        public List<NimbleSegmentMeasurment> GetMeasurments()
+        /// <summary>
+        /// Returns all of the segment responses made for this measurement record
+        /// </summary>
+        /// <returns></returns>
+        public List<NimbleSegmentResponse> GetMeasurments()
         {
             string[] potentialMeasuremetns = Directory.GetFiles(RecordDirectory);
-            List<NimbleSegmentMeasurment> output = new List<NimbleSegmentMeasurment>();
+            List<NimbleSegmentResponse> output = new List<NimbleSegmentResponse>();
             foreach (string file in potentialMeasuremetns)
             {
-                NimbleSegmentMeasurment s = new NimbleSegmentMeasurment(file);
+                NimbleSegmentResponse s = new NimbleSegmentResponse(file);
                 if (s.SegmentName.Length >= 1)
-                    output.Add(new NimbleSegmentMeasurment(file));
+                    output.Add(new NimbleSegmentResponse(file));
             }
             return output;
         }

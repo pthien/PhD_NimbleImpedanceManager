@@ -43,7 +43,14 @@ namespace NimbleDataProcessor
 
                     var seqs = sfm.CompiledSequences.Values.ToList();
 
-                    MeasurementSummary.GenerateSummaryForSubject("15_523_KYE", result.Value.DataFolder, result.Value.SequenceFolder, result.Value.OutputFolder);
+
+                    foreach (NimbleMeasurementRecord record in recordsall)
+                    {
+                        NimbleImpedanceRecord impRec = sfm.ProcessSequenceResponse(record, false, true);
+                        
+                    }
+
+                    //MeasurementSummary.GenerateSummaryForSubject("15_523_KYE", result.Value.DataFolder, result.Value.SequenceFolder, result.Value.OutputFolder);
 
                     //ProcessAliveDevices(result);
 

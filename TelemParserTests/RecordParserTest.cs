@@ -52,7 +52,7 @@ namespace TelemParserTests
             Assert.AreEqual(15, res.Count);
         }
 
-        private static List<NimbleSegmentMeasurment> GetBasicMeasurements()
+        private static List<NimbleSegmentResponse> GetBasicMeasurements()
         {
             NimbleMeasurementRecord rec = new NimbleMeasurementRecord();
             rec.RecordDirectory =
@@ -99,6 +99,41 @@ namespace TelemParserTests
         }
 
         [TestMethod]
+        public void CompiledSequence_CanParseOld2DArraySequence()
+        {
+            FilesForGenerationGUID files = new FilesForGenerationGUID();
+            files.Sequence_h = @"14_514_PCB1_bacd73be-60b4-49e3-ba31-e0903738cc93\Sequence.h";
+            files.Sequence_c = @"14_514_PCB1_bacd73be-60b4-49e3-ba31-e0903738cc93\Sequence.c";
+            files.PulseData_h = @"14_514_PCB1_bacd73be-60b4-49e3-ba31-e0903738cc93\PulseData.h";
+            files.PulseData_c = @"14_514_PCB1_bacd73be-60b4-49e3-ba31-e0903738cc93\PulseData.c";
+
+            CompiledSequence seq = new CompiledSequence(files);
+
+            Assert.AreEqual(31, seq.Sequence.Length);
+            Assert.AreEqual(4, seq.Sequence[0].Length);
+            Assert.AreEqual(16, seq.Sequence[1].Length);
+            Assert.AreEqual(38, seq.Sequence[25].Length);
+        }
+
+        [TestMethod]
+        public void CompiledSequence_CanParseNewJaggedArraySequence()
+        {
+            FilesForGenerationGUID files = new FilesForGenerationGUID();
+            files.Sequence_h = @"TEST_Dainty_dbb6c4e9-fb72-4d8d-a695-a5c058778693\Sequence.h";
+            files.Sequence_c = @"TEST_Dainty_dbb6c4e9-fb72-4d8d-a695-a5c058778693\Sequence.c";
+            files.PulseData_h = @"TEST_Dainty_dbb6c4e9-fb72-4d8d-a695-a5c058778693\PulseData.h";
+            files.PulseData_c = @"TEST_Dainty_dbb6c4e9-fb72-4d8d-a695-a5c058778693\PulseData.c";
+
+            CompiledSequence seq = new CompiledSequence(files);
+
+            Assert.AreEqual(219, seq.Sequence.Length);
+            Assert.AreEqual(9, seq.Sequence[0].Length);
+            Assert.AreEqual(9, seq.Sequence[1].Length);
+            Assert.AreEqual(38, seq.Sequence[213].Length);
+        }
+
+
+        [TestMethod]
         public void CompiledSequence_BasicImpedance()
         {
             var seq = GetTestSequence_ImpedanceAndCompliance();
@@ -107,7 +142,7 @@ namespace TelemParserTests
             rec.RecordDirectory =
                 @"14_514_PCB1-F4B85EB48907-bacd73be-60b4-49e3-ba31-e0903738cc93-2015-08-03_01-04-50-PM";
 
-            List<NimbleSegmentMeasurment> measurements = rec.GetMeasurments();
+            List<NimbleSegmentResponse> measurements = rec.GetMeasurments();
 
             List<TelemetryResult> impedances = seq.ProcessMeasurementCall(measurements[12]);
 
@@ -139,7 +174,7 @@ namespace TelemParserTests
             rec.RecordDirectory =
                 @"14_514_PCB1-F4B85EB48907-bacd73be-60b4-49e3-ba31-e0903738cc93-2015-08-03_01-04-50-PM";
 
-            List<NimbleSegmentMeasurment> measurements = rec.GetMeasurments();
+            List<NimbleSegmentResponse> measurements = rec.GetMeasurments();
 
             List<TelemetryResult> impedances = seq.ProcessMeasurementCall(measurements[0]);
 

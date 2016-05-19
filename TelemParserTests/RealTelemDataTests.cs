@@ -8,6 +8,7 @@ using Nimble.Sequences;
 namespace TelemParserTests
 {
     [TestClass]
+    [DeploymentItem("Data")]
     public class RealTelemDataTests
     {
         [TestMethod]
@@ -36,8 +37,8 @@ namespace TelemParserTests
             rec.RecordDirectory =
                 @"15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM";
 
-            List<NimbleSegmentMeasurment> measurements = rec.GetMeasurments();
-            NimbleSegmentMeasurment m =
+            List<NimbleSegmentResponse> measurements = rec.GetMeasurments();
+            NimbleSegmentResponse m =
                 measurements.Where(x => x.RepeatCount == 5 && x.SegmentName == "IMPEDANCE_MP25_V2").First();
 
             List<TelemetryResult> processed = seq.ProcessMeasurementCall(m);
@@ -48,19 +49,53 @@ namespace TelemParserTests
             List<ImpedanceResult> imps = processed.Cast<ImpedanceResult>().ToList();
            
             Assert.AreEqual(11, imps.Count);
-            Assert.AreEqual(5095.541401, imps[0]._Impedance_ohms, 100);
-            Assert.AreEqual(5170.068027, imps[1]._Impedance_ohms, 100);
-            Assert.AreEqual(4749.787956, imps[2]._Impedance_ohms, 100);
-            Assert.AreEqual(4365.180467, imps[3]._Impedance_ohms, 100);
-            Assert.AreEqual(4891.719745, imps[4]._Impedance_ohms, 100);
-            Assert.AreEqual(13384.28875, imps[5]._Impedance_ohms, 100);
-            Assert.AreEqual(13316.3482, imps[6]._Impedance_ohms,  100);
-            Assert.AreEqual(4263.269639, imps[7]._Impedance_ohms, 100);
-            Assert.AreEqual(4127.388535, imps[8]._Impedance_ohms, 100);
-            Assert.AreEqual(3380.042463, imps[9]._Impedance_ohms, 100);
-            Assert.AreEqual(4789.808917, imps[10]._Impedance_ohms,100);
+            Assert.AreEqual(5102.04081632653, imps[0]._Impedance_ohms, 50);
+            Assert.AreEqual(5170.06802721088, imps[1]._Impedance_ohms, 50);
+            Assert.AreEqual(4761.90476190476, imps[2]._Impedance_ohms, 50);
+            Assert.AreEqual(4370.74829931972, imps[3]._Impedance_ohms, 50);
+            Assert.AreEqual(4897.95918367347, imps[4]._Impedance_ohms, 50);
+            Assert.AreEqual(13367.3469387755, imps[5]._Impedance_ohms, 50);
+            Assert.AreEqual(13333.3333333333, imps[6]._Impedance_ohms, 50);
+            Assert.AreEqual(4268.70748299319, imps[7]._Impedance_ohms, 50);
+            Assert.AreEqual(4132.65306122449, imps[8]._Impedance_ohms, 50);
+            Assert.AreEqual(3384.35374149659, imps[9]._Impedance_ohms, 50);
+            Assert.AreEqual(4795.91836734693, imps[10]._Impedance_ohms,50);
 
-            
+            Assert.AreEqual(5102.04081632653, imps[0]._Impedance_ohms, 10);
+            Assert.AreEqual(5170.06802721088, imps[1]._Impedance_ohms, 10);
+            Assert.AreEqual(4761.90476190476, imps[2]._Impedance_ohms, 10);
+            Assert.AreEqual(4370.74829931972, imps[3]._Impedance_ohms, 10);
+            Assert.AreEqual(4897.95918367347, imps[4]._Impedance_ohms, 10);
+            Assert.AreEqual(13367.3469387755, imps[5]._Impedance_ohms, 10);
+            Assert.AreEqual(13333.3333333333, imps[6]._Impedance_ohms, 10);
+            Assert.AreEqual(4268.70748299319, imps[7]._Impedance_ohms, 10);
+            Assert.AreEqual(4132.65306122449, imps[8]._Impedance_ohms, 10);
+            Assert.AreEqual(3384.35374149659, imps[9]._Impedance_ohms, 10);
+            Assert.AreEqual(4795.91836734693, imps[10]._Impedance_ohms,10);
+
+            Assert.AreEqual(5102.04081632653, imps[0]._Impedance_ohms, 1);
+            Assert.AreEqual(5170.06802721088, imps[1]._Impedance_ohms, 1);
+            Assert.AreEqual(4761.90476190476, imps[2]._Impedance_ohms, 1);
+            Assert.AreEqual(4370.74829931972, imps[3]._Impedance_ohms, 1);
+            Assert.AreEqual(4897.95918367347, imps[4]._Impedance_ohms, 1);
+            Assert.AreEqual(13367.3469387755, imps[5]._Impedance_ohms, 1);
+            Assert.AreEqual(13333.3333333333, imps[6]._Impedance_ohms, 1);
+            Assert.AreEqual(4268.70748299319, imps[7]._Impedance_ohms, 1);
+            Assert.AreEqual(4132.65306122449, imps[8]._Impedance_ohms, 1);
+            Assert.AreEqual(3384.35374149659, imps[9]._Impedance_ohms, 1);
+            Assert.AreEqual(4795.91836734693, imps[10]._Impedance_ohms,1);
+
+            Assert.AreEqual(5102.04081632653, imps[0]._Impedance_ohms, .1);
+            Assert.AreEqual(5170.06802721088, imps[1]._Impedance_ohms, .1);
+            Assert.AreEqual(4761.90476190476, imps[2]._Impedance_ohms, .1);
+            Assert.AreEqual(4370.74829931972, imps[3]._Impedance_ohms, .1);
+            Assert.AreEqual(4897.95918367347, imps[4]._Impedance_ohms, .1);
+            Assert.AreEqual(13367.3469387755, imps[5]._Impedance_ohms, .1);
+            Assert.AreEqual(13333.3333333333, imps[6]._Impedance_ohms, .1);
+            Assert.AreEqual(4268.70748299319, imps[7]._Impedance_ohms, .1);
+            Assert.AreEqual(4132.65306122449, imps[8]._Impedance_ohms, .1);
+            Assert.AreEqual(3384.35374149659, imps[9]._Impedance_ohms, .1);
+            Assert.AreEqual(4795.91836734693, imps[10]._Impedance_ohms,.1);
         }
 
         [TestMethod]
@@ -72,11 +107,11 @@ namespace TelemParserTests
             rec.RecordDirectory =
                 @"15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_02-00-30-PM";
 
-            List<NimbleSegmentMeasurment> measurements = rec.GetMeasurments();
+            List<NimbleSegmentResponse> measurements = rec.GetMeasurments();
 
             Assert.AreEqual(54, measurements.Count);
 
-            foreach (NimbleSegmentMeasurment meas in measurements)
+            foreach (NimbleSegmentResponse meas in measurements)
             {
                 List<TelemetryResult> imps = seq.ProcessMeasurementCall(meas);
 
@@ -94,10 +129,18 @@ namespace TelemParserTests
 
 
 
-            impedances = seq.ProcessMeasurementCall(measurements[26]);
+            impedances = seq.ProcessMeasurementCall(measurements[21]);
             Assert.IsInstanceOfType(impedances[0], typeof(ImpedanceResult));
-            Assert.AreEqual(5, impedances.Where(x => x.PhaseWidth_us == 145).Count());
-            Assert.AreEqual(5, impedances.Where(x => x is ComplianceResult).Count());
+            Assert.AreEqual(11, impedances.Where(x => x.PhaseWidth_us == 145).Count());
+            Assert.AreEqual(0, impedances.Where(x => x is ComplianceResult).Count());
+
+            ImpedanceResult imp0 = (ImpedanceResult)impedances[0];
+
+            Assert.AreEqual("A1", imp0.ElectrodeName);
+            Assert.AreEqual(PulseType.MonoPolar, imp0.Type);
+            Assert.AreEqual(5952, imp0._Impedance_ohms,1);
+            Assert.AreEqual(5952, imp0._Impedance_ohms,10);
+            Assert.AreEqual(5952, imp0._Impedance_ohms,1000);
 
             //Assert.IsTrue(impedances[0] is ImpedanceResult);
             //if (impedances[0] is ImpedanceResult)
@@ -126,9 +169,9 @@ namespace TelemParserTests
             rec.RecordDirectory =
                 @"15_518_MARY-84EB1877AF2A-7e4254d7-5f13-4358-ab35-627c5c47baf7-2015-08-14_01-00-28-PM";
 
-            List<NimbleSegmentMeasurment> measurements = rec.GetMeasurments();
+            List<NimbleSegmentResponse> measurements = rec.GetMeasurments();
 
-            foreach (NimbleSegmentMeasurment meas in measurements)
+            foreach (NimbleSegmentResponse meas in measurements)
             {
                 List<TelemetryResult> impedances = seq.ProcessMeasurementCall(meas);
 
