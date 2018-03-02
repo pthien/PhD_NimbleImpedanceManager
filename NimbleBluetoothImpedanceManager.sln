@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NimbleBluetoothImpedanceManager", "NimbleBluetoothImpedanceManager\NimbleBluetoothImpedanceManager.csproj", "{4F6F473C-7900-4AD7-AB26-0B8E16D7835C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests_BluetoothCommsManager", "Tests_BluetoothCommsManager\Tests_BluetoothCommsManager.csproj", "{6E6E30A0-FB4A-45F3-80B9-8C9096895B94}"
@@ -18,9 +20,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NimbleDataProcessor", "NimbleDataProcessor\NimbleDataProcessor.csproj", "{CA505264-0C94-4367-90D1-2FF049CE347F}"
 EndProject
 Global
-	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = NimbleBluetoothImpedanceManager2.vsmdi
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -101,5 +100,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = NimbleBluetoothImpedanceManager2.vsmdi
 	EndGlobalSection
 EndGlobal

@@ -60,13 +60,79 @@ namespace Nimble.Sequences
             //return string.Format("{4}{0} vs {1} ({2}) {3:G4} @ {5}us", Electrode, Return, typestr, _Impedance_ohms, Implant == Implant.ImplantA ? "A" : "B", PhaseWidth_us);
             return base.ToString();
         }
+
+        public static List<TelemetryResult> ConvertAnnotatedResponses(List<AnnotatedTelemetryResponse> annotatedResponses, int clockRate_MHz)
+        {
+            List<TelemetryResult> telemResults = new List<TelemetryResult>();
+            try
+            {
+                var references = annotatedResponses.Where(x => x is ReferenceVoltageResponse).Cast<ReferenceVoltageResponse>();
+                var maxrefs = references
+                    .Where(x => x.VoltageReference == ReferenceVoltageResponse.VoltageReferences.MaxPWMValue && x.Captures_ticks.Count == 1);
+                var minrefs = references
+                    .Where(x => x.VoltageReference == ReferenceVoltageResponse.VoltageReferences.MinPWMValue && x.Captures_ticks.Count == 1);
+
+                var maxAList = maxrefs.Where(x => x.ImplantGivingResponse == Implant.ImplantA).Select(x => x.Captures_ticks[0]);
+                var maxBList = maxrefs.Where(x => x.ImplantGivingResponse == Implant.ImplantB).Select(x => x.Captures_ticks[0]);
+
+                var minAList = minrefs.Where(x => x.ImplantGivingResponse == Implant.ImplantA).Select(x => x.Captures_ticks[0]);
+                var minBList = minrefs.Where(x => x.ImplantGivingResponse == Implant.ImplantB).Select(x => x.Captures_ticks[0]);
+
+                if (maxAList.Count() == 0 || maxBList.Count() == 0 || minAList.Count() == 0 || minBList.Count() == 0)
+                    return telemResults;
+
+                int maxPWM_A = maxAList.Max();
+                int maxPWM_B = maxBList.Max();
+
+                int minPWM_A = minAList.Max();
+                int minPWM_B = minBList.Max();
+
+                var impedanceResponses = annotatedResponses.Where(x => x is ElectrodeVoltageResponse).Cast<ElectrodeVoltageResponse>();
+                var complianceResponses = annotatedResponses.Where(x => x is ComplianceVoltageResponse).Cast<ComplianceVoltageResponse>();
+
+
+
+                foreach (ElectrodeVoltageResponse e in impedanceResponses)
+                {
+                    int maxPWM = maxPWM_B, minPWM = minPWM_B;
+                    if (e.ImplantGivingResponse == Implant.ImplantA)
+                    {
+                        maxPWM = maxPWM_A;
+                        minPWM = minPWM_A;
+                    }
+                    if (e.Captures_ticks.Count > 0)
+                    {
+                        var result = new ImpedanceResult(e.Pulse, maxPWM, minPWM, e.Captures_ticks[0], e.vtel_gain, e.ImplantGivingResponse);
+                        telemResults.Add(result);
+                    }
+                }
+
+                foreach (ComplianceVoltageResponse e in complianceResponses)
+                {
+                    if (e.Captures_ticks.Count > 0)
+                    {
+                        var result = new ComplianceResult(e.Pulse, e.ImplantGivingResponse, e.Captures_ticks[0], clockRate_MHz);
+                        telemResults.Add(result);
+                    }
+                }
+
+                return telemResults;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+
+        }
     }
 
     [Serializable]
     public class ImpedanceResult : TelemetryResult
     {
         public ImpedanceCatagorization _Category;
-        public double _Impedance_ohms;
+        public double Impedance_ohms { get; private set; }
+        public double Voltage_V { get; private set; }
 
         public ImpedanceResult(int E, int M, double current_uA, int maxPWM, int minPWM, int TelemResponse_ticks, CICState.VTEL_AmplifierGain Gain, Implant implant, int PhaseWidth_us)
         {
@@ -77,11 +143,18 @@ namespace Nimble.Sequences
             Current_uA = current_uA;
             double vfs = CICState.vtel_gain_To_VFullScale(Gain);
 
-            _Impedance_ohms = CalculateImpedance(current_uA, minPWM, maxPWM, TelemResponse_ticks, vfs);
+            Impedance_ohms = CalculateImpedance(current_uA, minPWM, maxPWM, TelemResponse_ticks, vfs);
 
             _Category = ImpedanceCatagorization.Error;
+        }
 
-          
+        public ImpedanceResult(Pulse p, int maxPWM, int minPWM, int TelemResponse_ticks, CICState.VTEL_AmplifierGain Gain, Implant implant)
+            : this(implant == Implant.ImplantA ? p.LE : p.RE,
+                  implant == Implant.ImplantA ? p.LM : p.RM,
+                  implant == Implant.ImplantA ? p.LA : p.RA,
+                  maxPWM, minPWM, TelemResponse_ticks, Gain, implant, p.PW_us)
+        {
+
         }
 
         private double CalculateImpedance(double current_uA, int minPWM_ticks, int maxPWM_ticks, int RawVal_ticks, double VoltageFullScale_V)
@@ -89,8 +162,8 @@ namespace Nimble.Sequences
             int RampTime_ticks = RawVal_ticks - minPWM_ticks;
             double RampTime_percentMax = (double)RampTime_ticks / (maxPWM_ticks - minPWM_ticks);
 
-            double voltage_V = RampTime_percentMax * VoltageFullScale_V;
-            double voltave_uV = voltage_V * 1000000;
+            Voltage_V = RampTime_percentMax * VoltageFullScale_V;
+            double voltave_uV = Voltage_V * 1000000;
             double impedance = impedance = voltave_uV / current_uA;
 
             return impedance;
@@ -110,9 +183,11 @@ namespace Nimble.Sequences
                 default:
                     break;
             }
-            return string.Format("{4}{0} vs {1} ({2}) {3:G4} @ {5}us", Electrode, Return, typestr, _Impedance_ohms, Implant == Implant.ImplantA ? "A" : "B", PhaseWidth_us);
+            return string.Format("{4}{0} vs {1} ({2}) {3:G4} @ {5}us", Electrode, Return, typestr, Impedance_ohms, Implant == Implant.ImplantA ? "A" : "B", PhaseWidth_us);
             //return base.ToString();
         }
+
+
     }
 
     [Serializable]
@@ -287,7 +362,7 @@ namespace Nimble.Sequences
 
             foreach (NimbleSegmentTelemetry m in SegmentImpedances)
             {
-                
+
                 sw.Write(m + ",");
 
                 for (int i = 1; i < 23; i++)
@@ -297,7 +372,7 @@ namespace Nimble.Sequences
                     if (one.Any())
                     {
                         var first = one.First();
-                        sw.Write(first._Impedance_ohms + ",");
+                        sw.Write(first.Impedance_ohms + ",");
                     }
                     else
                     {
@@ -311,7 +386,7 @@ namespace Nimble.Sequences
                     if (one.Any())
                     {
                         var first = one.First();
-                        sw.Write(first._Impedance_ohms + ",");
+                        sw.Write(first.Impedance_ohms + ",");
                     }
                     else
                     {

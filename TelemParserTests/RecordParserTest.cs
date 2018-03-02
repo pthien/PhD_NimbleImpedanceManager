@@ -152,7 +152,7 @@ namespace TelemParserTests
                 ImpedanceResult i0 = (ImpedanceResult)impedances[1];
                 Assert.AreEqual(i0.ElectrodeName, "A2");
                 Assert.AreEqual(i0._Category, ImpedanceCatagorization.Error);
-                Assert.AreEqual(4071, Math.Round(i0._Impedance_ohms));
+                Assert.AreEqual(4071, Math.Round(i0.Impedance_ohms));
                 Assert.AreEqual(2, i0.Electrode);
                 Assert.AreEqual(i0.Implant, PIC_Sequence.Implant.ImplantA);
                 Assert.AreEqual(25, i0.PhaseWidth_us);

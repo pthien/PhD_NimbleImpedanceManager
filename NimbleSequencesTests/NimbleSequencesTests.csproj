@@ -144,6 +144,20 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Data\14_514_PCB1_e0479d64-2134-4a30-aff2-fbd33ac78358\PulseData.c">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\14_514_PCB1_e0479d64-2134-4a30-aff2-fbd33ac78358\PulseData.h">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\14_514_PCB1_e0479d64-2134-4a30-aff2-fbd33ac78358\Sequence.c">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\14_514_PCB1_e0479d64-2134-4a30-aff2-fbd33ac78358\Sequence.h">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

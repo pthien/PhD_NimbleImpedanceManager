@@ -59,7 +59,7 @@ namespace Nimble.Sequences
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        public List<int> Captures_ticks;
+        public readonly List<int> Captures_ticks;
 
         public int PulseIndex { get; private set; }
 
@@ -97,6 +97,14 @@ namespace Nimble.Sequences
                 }
                 
             }
+        }
+
+        protected TelemetryResponse(int pulseIndex, int segment, int segmentPulseIndex, List<int> caps, string rawResponse) : base (rawResponse)
+        {
+            Captures_ticks = caps;
+            PulseIndex = pulseIndex;
+            Segment = segment;
+            SegmentPulseIndex = segmentPulseIndex;
         }
 
         

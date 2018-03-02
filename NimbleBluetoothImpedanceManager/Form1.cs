@@ -346,6 +346,21 @@ namespace NimbleBluetoothImpedanceManager
 
                 string guid = nimble.RemoteNimbleProcessor.GenGUID;
 
+                bool stimOn = false;
+                for (int i = 0; i < 3; i++)
+                {
+                    bool res = nimble.IsStimOn(out stimOn);
+                    if (res)
+                        break;
+                }
+                if (!stimOn)
+                {
+                    MessageBox.Show("Stimulation is not on. Please turn stimulation on before continuing");
+                    ManualActionInProgress = false;
+                    UpdateStatusStrip();
+                    return;
+                }
+
                 List<int> segIDsToCheck = new List<int>();
 
                 foreach (object d in chkCheckSegments.CheckedItems)

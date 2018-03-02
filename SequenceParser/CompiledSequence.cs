@@ -311,16 +311,29 @@ namespace Nimble.Sequences
             //}
         }
 
+        public List<AnnotatedTelemetryResponse> GetAllMaxMinPWMResponses(List<NimbleSegmentResponse> measurements)
+        {
+            List<AnnotatedTelemetryResponse> allMaxMinPWMresponses = new List<AnnotatedTelemetryResponse>();
+            foreach (NimbleSegmentResponse m in measurements)
+            {
+                var annotatedresponses = ProcessIndividualSegmentReponse(m).Where(x => x is ReferenceVoltageResponse);
+                allMaxMinPWMresponses.AddRange(annotatedresponses);
+            }
+
+            return allMaxMinPWMresponses;
+        }
+
+
         private void ProcessSegmentResponses(IEnumerable<NimbleSegmentResponse> segResponses)
         {
-
             foreach (NimbleSegmentResponse segResponse in segResponses)
             {
                 ProcessIndividualSegmentReponse(segResponse);
             }
         }
 
-        private void ProcessIndividualSegmentReponse(NimbleSegmentResponse segResponse)
+
+        public List<AnnotatedTelemetryResponse> ProcessIndividualSegmentReponse(NimbleSegmentResponse segResponse)
         {
             CICState ImplantA = new CICState();
             CICState ImplantB = new CICState();
@@ -328,6 +341,8 @@ namespace Nimble.Sequences
             var telemResponses = segResponse.TelemetryResponses;
 
             int numTelemetryLines = segResponse.TelemetryResponses.Count;
+
+            List<AnnotatedTelemetryResponse> annotatedResponses = new List<AnnotatedTelemetryResponse>();
 
             for (int telemLineNumber = 0; telemLineNumber < numTelemetryLines; telemLineNumber++)
             {
@@ -351,7 +366,7 @@ namespace Nimble.Sequences
                         }
                         else if (((SegmentChangeResponse)responseLine).NewSegment != ((TelemetryResponse)nextresp).Segment) //next is telem response of different segment
                         {
-                            logger.Warn("This is unlikely to happen! sdfsferawvhn");
+                            //logger.Warn("This is unlikely to happen! sdfsferawvhn");
 
                             //Apply current segment
                             int currentSegNum = ((SegmentChangeResponse)responseLine).NewSegment;
@@ -374,7 +389,7 @@ namespace Nimble.Sequences
                         }
                     }
                 }
-                else //response line is not a SegmentChangeResponse
+                else //response line is not a SegmentChangeResponse, so must be a TelemetryResponse
                 {
                     TelemetryResponse resp_t = (TelemetryResponse)responseLine;
                     //if (resp_t.Segment <= 18)
@@ -387,6 +402,7 @@ namespace Nimble.Sequences
 
                     if (telemLineNumber == segResponse.TelemetryResponses.Count - 1) //at last response
                     {
+                        annotatedResponses.Add(AnnotateResponse(resp_t, ImplantA, ImplantB, p));
                         //parse data of current response
                         /*ExtractDataOfResponse(segResponse, resp_t, ImplantA, ref maxPWMA, ImplantB, telemetryResults, ref maxPWMB,
                            ref minPWMA, ref minPWMB, p);*/
@@ -402,10 +418,10 @@ namespace Nimble.Sequences
 
                         //apply current pulse
                         ApplyPulse(ImplantA, ImplantB, resp_t.SegmentPulseIndex, resp_t.Segment);
-                        pulsenum = Sequence[resp_t.Segment][resp_t.SegmentPulseIndex];
-                        p = PulseData[pulsenum];
-                        ImplantA.ApplyPulse(p.LE, p.LM, p.LA);
-                        ImplantB.ApplyPulse(p.RE, p.RM, p.RA);
+                        //pulsenum = Sequence[resp_t.Segment][resp_t.SegmentPulseIndex];
+                        //p = PulseData[pulsenum];
+                        //ImplantA.ApplyPulse(p.LE, p.LM, p.LA);
+                        //ImplantB.ApplyPulse(p.RE, p.RM, p.RA);
 
                         //parse data of current response
                         if (resp_t.Segment <= 18)
@@ -415,6 +431,7 @@ namespace Nimble.Sequences
                         }
                         else
                         {
+                            annotatedResponses.Add(AnnotateResponse(resp_t, ImplantA, ImplantB, p));
                             //ExtractDataOfResponse(segResponse, resp_t, ImplantA, ref maxPWMA, ImplantB, telemetryResults, ref maxPWMB,
                             //    ref minPWMA, ref minPWMB, p);
                         }
@@ -469,6 +486,8 @@ namespace Nimble.Sequences
 
                 }
             }
+
+            return annotatedResponses;
         }
 
         private void ApplyAllPulsesOfSegment(CICState ImplantA, CICState ImplantB, int segnum)
@@ -491,6 +510,7 @@ namespace Nimble.Sequences
 
         public List<TelemetryResult> ProcessMeasurementCall(NimbleSegmentResponse m1)
         {
+
             try
             {
                 if (!m1.path.Contains(this.Guid.ToString()))
@@ -580,7 +600,7 @@ namespace Nimble.Sequences
 
                             //apply current pulse
                             ApplyPulse(ImplantA, ImplantB, resp_t.SegmentPulseIndex, resp_t.Segment);
-                      
+
 
                             //parse data of current response
                             if (resp_t.Segment <= 18)
@@ -686,6 +706,44 @@ namespace Nimble.Sequences
 
         }
 
+        private AnnotatedTelemetryResponse AnnotateResponse(TelemetryResponse resp_t, CICState ImplantA, CICState ImplantB, Pulse p)
+        {
+            if (ImplantA.SetUpToReturnAnyTelemetry)
+            {
+                return AnnotateResponse(resp_t, ImplantA, Implant.ImplantA, p);
+            }
+            else if (ImplantB.SetUpToReturnAnyTelemetry)
+            {
+                return AnnotateResponse(resp_t, ImplantB, Implant.ImplantB, p);
+            }
+            //logger.Warn("Neither implant set up for telemetry, probably a register read {0}, {1}", resp_t, p);
+            return new AnnotatedTelemetryResponse(resp_t, Implant.ImplantA, p);
+            //throw new ArgumentOutOfRangeException("neither implant set up to send telemetry");
+        }
+
+        private AnnotatedTelemetryResponse AnnotateResponse(TelemetryResponse resp_t, CICState ImplantState, Implant implant, Pulse p)
+        {
+            if (ImplantState.SetUpForComplianceTelemetry)
+            {
+                return new ComplianceVoltageResponse(resp_t, implant, p);
+            }
+            else if (ImplantState.SetUpForVoltageTelemetry_EndPhase1 || ImplantState.SetUpForVoltageTelemetry_StartPhase1)
+            {
+                return new ElectrodeVoltageResponse(resp_t, implant, p, ImplantState);
+            }
+            else if (ImplantState.SetUpToReadMaxPWM)
+            {
+                return new ReferenceVoltageResponse(resp_t, implant, p, ReferenceVoltageResponse.VoltageReferences.MaxPWMValue);
+            }
+            else if (ImplantState.SetUpToReadMinPWM)
+            {
+                return new ReferenceVoltageResponse(resp_t, implant, p, ReferenceVoltageResponse.VoltageReferences.MinPWMValue);
+            }
+            else
+            {
+                return new AnnotatedTelemetryResponse(resp_t, implant, p);
+            }
+        }
 
         private void ExtractDataOfResponse(NimbleSegmentResponse m1, TelemetryResponse resp_t, CICState ImplantA,
             ref int maxPWMA, CICState ImplantB, List<TelemetryResult> telemetryResults, ref int maxPWMB, ref int minPWMA, ref int minPWMB, Pulse p)

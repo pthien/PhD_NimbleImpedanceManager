@@ -604,6 +604,54 @@
     <Content Include="Data\15_518_MARY_7e4254d7-5f13-4358-ab35-627c5c47baf7\Sequence.h">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Data\15_523_KYE-84EB1877B26F-0236808c-2bdb-4681-b4d7-a7bd0f84503d-2016-02-03_09-17-36-AM\IMPEDANCE_MP400_V10_AONLY_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_523_KYE-84EB1877B26F-0236808c-2bdb-4681-b4d7-a7bd0f84503d-2016-02-03_09-17-36-AM\IMPEDANCE_MP400_V10_AONLY_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_523_KYE-84EB1877B26F-0236808c-2bdb-4681-b4d7-a7bd0f84503d-2016-02-03_09-17-36-AM\IMPEDANCE_MP400_V10_AONLY_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_523_KYE-84EB1877B26F-0236808c-2bdb-4681-b4d7-a7bd0f84503d-2016-02-03_09-17-36-AM\IMPEDANCE_MP400_V10_AONLY_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_523_KYE-84EB1877B26F-0236808c-2bdb-4681-b4d7-a7bd0f84503d-2016-02-03_09-17-36-AM\IMPEDANCE_MP400_V10_AONLY_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_523_KYE-84EB1877B26F-0236808c-2bdb-4681-b4d7-a7bd0f84503d-2016-02-03_09-17-36-AM\IMPEDANCE_MP400_V10_AONLY_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_523_KYE-84EB1877B26F-0236808c-2bdb-4681-b4d7-a7bd0f84503d-2016-02-03_09-17-36-AM\IMPEDANCE_MP400_V10_BONLY_0.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_523_KYE-84EB1877B26F-0236808c-2bdb-4681-b4d7-a7bd0f84503d-2016-02-03_09-17-36-AM\IMPEDANCE_MP400_V10_BONLY_1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_523_KYE-84EB1877B26F-0236808c-2bdb-4681-b4d7-a7bd0f84503d-2016-02-03_09-17-36-AM\IMPEDANCE_MP400_V10_BONLY_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_523_KYE-84EB1877B26F-0236808c-2bdb-4681-b4d7-a7bd0f84503d-2016-02-03_09-17-36-AM\IMPEDANCE_MP400_V10_BONLY_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_523_KYE-84EB1877B26F-0236808c-2bdb-4681-b4d7-a7bd0f84503d-2016-02-03_09-17-36-AM\IMPEDANCE_MP400_V10_BONLY_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_523_KYE-84EB1877B26F-0236808c-2bdb-4681-b4d7-a7bd0f84503d-2016-02-03_09-17-36-AM\IMPEDANCE_MP400_V10_BONLY_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_523_KYE_0236808c-2bdb-4681-b4d7-a7bd0f84503d\PulseData.c">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_523_KYE_0236808c-2bdb-4681-b4d7-a7bd0f84503d\PulseData.h">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_523_KYE_0236808c-2bdb-4681-b4d7-a7bd0f84503d\Sequence.c">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\15_523_KYE_0236808c-2bdb-4681-b4d7-a7bd0f84503d\Sequence.h">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Data\MEASURE_15_523_KYE-84EB1877B26F-0e81180e-a80d-4168-9b9b-b36615b6e07a-2016-02-15_03-37-00-PM\IMPEDANCE_CG25_V10_AONLY_0.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

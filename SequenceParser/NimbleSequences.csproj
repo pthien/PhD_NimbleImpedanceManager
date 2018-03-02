@@ -62,6 +62,7 @@
     <Reference Include="PIC_Sequence, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\PIC_Sequence.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -81,6 +82,7 @@
     <Compile Include="MeasurementSummary.cs" />
     <Compile Include="NimbleImpedanceRecord.cs" />
     <Compile Include="NimbleMeasurementRecord.cs" />
+    <Compile Include="RawTelemetryResponse.cs" />
     <Compile Include="SequenceFileManager.cs" />
     <Compile Include="SequenceParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

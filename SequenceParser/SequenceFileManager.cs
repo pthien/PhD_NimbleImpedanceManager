@@ -181,7 +181,7 @@ namespace Nimble.Sequences
             return new List<NimbleMeasurementRecord>();
         }
 
-        public NimbleImpedanceRecord ProcessSequenceResponse(NimbleMeasurementRecord measurementRecord, 
+        public NimbleImpedanceRecord ProcessSequenceResponse(NimbleMeasurementRecord measurementRecord,
             bool LoadPreproccessIfExisting, bool Readonly)
         {
             try
@@ -203,26 +203,37 @@ namespace Nimble.Sequences
 
                 if (CompiledSequences.ContainsKey(measurementRecord.GenGuid.ToString()))
                 {
-                    logger.Info("Calculating impedances for {0} ({1})", measurementRecord, measurementRecord.RecordDirectory);
+                    //logger.Info("Calculating impedances for {0} ({1})", measurementRecord, measurementRecord.RecordDirectory);
                     CompiledSequence cs = CompiledSequences[measurementRecord.GenGuid.ToString()];
+
+                    List<AnnotatedTelemetryResponse> allMaxMinPWMresponses = cs.GetAllMaxMinPWMResponses(measurements);
 
                     //Process each segment response.
                     foreach (NimbleSegmentResponse m in measurements)
                     {
-                        NimbleSegmentTelemetry segImp = new NimbleSegmentTelemetry
+                        //var v1 = cs.ProcessMeasurementCall(m);
+                        var v2a = cs.ProcessIndividualSegmentReponse(m);
+
+                        if (v2a.Count > 0 && allMaxMinPWMresponses.Count > 0)
                         {
-                            SegmentName = m.SegmentName,
-                            RepeateCount = m.RepeatCount,
-                            Impedances = cs.ProcessMeasurementCall(m)
-                        };
-                        impedanceRecord.AddSegmentImpedanceResult(segImp);
+                            v2a.AddRange(allMaxMinPWMresponses);
+                            var v2 = TelemetryResult.ConvertAnnotatedResponses(v2a, cs.ClockRate);
+
+                            NimbleSegmentTelemetry segImp = new NimbleSegmentTelemetry
+                            {
+                                SegmentName = m.SegmentName,
+                                RepeateCount = m.RepeatCount,
+                                Impedances = v2//cs.ProcessMeasurementCall(m)
+                            };
+                            impedanceRecord.AddSegmentImpedanceResult(segImp);
+                        }
                     }
                 }
                 else
                 {
                     logger.Warn("Compiled sequence {0} not found. Probably need to do a scan");
                 }
-                logger.Info("Finished processing sequences response. Took {0}s", (DateTime.Now - start).TotalSeconds);
+                logger.Info("Took {1:F4}s to calculate impedances for {0}. ({2})", measurementRecord, (DateTime.Now - start).TotalSeconds, measurementRecord.RecordDirectory);
 
                 if (!Readonly)
                     impedanceRecord.Save();

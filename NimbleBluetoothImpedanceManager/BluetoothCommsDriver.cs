@@ -111,7 +111,7 @@ namespace NimbleBluetoothImpedanceManager
         /// <param name="CommPort"></param>
         /// <param name="BaudRate"></param>
         /// <returns></returns>
-        public bool ConnectToDongle(string CommPort, int BaudRate = 57600)
+        public bool ConnectToDongle(string CommPort, int BaudRate = 115200)
         {
             try
             {
@@ -199,7 +199,7 @@ namespace NimbleBluetoothImpedanceManager
         {
             foreach (string s in mostRecentlyRecievedData)
             {
-                //dataLoggerRX.Info(s);
+                dataLoggerRX.Info(s);
                 if (s == OK_CONN_ESTABLISHED)
                 {
                     _connectedToRemoteDevice = true;
@@ -299,7 +299,6 @@ namespace NimbleBluetoothImpedanceManager
         public bool IsDongleOK()
         {
             Dongle_ATOK_WaitHandle.Reset();
-            TransmitAndLog("AT");
             if (Dongle_ATOK_WaitHandle.WaitOne(DataChunker.Timeout + 500))
             {
                 logger.Debug("Dongle is OK!");

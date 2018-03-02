@@ -156,6 +156,7 @@ const int PulseData[108][12] = {
 
 
         [TestMethod()]
+        [DeploymentItem("Data")]
         public void CompiledSequenceTest2()
         {
             string alltext = File.ReadAllText("14_514_PCB1_e0479d64-2134-4a30-aff2-fbd33ac78358\\Sequence.c");

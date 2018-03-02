@@ -6,7 +6,7 @@ using NLog;
 
 namespace Nimble.Sequences
 {
-    public class  CICState
+    public class CICState
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -16,7 +16,7 @@ namespace Nimble.Sequences
         public VTEL_SampleTime_TokenPos vtel_ts_tokenpos { get; private set; }
         public VTEL_SampleTime_TokenClock vtel_ts_tokenclock { get; private set; }
         public bool VoltageTelemetryEnabled { get; private set; }
-        public bool ComplianceTelemetryEnabled  { get; private set; }
+        public bool ComplianceTelemetryEnabled { get; private set; }
 
         public const double VREF = 1.105;
 
@@ -76,9 +76,17 @@ namespace Nimble.Sequences
         {
             get
             {
-              
+
                 bool x = !VoltageTelemetryEnabled && ComplianceTelemetryEnabled;
                 return x;
+            }
+        }
+
+        public bool SetUpToReturnAnyTelemetry
+        {
+            get
+            {
+                return SetUpForComplianceTelemetry || SetUpForVoltageTelemetry_EndPhase1 || SetUpForVoltageTelemetry_StartPhase1 || SetUpToReadMaxPWM || SetUpToReadMinPWM;
             }
         }
 
@@ -99,7 +107,7 @@ namespace Nimble.Sequences
 
         public void ApplyPulse(int E, int M, double A_dbl)
         {
-            int A = (int) A_dbl;
+            int A = (int)A_dbl;
             A = A < 0 ? -A : A;
             E = E < 0 ? -E : E;
             M = M < 0 ? -M : M;
@@ -229,6 +237,11 @@ namespace Nimble.Sequences
             TwoCellsAfterTokenClock = 1,
         }
 
+        public enum CIRegisters
+        {
+            ChipID,
+        }
+
         public static double vtel_gain_To_VFullScale(CICState.VTEL_AmplifierGain Gain)
         {
             double gain;
@@ -241,7 +254,7 @@ namespace Nimble.Sequences
                     gain = 2;
                     break;
                 case CICState.VTEL_AmplifierGain.Gain2on5:
-                    gain =5;
+                    gain = 5;
                     break;
                 case CICState.VTEL_AmplifierGain.Gain1on5:
                     gain = 10;

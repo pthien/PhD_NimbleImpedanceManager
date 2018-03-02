@@ -193,7 +193,7 @@ namespace Nimble.Sequences
                                         continue;
                                     lockedToImpedance = true;
                                     int x = result.Electrode + (result.Implant == Implant.ImplantA ? 0 : maxRange);
-                                    double y = ((ImpedanceResult)result)._Impedance_ohms;
+                                    double y = ((ImpedanceResult)result).Impedance_ohms;
                                     DataPoint dp = new DataPoint(x, y);
                                     dp.MarkerStyle = MarkerStyle.Cross;
                                     segSeries.Points.Add(dp);
@@ -231,7 +231,7 @@ namespace Nimble.Sequences
                                         continue;
                                     lockedToImpedance = true;
                                     int x = result.Electrode + (result.Implant == Implant.ImplantA ? 0 : maxRange);
-                                    double y = ((ImpedanceResult)result)._Impedance_ohms;
+                                    double y = ((ImpedanceResult)result).Impedance_ohms;
                                    
                                     DataPoint dp = new DataPoint(x, y);
                                     dp.MarkerStyle = MarkerStyle.Cross;

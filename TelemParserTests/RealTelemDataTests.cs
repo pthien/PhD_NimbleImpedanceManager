@@ -49,53 +49,53 @@ namespace TelemParserTests
             List<ImpedanceResult> imps = processed.Cast<ImpedanceResult>().ToList();
            
             Assert.AreEqual(11, imps.Count);
-            Assert.AreEqual(5102.04081632653, imps[0]._Impedance_ohms, 50);
-            Assert.AreEqual(5170.06802721088, imps[1]._Impedance_ohms, 50);
-            Assert.AreEqual(4761.90476190476, imps[2]._Impedance_ohms, 50);
-            Assert.AreEqual(4370.74829931972, imps[3]._Impedance_ohms, 50);
-            Assert.AreEqual(4897.95918367347, imps[4]._Impedance_ohms, 50);
-            Assert.AreEqual(13367.3469387755, imps[5]._Impedance_ohms, 50);
-            Assert.AreEqual(13333.3333333333, imps[6]._Impedance_ohms, 50);
-            Assert.AreEqual(4268.70748299319, imps[7]._Impedance_ohms, 50);
-            Assert.AreEqual(4132.65306122449, imps[8]._Impedance_ohms, 50);
-            Assert.AreEqual(3384.35374149659, imps[9]._Impedance_ohms, 50);
-            Assert.AreEqual(4795.91836734693, imps[10]._Impedance_ohms,50);
+            Assert.AreEqual(5102.04081632653, imps[0].Impedance_ohms, 50);
+            Assert.AreEqual(5170.06802721088, imps[1].Impedance_ohms, 50);
+            Assert.AreEqual(4761.90476190476, imps[2].Impedance_ohms, 50);
+            Assert.AreEqual(4370.74829931972, imps[3].Impedance_ohms, 50);
+            Assert.AreEqual(4897.95918367347, imps[4].Impedance_ohms, 50);
+            Assert.AreEqual(13367.3469387755, imps[5].Impedance_ohms, 50);
+            Assert.AreEqual(13333.3333333333, imps[6].Impedance_ohms, 50);
+            Assert.AreEqual(4268.70748299319, imps[7].Impedance_ohms, 50);
+            Assert.AreEqual(4132.65306122449, imps[8].Impedance_ohms, 50);
+            Assert.AreEqual(3384.35374149659, imps[9].Impedance_ohms, 50);
+            Assert.AreEqual(4795.91836734693, imps[10].Impedance_ohms,50);
 
-            Assert.AreEqual(5102.04081632653, imps[0]._Impedance_ohms, 10);
-            Assert.AreEqual(5170.06802721088, imps[1]._Impedance_ohms, 10);
-            Assert.AreEqual(4761.90476190476, imps[2]._Impedance_ohms, 10);
-            Assert.AreEqual(4370.74829931972, imps[3]._Impedance_ohms, 10);
-            Assert.AreEqual(4897.95918367347, imps[4]._Impedance_ohms, 10);
-            Assert.AreEqual(13367.3469387755, imps[5]._Impedance_ohms, 10);
-            Assert.AreEqual(13333.3333333333, imps[6]._Impedance_ohms, 10);
-            Assert.AreEqual(4268.70748299319, imps[7]._Impedance_ohms, 10);
-            Assert.AreEqual(4132.65306122449, imps[8]._Impedance_ohms, 10);
-            Assert.AreEqual(3384.35374149659, imps[9]._Impedance_ohms, 10);
-            Assert.AreEqual(4795.91836734693, imps[10]._Impedance_ohms,10);
+            Assert.AreEqual(5102.04081632653, imps[0].Impedance_ohms, 10);
+            Assert.AreEqual(5170.06802721088, imps[1].Impedance_ohms, 10);
+            Assert.AreEqual(4761.90476190476, imps[2].Impedance_ohms, 10);
+            Assert.AreEqual(4370.74829931972, imps[3].Impedance_ohms, 10);
+            Assert.AreEqual(4897.95918367347, imps[4].Impedance_ohms, 10);
+            Assert.AreEqual(13367.3469387755, imps[5].Impedance_ohms, 10);
+            Assert.AreEqual(13333.3333333333, imps[6].Impedance_ohms, 10);
+            Assert.AreEqual(4268.70748299319, imps[7].Impedance_ohms, 10);
+            Assert.AreEqual(4132.65306122449, imps[8].Impedance_ohms, 10);
+            Assert.AreEqual(3384.35374149659, imps[9].Impedance_ohms, 10);
+            Assert.AreEqual(4795.91836734693, imps[10].Impedance_ohms,10);
 
-            Assert.AreEqual(5102.04081632653, imps[0]._Impedance_ohms, 1);
-            Assert.AreEqual(5170.06802721088, imps[1]._Impedance_ohms, 1);
-            Assert.AreEqual(4761.90476190476, imps[2]._Impedance_ohms, 1);
-            Assert.AreEqual(4370.74829931972, imps[3]._Impedance_ohms, 1);
-            Assert.AreEqual(4897.95918367347, imps[4]._Impedance_ohms, 1);
-            Assert.AreEqual(13367.3469387755, imps[5]._Impedance_ohms, 1);
-            Assert.AreEqual(13333.3333333333, imps[6]._Impedance_ohms, 1);
-            Assert.AreEqual(4268.70748299319, imps[7]._Impedance_ohms, 1);
-            Assert.AreEqual(4132.65306122449, imps[8]._Impedance_ohms, 1);
-            Assert.AreEqual(3384.35374149659, imps[9]._Impedance_ohms, 1);
-            Assert.AreEqual(4795.91836734693, imps[10]._Impedance_ohms,1);
+            Assert.AreEqual(5102.04081632653, imps[0].Impedance_ohms, 1);
+            Assert.AreEqual(5170.06802721088, imps[1].Impedance_ohms, 1);
+            Assert.AreEqual(4761.90476190476, imps[2].Impedance_ohms, 1);
+            Assert.AreEqual(4370.74829931972, imps[3].Impedance_ohms, 1);
+            Assert.AreEqual(4897.95918367347, imps[4].Impedance_ohms, 1);
+            Assert.AreEqual(13367.3469387755, imps[5].Impedance_ohms, 1);
+            Assert.AreEqual(13333.3333333333, imps[6].Impedance_ohms, 1);
+            Assert.AreEqual(4268.70748299319, imps[7].Impedance_ohms, 1);
+            Assert.AreEqual(4132.65306122449, imps[8].Impedance_ohms, 1);
+            Assert.AreEqual(3384.35374149659, imps[9].Impedance_ohms, 1);
+            Assert.AreEqual(4795.91836734693, imps[10].Impedance_ohms,1);
 
-            Assert.AreEqual(5102.04081632653, imps[0]._Impedance_ohms, .1);
-            Assert.AreEqual(5170.06802721088, imps[1]._Impedance_ohms, .1);
-            Assert.AreEqual(4761.90476190476, imps[2]._Impedance_ohms, .1);
-            Assert.AreEqual(4370.74829931972, imps[3]._Impedance_ohms, .1);
-            Assert.AreEqual(4897.95918367347, imps[4]._Impedance_ohms, .1);
-            Assert.AreEqual(13367.3469387755, imps[5]._Impedance_ohms, .1);
-            Assert.AreEqual(13333.3333333333, imps[6]._Impedance_ohms, .1);
-            Assert.AreEqual(4268.70748299319, imps[7]._Impedance_ohms, .1);
-            Assert.AreEqual(4132.65306122449, imps[8]._Impedance_ohms, .1);
-            Assert.AreEqual(3384.35374149659, imps[9]._Impedance_ohms, .1);
-            Assert.AreEqual(4795.91836734693, imps[10]._Impedance_ohms,.1);
+            Assert.AreEqual(5102.04081632653, imps[0].Impedance_ohms, .000001);
+            Assert.AreEqual(5170.06802721088, imps[1].Impedance_ohms, .000001);
+            Assert.AreEqual(4761.90476190476, imps[2].Impedance_ohms, .000001);
+            Assert.AreEqual(4370.74829931972, imps[3].Impedance_ohms, .000001);
+            Assert.AreEqual(4897.95918367347, imps[4].Impedance_ohms, .000001);
+            Assert.AreEqual(13367.3469387755, imps[5].Impedance_ohms, .000001);
+            Assert.AreEqual(13333.3333333333, imps[6].Impedance_ohms, .000001);
+            Assert.AreEqual(4268.70748299319, imps[7].Impedance_ohms, .000001);
+            Assert.AreEqual(4132.65306122449, imps[8].Impedance_ohms, .000001);
+            Assert.AreEqual(3384.35374149659, imps[9].Impedance_ohms, .000001);
+            Assert.AreEqual(4795.91836734693, imps[10].Impedance_ohms,.000001);
         }
 
         [TestMethod]
@@ -138,9 +138,9 @@ namespace TelemParserTests
 
             Assert.AreEqual("A1", imp0.ElectrodeName);
             Assert.AreEqual(PulseType.MonoPolar, imp0.Type);
-            Assert.AreEqual(5952, imp0._Impedance_ohms,1);
-            Assert.AreEqual(5952, imp0._Impedance_ohms,10);
-            Assert.AreEqual(5952, imp0._Impedance_ohms,1000);
+            Assert.AreEqual(5952, imp0.Impedance_ohms,1);
+            Assert.AreEqual(5952, imp0.Impedance_ohms,10);
+            Assert.AreEqual(5952, imp0.Impedance_ohms,1000);
 
             //Assert.IsTrue(impedances[0] is ImpedanceResult);
             //if (impedances[0] is ImpedanceResult)

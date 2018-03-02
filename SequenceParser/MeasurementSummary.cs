@@ -209,7 +209,7 @@ namespace Nimble.Sequences
                 bool gotVal = false;
                 double impedance = -1;
                 var c = measure1.Where(x => x.Electrode == electrode && x.Implant == implant)
-                    .Select(x => x._Impedance_ohms);
+                    .Select(x => x.Impedance_ohms);
                 var b = measure1.Where(x => x.Electrode == electrode && x.Implant == implant);
                 if (c.Any())
                 {
