@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Text;
 using System.Timers;
 using NLog;
@@ -13,7 +14,7 @@ namespace NimbleBluetoothImpedanceManager
 
         private object mylock = new object();
 
-        public const int Timeout = 500;
+        public const int Timeout = 50;
         public DataChunker()
         {
             tmr = new Timer(Timeout);
@@ -74,6 +75,13 @@ namespace NimbleBluetoothImpedanceManager
         {
             public string Chunk { get; set; }
             public ChunkingReason Reason;
+        }
+
+        public void Count()
+        {
+            logger.Info("Number of handlers: " + ChunkReady?.GetInvocationList().Count());
+            string msg = string.Join(", ", ChunkReady?.GetInvocationList().Select(x => x.Target.ToString()));
+            logger.Info(msg);
         }
     }
 

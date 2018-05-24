@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using NLog;
+using System.Text.RegularExpressions;
+using NimbleBluetoothImpedanceManager.RN4871Driver.Model;
+using NimbleBluetoothImpedanceManager.RN4871Driver.StreamParsers;
 
 namespace NimbleBluetoothImpedanceManager
 {
@@ -17,25 +21,10 @@ namespace NimbleBluetoothImpedanceManager
         private SerialPort serialPort;
         private DataChunker dataChunker;
 
-        public EventWaitHandle Dongle_ATOK_WaitHandle = new AutoResetEvent(false);
-        public EventWaitHandle Dongle_OkGet_WaitHandle = new AutoResetEvent(false);
-        public EventWaitHandle Dongle_OkSet_WaitHandle = new AutoResetEvent(false);
-        public EventWaitHandle Dongle_OkName_WaitHandle = new AutoResetEvent(false);
         public EventWaitHandle Dongle_DeviceDiscoveryComplete_WaitHandle = new AutoResetEvent(false);
         public EventWaitHandle Dongle_ConnectionAttempt_WaitHandle = new AutoResetEvent(false);
         public EventWaitHandle Dongle_ConnectionEstablished_WaitHandle = new AutoResetEvent(false);
         public EventWaitHandle Dongle_ConnectionLost_WaitHandle = new AutoResetEvent(false);
-
-        const string OK_CONN_ATTEMPT = "OK+CONNA";
-        const string OK_CONN_LOST = "OK+LOST";
-        const string OK_CONN_ESTABLISHED = "OK+CONN";
-        const string OK_GET = "OK+Get";
-        const string OK_SET = "OK+Set";
-        const string OK_NAME = "OK+NAME";
-        const string AT_OK = "OK";
-        const string OK_DISCOVERYSTART = "OK+DISCS";
-        const string OK_DISCOVERYEND = "OK+DISCE";
-        const string OK_DEVICEDISCOVERED = "OK+DISC:";
 
 
         public delegate void ConnectionEstablishedEventHandler(object sender, DataRecievedEventArgs e);
@@ -47,15 +36,6 @@ namespace NimbleBluetoothImpedanceManager
         public delegate void DataReceivedEventHandler(object sender, DataRecievedEventArgs e);
         public event DataReceivedEventHandler DataReceivedFromRemoteDevice;
 
-        //public delegate void OKGetEventHandler(object sender, DataRecievedEventArgs e);
-        //public event OKGetEventHandler OKGet;
-
-        //public delegate void OKSetEventHandler(object sender, DataRecievedEventArgs e);
-        //public event OKSetEventHandler OKSet;
-
-        //public delegate void OKNameEventHandler(object sender, DataRecievedEventArgs e);
-        //public event OKNameEventHandler OKName;
-
         public class DataRecievedEventArgs : EventArgs
         {
             public string RecievedData { get; set; }
@@ -66,42 +46,43 @@ namespace NimbleBluetoothImpedanceManager
         private string[] MostRecentlyRecievedData = new string[] { };
 
         private object knownDevicesLock = new object();
-        private string[] _knownDevices = new string[10];
-        private List<string> buildingKnownDevices = new List<string>();
         public string[] KnownDevices
         {
             get
             {
                 lock (knownDevicesLock)
                 {
-                    string[] copy = (string[])_knownDevices.Clone();
+                    string[] copy = (string[])Status.KnownDevices.ToArray().Clone();
                     return copy;
                 }
             }
         }
 
-        public bool ConnectedToRemoteDevice { get { return _connectedToRemoteDevice; } }
+        public Status Status = new Status() { DeviceState = DeviceState.Unknown, RemoteDeviceAddress = null, KnownDevices = new List<string>() };
 
-        private bool _connectedToRemoteDevice = false;
+        public bool ConnectedToRemoteDevice { get { return Status.DeviceState == DeviceState.Connected; } }
 
-        private string _RemoteDeviceAddr = "";
 
         /// <summary>
         /// The bluetooth address of the remote device
         /// </summary>
-        public string RemoteDeviceAddr
-        {
-            get { return _RemoteDeviceAddr; }
-        }
+        public string RemoteDeviceAddr => Status.RemoteDeviceAddress;
 
         private bool currentlyScanningForDevices = false;
+
+        private DataDumpParser dataDumpParser = new DataDumpParser();
+        private OKParser okParser = new OKParser();
+        private ScanForDevicesParser scanForDevicesParser = new ScanForDevicesParser();
 
         public BluetoothCommsDriver()
         {
             dataChunker = new DataChunker();
             dataChunker.ChunkReady += dataChunker_ChunkReady;
 
-            _connectedToRemoteDevice = false;
+            dataChunker.ChunkReady += dataDumpParser.ScanChunksForDongleDataDump;
+            dataChunker.ChunkReady += okParser.processChunk;
+            dataChunker.ChunkReady += scanForDevicesParser.processChunk;
+
             logger.Info("*BluetoothCommsDriver initialised*");
         }
 
@@ -116,9 +97,14 @@ namespace NimbleBluetoothImpedanceManager
             try
             {
                 serialPort = new SerialPort(CommPort, BaudRate);
+                serialPort.DataReceived += serialPort_DataReceived;
                 serialPort.Open();
-                serialPort.DataReceived += new SerialDataReceivedEventHandler(serialPort_DataReceived);
                 logger.Info("*Connection to dongle on {0} established*", CommPort);
+                if (!InitialiseDongle())
+                {
+                    serialPort.DataReceived -= serialPort_DataReceived;
+                    serialPort.Close();
+                }
             }
             catch (Exception ex)
             {
@@ -145,25 +131,36 @@ namespace NimbleBluetoothImpedanceManager
             ProcessData(MostRecentlyRecievedData);
         }
 
-        public bool ConnectToRemoteDevice(string Address)
+        public bool ConnectToRemoteDevice(string address)
         {
-            Dongle_ConnectionEstablished_WaitHandle.Reset();
-            TransmitAndLog("AT+CON" + Address);
-            _RemoteDeviceAddr = Address;
-            if (Dongle_ConnectionEstablished_WaitHandle.WaitOne(DataChunker.Timeout + 20000))
+            Dongle_ConnectionAttempt_WaitHandle.Set();
+            Status.DeviceState = DeviceState.Connecting;
+            Status.RemoteDeviceAddress = address;
+
+            ConnectionParser parser = new ConnectionParser();
+            dataChunker.ChunkReady += parser.processChunk;
+
+            TransmitAndLog("C,0," + address + "\n");
+
+            bool connectionSuccess = parser.StreamOpenWaitHandle.WaitOne(10000);
+
+            if (connectionSuccess)
             {
-                logger.Info("Connected to {0}", Address);
-                return true;
+                Status.RemoteDeviceAddress = address;
+                logger.Info("Connected to {0}", address);
             }
             else
             {
-                _RemoteDeviceAddr = "";
-                logger.Info("Connection to {0} timed out", Address);
-                return false;
+                Status.RemoteDeviceAddress = null;
+                Status.DeviceState = DeviceState.Unknown;
+
+                logger.Info("Connection to {0} timed out. Trying to reset dongle", address);
+                ReinitialiseDongle();
             }
+            return connectionSuccess;
         }
 
-        public void TransmitAndLog(string text)
+        protected void TransmitAndLog(string text)
         {
             if (currentlyScanningForDevices)
             {
@@ -180,14 +177,14 @@ namespace NimbleBluetoothImpedanceManager
         /// Sends the specified text plus '\n'
         /// </summary>
         /// <param name="text"></param>
-        public void TransmitAndLogLine(string text)
+        protected void TransmitAndLogLine(string text)
         {
             TransmitAndLog(text + "\n");
         }
 
         public void TransmitToRemoteDevice(string command)
         {
-            if (!ConnectedToRemoteDevice)
+            if (Status.DeviceState != DeviceState.Connected)
             {
                 logger.Error("Not connected to any nimble processor. Discarding transmission: {0}", command.EscapeWhiteSpace());
                 //throw new Exception("Not connected to any nimble processor");
@@ -195,120 +192,142 @@ namespace NimbleBluetoothImpedanceManager
             TransmitAndLog(command);
         }
 
+        private void ReinitialiseDongle()
+        {
+            Thread.Sleep(200);
+            TransmitAndLog("$$$"); //Transmit escape sequence
+            Thread.Sleep(200);
+            TransmitAndLog("R,1");
+            Thread.Sleep(400);
+            TransmitAndLog("$$$");
+        }
+
+        private bool InitialiseDongle()
+        {
+            logger.Info("Initialising dongle");
+            TransmitAndLog("$$$"); //Transmit escape sequence
+            Thread.Sleep(200);
+            TransmitAndLog("X\n");
+            Thread.Sleep(100);
+            TransmitAndLog("Z\n");
+            Thread.Sleep(100);
+            TransmitAndLog("K,1\n");
+
+            for (int i = 0; i < 3; i++)
+            {
+                if (IsDongleOK())
+                {
+                    DataDump? dataDump = GetDongleData();
+
+                    if (!dataDump.HasValue)
+                    {
+                        logger.Info("Data dump did not have a value");
+                        return false;
+                    }
+
+                    if (dataDump.Value.IsConnected)
+                    {
+                        logger.Info("When initialising dongle, it was already connected");
+                        return DisconnectFromRemoteDevice();
+                    }
+
+                    Status.DeviceState = DeviceState.Disconnected;
+                    return true;
+                }
+                Thread.Sleep(100);
+            }
+            return false;
+        }
+
+        private DataDump? GetDongleData()
+        {
+            DataDumpParser scanner = new DataDumpParser();
+            dataChunker.ChunkReady += scanner.ScanChunksForDongleDataDump;
+            TransmitAndLog("D\n");
+            return dataDumpParser.GetDataDump();
+        }
+
+        public bool DisconnectFromRemoteDevice()
+        {
+            TransmitAndLog("$$$");
+            Thread.Sleep(200);
+            TransmitAndLog("K,1\n");
+            bool success = Dongle_ConnectionLost_WaitHandle.WaitOne(DataChunker.Timeout + 500);
+            if (success)
+            {
+                logger.Info("Disconnected from remote device");
+            }
+            else
+            {
+                logger.Info("Failed to disconnect from remote device");
+            }
+            return success;
+        }
+
+
+        public string[] DiscoverDevices()
+        {
+            scanForDevicesParser.Reset();
+            TransmitAndLog("F\n");
+
+            Status.KnownDevices.Clear();
+            Status.KnownDevices.AddRange(scanForDevicesParser.ScanForDevices().Select(x => x.BluetoothAddress));
+            logger.Info("Scan for devices completed. Found {0} devices", Status.KnownDevices.Count);
+
+            TransmitAndLog("X\n");
+
+            return KnownDevices;
+        }
+
+        public bool IsDongleOK()
+        {
+            TransmitAndLog("X\n");
+            bool success = okParser.OKFound(DataChunker.Timeout + 500);
+
+            if (success)
+            {
+                logger.Debug("Dongle is OK!");
+
+                return true;
+            }
+
+            logger.Debug("Dongle not OK :(");
+            return false;
+        }
+
         private void ProcessData(string[] mostRecentlyRecievedData)
         {
             foreach (string s in mostRecentlyRecievedData)
             {
-                dataLoggerRX.Info(s);
-                if (s == OK_CONN_ESTABLISHED)
+                //dataLoggerRX.Info(s);
+                if (s.Contains("%DISCONNECT%"))
                 {
-                    _connectedToRemoteDevice = true;
-                    Dongle_ConnectionEstablished_WaitHandle.Set();
-                    if (ConnectionEstablished != null)
-                        ConnectionEstablished(this, new DataRecievedEventArgs() { RecievedData = s });
-                }
-                else if (s == OK_CONN_LOST)
-                {
-                    _connectedToRemoteDevice = false;
                     Dongle_ConnectionLost_WaitHandle.Set();
+                    logger.Info("Bluetooth disconnected");
+                    Status.DeviceState = DeviceState.Disconnected;
+                    Status.RemoteDeviceAddress = null;
                     if (ConnectionLost != null)
                         ConnectionLost(this, new DataRecievedEventArgs() { RecievedData = s });
-                }
-                else if (s == AT_OK)
-                {
-                    Dongle_ATOK_WaitHandle.Set();
-                }
-                else if (s.StartsWith(OK_GET))
-                {
-                    Dongle_OkGet_WaitHandle.Set();
-                }
-                else if (s.StartsWith(OK_SET))
-                {
-                    Dongle_OkSet_WaitHandle.Set();
-                }
-                else if (s.StartsWith(OK_NAME))
-                {
-                    Dongle_OkName_WaitHandle.Set();
-                }
-                else if (s == OK_DISCOVERYSTART)
-                {
-                    lock (knownDevicesLock)
-                    {
-                        currentlyScanningForDevices = true;
-                        logger.Info("Discovery started");
-                        buildingKnownDevices.Clear();
-                    }
-                }
-                else if (s == OK_DISCOVERYEND)
-                {
-                    lock (knownDevicesLock)
-                    {
-                        currentlyScanningForDevices = false;
-                        logger.Info("Discovery finished");
-                        _knownDevices = buildingKnownDevices.ToArray();
 
-                        Dongle_DeviceDiscoveryComplete_WaitHandle.Set();
-                    }
                 }
-                else if (s.StartsWith(OK_DEVICEDISCOVERED))
+                if (s.Contains("%STREAM_OPEN%"))
                 {
-                    lock (knownDevicesLock)
-                    {
-
-                        string addr = s.Split(new char[] { ':' })[1];
-                        buildingKnownDevices.Add(addr);
-                        _knownDevices = buildingKnownDevices.ToArray();
-                        logger.Info("device found: {0}", addr);
-                    }
+                    Dongle_ConnectionEstablished_WaitHandle.Set();
+                    Status.DeviceState = DeviceState.Connected;
+                    logger.Info("Connection established");
+                    if (ConnectionEstablished != null)
+                        ConnectionEstablished(this, new DataRecievedEventArgs { RecievedData = s });
                 }
-                else if (s.StartsWith("OK+"))
+                else if (Status.DeviceState == DeviceState.Connected)
                 {
-                    logger.Debug("handling of {0} not implemented", s);
-                    //not yet implemented or not needed
-                }
-                else
-                {
-                    logger.Debug("data received from remote device: {0}", s);
+                    //     logger.Debug("data received from remote device: {0}", s);
                     if (DataReceivedFromRemoteDevice != null)
                         DataReceivedFromRemoteDevice(this, new DataRecievedEventArgs() { RecievedData = s });
                 }
             }
         }
 
-        public string[] DiscoverDevices()
-        {
-            Dongle_DeviceDiscoveryComplete_WaitHandle.Reset();
-            TransmitAndLog("AT+DISC?");
-            if (Dongle_DeviceDiscoveryComplete_WaitHandle.WaitOne(DataChunker.Timeout + 10000))
-            {
-                logger.Info("Scan for devices completed");
-                return KnownDevices;
-            }
-            else
-            {
-                lock (knownDevicesLock)
-                {
-                    logger.Warn("Scan for devices timed out");
-                    currentlyScanningForDevices = false;
-                    _knownDevices = buildingKnownDevices.ToArray();
-                }
-            }
-            return null;
-        }
 
-        public bool IsDongleOK()
-        {
-            Dongle_ATOK_WaitHandle.Reset();
-            if (Dongle_ATOK_WaitHandle.WaitOne(DataChunker.Timeout + 500))
-            {
-                logger.Debug("Dongle is OK!");
-                return true;
-            }
-            else
-            {
-                logger.Debug("Dongle not OK :(");
-                return false;
-            }
-        }
+
     }
 }

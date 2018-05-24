@@ -9,27 +9,33 @@ namespace NimbleBluetoothImpedanceManager
     public static class ChunkParser
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
+
         static Regex regex_ok_start = new Regex(@"\AOK\+[A-Za-z:0-9]+(?=OK|\s|$)");
         static Regex regex_ErronousATPlus = new Regex(@"AT\+[A-Z]+(?=OK|\s|$)");
         static Regex regex_CommandResponse = new Regex(@"{([A-Za-z0-9]+):([ A-Z0-9a-z-:_|()\[\]]+)}");
+
+        static Regex regex_CMDPrompt = new Regex(@"(CMD> )(.*)");
+
         public static List<string> ParseChunk(string chunk)
         {
             logger.Debug("Parsing chunk of length {1}: {0}", chunk.EscapeWhiteSpace(), chunk.Length);
             List<string> tokens = new List<string>();
-            
-            chunk = chunk.Trim(new char[]{'\r','\n','\0'});
+
+            chunk = chunk.Trim(new char[] { '\r', '\n', '\0' });
             string originalChunck = chunk;
 
             while (chunk.Length > 0)
             {
-                if (chunk.StartsWith("OK+"))
+                if (chunk.StartsWith("CMD> "))
                 {
-                    var match = regex_ok_start.Match(chunk);
+                    tokens.Add("CMD> ");
+                    var match = regex_CMDPrompt.Match(chunk);
                     if (match.Success)
                     {
-                        string m = match.Groups[0].Value;
-                        tokens.Add(m);
-                        chunk = chunk.Remove(0, m.Length);
+                        string m = match.Groups[1].Value;
+                        tokens.Add(match.Groups[1].Value);
+                        tokens.Add(match.Groups[2].Value);
+                        chunk = chunk.Remove(0, match.Groups[0].Value.Length);
                     }
                     else
                     {
@@ -40,7 +46,7 @@ namespace NimbleBluetoothImpedanceManager
                 {
                     //is just an ok
                     //logger.Debug("Parsed: 'OK'");
-                    chunk=chunk.Remove(0, 2);
+                    chunk = chunk.Remove(0, 2);
                     tokens.Add("OK");
                 }
                 else if (chunk.StartsWith("AT+"))
@@ -50,7 +56,7 @@ namespace NimbleBluetoothImpedanceManager
                     if (match.Success)
                     {
                         string m = match.Groups[0].Value;
-                        temptoken =  m;
+                        temptoken = m;
                         tokens.Add(temptoken);
                         chunk = chunk.Remove(0, temptoken.Length);
                     }
@@ -61,7 +67,7 @@ namespace NimbleBluetoothImpedanceManager
                 }
                 else if (chunk.StartsWith("{"))
                 {
-                  
+
                     var match = regex_CommandResponse.Match(chunk);
                     if (match.Success)
                     {
@@ -78,7 +84,8 @@ namespace NimbleBluetoothImpedanceManager
                 }
                 else
                 {
-                    chunk = chunk.Remove(0, 1);
+                    tokens.Add(chunk);
+                    chunk = "";
                     //var match = regex_ErronousATPlus.Match(chunk);
                     //if (match.Success)
                     //{

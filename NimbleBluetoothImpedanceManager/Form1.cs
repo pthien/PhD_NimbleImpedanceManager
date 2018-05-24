@@ -166,7 +166,7 @@ namespace NimbleBluetoothImpedanceManager
                     break;
                 case NimbleState.ConnectedToDongle:
                     textCon = string.Format("Connected to dongle ({0}), not connected to remote device", nimble.Comport);
-                    textStatus = "Idle";
+                    textStatus = "Disconnected";
                     colourCon = clrReady;
                     colourStatus = clrReady;
                     break;

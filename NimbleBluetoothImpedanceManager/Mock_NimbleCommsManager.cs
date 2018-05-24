@@ -42,7 +42,7 @@ namespace NimbleBluetoothImpedanceManager
             {
                 if (value == _State) //do nothing
                     return;
-                logger.Info("State changed from {0} to {1}", _State, value);
+                logger.Info("DeviceState changed from {0} to {1}", _State, value);
                 _State = value;
                 if (StateChanged != null)
                     StateChanged(this, new NimbleCommsManager.StateChangedEventArgs() { NewState = _State });
@@ -149,7 +149,7 @@ namespace NimbleBluetoothImpedanceManager
         }
 
 
-        //Stim State Vars
+        //Stim DeviceState Vars
         bool StimOn = false;
         int CurrentRampProgress = 0;
         int RampMax;

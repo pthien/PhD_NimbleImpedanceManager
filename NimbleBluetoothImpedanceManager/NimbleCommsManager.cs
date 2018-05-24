@@ -130,7 +130,7 @@ namespace NimbleBluetoothImpedanceManager
             {
                 if (value == _State) //do nothing
                     return;
-                logger.Debug("State changed from {0} to {1}", _State, value);
+                logger.Debug("DeviceState changed from {0} to {1}", _State, value);
                 _State = value;
                 if (StateChanged != null)
                     StateChanged(this, new StateChangedEventArgs() { NewState = _State });
@@ -493,7 +493,7 @@ namespace NimbleBluetoothImpedanceManager
             if (receivingTelemData)
             {
                 logger.Error("Called collectTelemData when state was {0}", State);
-                //State = NimbleState.ConnectingToNimble;
+                //DeviceState = NimbleState.ConnectingToNimble;
                 return false;
             }
             //receivingTelemData = true;
@@ -539,8 +539,8 @@ namespace NimbleBluetoothImpedanceManager
             //    logger.Info("Receive Telem data successful. Sequence {0}, Device {1}", sequence, RemoteDeviceId);
             //    lock (stateLock)
             //    {
-            //        if (State == NimbleState.ConnectedToNimbleAndWorking)
-            //            State = NimbleState.ConnectedToNimbleAndReady;
+            //        if (DeviceState == NimbleState.ConnectedToNimbleAndWorking)
+            //            DeviceState = NimbleState.ConnectedToNimbleAndReady;
             //    }
             //    data = (string[])TelemetryData.Clone();
             //    return true;
@@ -552,8 +552,8 @@ namespace NimbleBluetoothImpedanceManager
             //    //receivingTelemData = false;
             //    lock (stateLock)
             //    {
-            //        if (State == NimbleState.ConnectedToNimbleAndWorking)
-            //            State = NimbleState.ConnectedToNimbleAndReady;
+            //        if (DeviceState == NimbleState.ConnectedToNimbleAndWorking)
+            //            DeviceState = NimbleState.ConnectedToNimbleAndReady;
             //    }
             //    data = (string[])TelemetryData.Clone();
             //    return false;
@@ -565,10 +565,10 @@ namespace NimbleBluetoothImpedanceManager
         //    NimbleState entryState;
         //    lock (stateLock)
         //    {
-        //        if (State == NimbleState.ConnectingToNimble || State == NimbleState.ConnectedToNimbleAndReady)
+        //        if (DeviceState == NimbleState.ConnectingToNimble || DeviceState == NimbleState.ConnectedToNimbleAndReady)
         //        {
-        //            entryState = State;
-        //            State = NimbleState.ConnectedToNimbleAndWorking;
+        //            entryState = DeviceState;
+        //            DeviceState = NimbleState.ConnectedToNimbleAndWorking;
         //        }
         //        else
         //            return false;
@@ -580,24 +580,24 @@ namespace NimbleBluetoothImpedanceManager
         //        btDongle.TransmitToRemoteDevice("\nGetID\n");
         //        if (NimbleCmdRx_Name_WaitHandle.WaitOne(DataChunker.Timeout + 1000))
         //        {
-        //            State = NimbleState.ConnectedToNimbleAndReady;
+        //            DeviceState = NimbleState.ConnectedToNimbleAndReady;
         //            return true;
         //        }
         //        else
         //        {
-        //            State = entryState;
+        //            DeviceState = entryState;
         //            return false;
         //        }
         //    }
         //    catch (Exception ex)
         //    {
-        //        State = entryState;
+        //        DeviceState = entryState;
         //        logger.Error(ex.Message);
         //        //throw ex;
         //        return false;
         //    }
 
-        //    //State = NimbleState.ConnectedToNimbleAndReady;
+        //    //DeviceState = NimbleState.ConnectedToNimbleAndReady;
         //    //return true;
         //}
 
@@ -1142,9 +1142,9 @@ namespace NimbleBluetoothImpedanceManager
         //{
         //    lock (stateLock)
         //    {
-        //        if (State == NimbleState.ConnectedToNimbleAndReady)
+        //        if (DeviceState == NimbleState.ConnectedToNimbleAndReady)
         //        {
-        //            State = NimbleState.ConnectedToNimbleAndWorking;
+        //            DeviceState = NimbleState.ConnectedToNimbleAndWorking;
         //        }
         //        else
         //            return "";
@@ -1154,10 +1154,10 @@ namespace NimbleBluetoothImpedanceManager
         //    btDongle.TransmitToRemoteDevice("\ngetGenGUID\n");
         //    if (NimbleCmdRx_GenGUID_WaitHandle.WaitOne(DataChunker.Timeout + 2000))
         //    {
-        //        State = NimbleState.ConnectedToNimbleAndReady;
+        //        DeviceState = NimbleState.ConnectedToNimbleAndReady;
         //        return remoteDeviceGenGUID;
         //    }
-        //    State = NimbleState.ConnectedToNimbleAndReady;
+        //    DeviceState = NimbleState.ConnectedToNimbleAndReady;
         //    return "";
         //}
 
@@ -1182,9 +1182,7 @@ namespace NimbleBluetoothImpedanceManager
                 //btDongle.TransmitAndLog("endSession\n");
                 for (int i = 0; i < 10; i++)
                 {
-                    btDongle.Dongle_ConnectionLost_WaitHandle.Reset();
-                    btDongle.TransmitAndLog("AT");
-                    if (btDongle.Dongle_ConnectionLost_WaitHandle.WaitOne(DataChunker.Timeout + 2000))
+                    if (btDongle.DisconnectFromRemoteDevice())
                     {
                         logger.Info("Disconnected from Nimble processor on attempt {0}", i);
                         break;

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NimbleBluetoothImpedanceManager", "NimbleBluetoothImpedanceManager\NimbleBluetoothImpedanceManager.csproj", "{4F6F473C-7900-4AD7-AB26-0B8E16D7835C}"
 EndProject
@@ -18,6 +18,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PIC_Sequence", "H:\CochlearImplantSequenceEncoder\PIC_Sequence\PIC_Sequence.csproj", "{5D075E0C-7117-4608-B0DD-278E8C2CA928}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NimbleDataProcessor", "NimbleDataProcessor\NimbleDataProcessor.csproj", "{CA505264-0C94-4367-90D1-2FF049CE347F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NimbleBluetoothImpedanceManagerTests", "NimbleBluetoothImpedanceManagerTests\NimbleBluetoothImpedanceManagerTests.csproj", "{89EA719E-683D-4BD1-B13F-03689F252B9E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -97,6 +99,18 @@ Global
 		{CA505264-0C94-4367-90D1-2FF049CE347F}.Release|Mixed Platforms.Build.0 = Release|x86
 		{CA505264-0C94-4367-90D1-2FF049CE347F}.Release|x86.ActiveCfg = Release|x86
 		{CA505264-0C94-4367-90D1-2FF049CE347F}.Release|x86.Build.0 = Release|x86
+		{89EA719E-683D-4BD1-B13F-03689F252B9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89EA719E-683D-4BD1-B13F-03689F252B9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89EA719E-683D-4BD1-B13F-03689F252B9E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{89EA719E-683D-4BD1-B13F-03689F252B9E}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{89EA719E-683D-4BD1-B13F-03689F252B9E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{89EA719E-683D-4BD1-B13F-03689F252B9E}.Debug|x86.Build.0 = Debug|Any CPU
+		{89EA719E-683D-4BD1-B13F-03689F252B9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89EA719E-683D-4BD1-B13F-03689F252B9E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89EA719E-683D-4BD1-B13F-03689F252B9E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{89EA719E-683D-4BD1-B13F-03689F252B9E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{89EA719E-683D-4BD1-B13F-03689F252B9E}.Release|x86.ActiveCfg = Release|Any CPU
+		{89EA719E-683D-4BD1-B13F-03689F252B9E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
