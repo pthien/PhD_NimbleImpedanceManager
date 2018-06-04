@@ -102,10 +102,10 @@ namespace Nimble.Sequences
         public static NimbleMeasurementRecord? OpenMeasurementRecord(string full_path_folder_of_record)
         {
             List<string> TelemetryRecordDirectories = new List<string>();
-            Regex folder_regex = new Regex("([A-Za-z0-9_]+)-([A-Z0-9]{12})-([A-Za-z0-9-]{36})-([0-9APM_-]{22})");
+            Regex folder_regex = new Regex("([A-Za-z0-9_]+)-([A-Z0-9]+)-([A-Za-z0-9-]{36})-([0-9APM_-]{22})");
 
             string foldername = Path.GetFileName(full_path_folder_of_record);
-            var m = folder_regex.Match(full_path_folder_of_record);
+            var m = folder_regex.Match(foldername);
             if (m.Success)
             {
                 NimbleMeasurementRecord temp = new NimbleMeasurementRecord();

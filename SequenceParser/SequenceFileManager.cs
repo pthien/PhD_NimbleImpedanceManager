@@ -143,7 +143,7 @@ namespace Nimble.Sequences
                     return results;
 
                 List<string> TelemetryRecordDirectories = new List<string>();
-                Regex folder = new Regex("([A-Za-z0-9_]+)-([A-Z0-9]{12})-([A-Za-z0-9-]{36})-([0-9APM_-]{22})");
+                Regex folder = new Regex("([A-Za-z0-9_]+)-([A-Z0-9]+)-([A-Za-z0-9-]{36})-([0-9APM_-]{22})");
                 foreach (string s in possibledirectories)
                 {
                     var m = folder.Match(s);

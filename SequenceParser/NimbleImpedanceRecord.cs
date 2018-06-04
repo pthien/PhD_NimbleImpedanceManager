@@ -78,14 +78,16 @@ namespace Nimble.Sequences
                 var minAList = minrefs.Where(x => x.ImplantGivingResponse == Implant.ImplantA).Select(x => x.Captures_ticks[0]);
                 var minBList = minrefs.Where(x => x.ImplantGivingResponse == Implant.ImplantB).Select(x => x.Captures_ticks[0]);
 
-                if (maxAList.Count() == 0 || maxBList.Count() == 0 || minAList.Count() == 0 || minBList.Count() == 0)
+                //TODO: !!! Fix this. Previous code checked A and B channels. Needs to be able to adapt if A or B channels are not available
+                //if (maxAList.Count() == 0 || maxBList.Count() == 0 || minAList.Count() == 0 || minBList.Count() == 0)
+                if (maxAList.Count() == 0 || minAList.Count() == 0 )
                     return telemResults;
 
                 int maxPWM_A = maxAList.Max();
-                int maxPWM_B = maxBList.Max();
+                int maxPWM_B = 10;
 
                 int minPWM_A = minAList.Max();
-                int minPWM_B = minBList.Max();
+                int minPWM_B = 5;
 
                 var impedanceResponses = annotatedResponses.Where(x => x is ElectrodeVoltageResponse).Cast<ElectrodeVoltageResponse>();
                 var complianceResponses = annotatedResponses.Where(x => x is ComplianceVoltageResponse).Cast<ComplianceVoltageResponse>();
