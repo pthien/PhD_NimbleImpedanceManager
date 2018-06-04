@@ -169,7 +169,11 @@ namespace NimbleBluetoothImpedanceManager
                     throw new AccessViolationException("Cant transmit while scanning for devices");
                 return;
             }
-            serialPort.Write(text);
+            foreach (char c in text)
+            {
+                serialPort.Write(c.ToString());
+                Thread.Sleep(2);
+            }
             dataLoggerTX.Info(text.EscapeWhiteSpace());
         }
 
