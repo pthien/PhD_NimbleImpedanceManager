@@ -494,7 +494,9 @@ namespace NimbleBluetoothImpedanceManager
 
                 var recordMaybe = NimbleMeasurementRecord.OpenMeasurementRecord(s);
                 if (!recordMaybe.HasValue)
+                {
                     return;
+                }
 
                 NimbleMeasurementRecord record = recordMaybe.Value;
                 fileManager.ProcessSequenceResponse(record);

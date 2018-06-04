@@ -55,9 +55,19 @@ namespace NimbleBluetoothImpedanceManager
                 tmr.Stop();
                 tmr.Start();
                 //logger.Debug("Pause! {0}.{1}", DateTime.Now.Second, DateTime.Now.Millisecond);
-                sb.Append(c);
+
                 if (c == '\r' || c == '\n')
+                {
+                    sb.Append(c);
                     SendOffChunk(ChunkingReason.Newline);
+                }
+              else  if (c == '{')
+                {
+                    SendOffChunk(ChunkingReason.Newline);
+                    sb.Append(c);
+                }
+                else 
+                      sb.Append(c);
             }
         }
 

@@ -187,6 +187,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="tst\" />
+    <Folder Include="UARTCableDriver\" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">

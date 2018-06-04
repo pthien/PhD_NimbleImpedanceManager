@@ -83,7 +83,7 @@ namespace NimbleDataProcessor
         static void Main()
         {
             var args = Environment.GetCommandLineArgs();
-            var result = CommandLine.Parser.Default.ParseArguments<CmdLineOptions>(args);
+            var result = Parser.Default.ParseArguments<CmdLineOptions>(args);
 
 
 
@@ -117,8 +117,8 @@ namespace NimbleDataProcessor
 
                 List<string> subjects = ListSubjectSummary(recordsall);
 
-                subjects.Clear();
-                subjects.Add("15_520_DINAH");
+                //subjects.Clear();
+                //subjects.Add("15_520_DINAH");
 
                 SequenceFileManager sfm = new SequenceFileManager();
                 sfm.ScanDirectory(result.Value.SequenceFolder);
@@ -165,24 +165,26 @@ namespace NimbleDataProcessor
 
                 subjects.Sort();
 
-                foreach (string subject in subjects)
-                {
-                    var subjectrecords = allImpedanceRecords.Where(x => x.SubjectName == subject).OrderBy(x => x.Timestamp).ToList();
+                //Waveforms
+                //foreach (string subject in subjects)
+                //{
+                //    var subjectrecords = allImpedanceRecords.Where(x => x.SubjectName == subject).OrderBy(x => x.Timestamp).ToList();
 
-                    var electrodes = GetDistictElectrodes(subjectrecords);
+                //    var electrodes = GetDistictElectrodes(subjectrecords);
 
-                    ExcelPackage pkg = new ExcelPackage();
-                    var sheet = pkg.Workbook.Worksheets.Add("data V10");
-                    var sheet_avg = pkg.Workbook.Worksheets.Add("averages V10");
+                //    ExcelPackage pkg = new ExcelPackage();
+                //    var sheet = pkg.Workbook.Worksheets.Add("data V10");
+                //    var sheet_avg = pkg.Workbook.Worksheets.Add("averages V10");
 
-                    var sheet_2 = pkg.Workbook.Worksheets.Add("data V2");
-                    var sheet_avg_2 = pkg.Workbook.Worksheets.Add("averages V2");
+                //    var sheet_2 = pkg.Workbook.Worksheets.Add("data v2");
+                //    var sheet_avg_2 = pkg.Workbook.Worksheets.Add("averages v2");
 
-                    AddVoltageDataToSheets(subjectrecords, electrodes, sheet, sheet_avg, "_V10");
-                    AddVoltageDataToSheets(subjectrecords, electrodes, sheet_2, sheet_avg_2, "_V2");
+                //    AddVoltageDataToSheets(subjectrecords, electrodes, sheet, sheet_avg, "_V10");
+                //    AddVoltageDataToSheets(subjectrecords, electrodes, sheet_2, sheet_avg_2, "_V2");
 
-                    pkg.SaveAs(new FileInfo(subject + "_waveforms.xlsx"));
-                }
+                //    pkg.SaveAs(new FileInfo(subject + "_waveforms.xlsx"));
+                //}
+
                 //return;
                 foreach (string subject in subjects)
                 {

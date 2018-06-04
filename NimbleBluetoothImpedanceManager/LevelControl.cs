@@ -40,7 +40,7 @@ namespace NimbleBluetoothImpedanceManager
 
             setLevel = nimbleCommsManager.GetRampLevel(relevantSequence);
 
-            tmrStatus = new System.Timers.Timer(1200);
+            tmrStatus = new System.Timers.Timer(2000);
             tmrStatus.Elapsed += statusTimer_Tick;
             tmrStatus.Start();
             InitializeComponent();

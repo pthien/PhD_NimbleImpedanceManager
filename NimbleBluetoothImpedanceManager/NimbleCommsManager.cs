@@ -186,6 +186,7 @@ namespace NimbleBluetoothImpedanceManager
             {
                 lock (receivingTelemDataLock)
                 {
+                    logger.Info("receiving telem data: "+ p);
                     telemData_temp.Add(p);
                 }
             }
