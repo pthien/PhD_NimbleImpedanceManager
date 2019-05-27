@@ -98,10 +98,12 @@ namespace NimbleBluetoothImpedanceManager
             {
                 serialPort = new SerialPort(CommPort, BaudRate);
                 serialPort.DataReceived += serialPort_DataReceived;
+                serialPort.ErrorReceived += SerialPort_ErrorReceived;
                 serialPort.Open();
                 logger.Info("*Connection to dongle on {0} established*", CommPort);
                 if (!InitialiseDongle())
                 {
+                    logger.Warn("Failed to initialise dongle. Closing serial port");
                     serialPort.DataReceived -= serialPort_DataReceived;
                     serialPort.Close();
                 }
@@ -112,6 +114,11 @@ namespace NimbleBluetoothImpedanceManager
                 return false;
             }
             return true;
+        }
+
+        private void SerialPort_ErrorReceived(object sender, SerialErrorReceivedEventArgs e)
+        {
+           logger.Error("serial port error! {}", e.ToString());
         }
 
         void serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
@@ -133,8 +140,31 @@ namespace NimbleBluetoothImpedanceManager
 
         public bool ConnectToRemoteDevice(string address)
         {
-            Status.RemoteDeviceAddress = "UART";// = new Status() {DeviceState = DeviceState.Connected, RemoteDeviceAddress = "UART"};
-            return true;
+            Dongle_ConnectionAttempt_WaitHandle.Set();
+            Status.DeviceState = DeviceState.Connecting;
+            Status.RemoteDeviceAddress = address;
+
+            ConnectionParser parser = new ConnectionParser();
+            dataChunker.ChunkReady += parser.processChunk;
+
+            TransmitAndLog("C,0," + address + "\n");
+
+            bool connectionSuccess = parser.StreamOpenWaitHandle.WaitOne(10000);
+
+            if (connectionSuccess)
+            {
+                Status.RemoteDeviceAddress = address;
+                logger.Info("Connected to {0}", address);
+            }
+            else
+            {
+                Status.RemoteDeviceAddress = null;
+                Status.DeviceState = DeviceState.Unknown;
+
+                logger.Info("Connection to {0} timed out. Trying to reset dongle", address);
+                ReinitialiseDongle();
+            }
+            return connectionSuccess;
         }
 
         protected void TransmitAndLog(string text)
@@ -165,44 +195,148 @@ namespace NimbleBluetoothImpedanceManager
 
         public void TransmitToRemoteDevice(string command)
         {
+            if (Status.DeviceState != DeviceState.Connected)
+            {
+                logger.Error("Not connected to any nimble processor. Discarding transmission: {0}", command.EscapeWhiteSpace());
+                //throw new Exception("Not connected to any nimble processor");
+            }
             TransmitAndLog(command);
         }
 
         private void ReinitialiseDongle()
         {
+            Thread.Sleep(200);
+            TransmitAndLog("$$$"); //Transmit escape sequence
+            Thread.Sleep(200);
+            TransmitAndLog("R,1");
+            Thread.Sleep(400);
+            TransmitAndLog("$$$");
         }
 
         private bool InitialiseDongle()
         {
-            return true;
+            logger.Info("Initialising dongle");
+            TransmitAndLog("$$$"); //Transmit escape sequence
+            Thread.Sleep(200);
+            TransmitAndLog("X\n");
+            Thread.Sleep(100);
+            TransmitAndLog("Z\n");
+            Thread.Sleep(100);
+            TransmitAndLog("K,1\n");
+
+            for (int i = 0; i < 3; i++)
+            {
+                if (IsDongleOK())
+                {
+                    DataDump? dataDump = GetDongleData();
+
+                    if (!dataDump.HasValue)
+                    {
+                        logger.Info("Data dump did not have a value");
+                        return false;
+                    }
+
+                    if (dataDump.Value.IsConnected)
+                    {
+                        logger.Info("When initialising dongle, it was already connected");
+                        return DisconnectFromRemoteDevice();
+                    }
+
+                    Status.DeviceState = DeviceState.Disconnected;
+                    return true;
+                }
+                Thread.Sleep(100);
+            }
+            return false;
+        }
+
+        private DataDump? GetDongleData()
+        {
+            DataDumpParser scanner = new DataDumpParser();
+            dataChunker.ChunkReady += scanner.ScanChunksForDongleDataDump;
+            TransmitAndLog("D\n");
+            return dataDumpParser.GetDataDump();
         }
 
         public bool DisconnectFromRemoteDevice()
         {
-            return true;
+            TransmitAndLog("$$$");
+            Thread.Sleep(200);
+            TransmitAndLog("K,1\n");
+            bool success = Dongle_ConnectionLost_WaitHandle.WaitOne(DataChunker.Timeout + 500);
+            if (success)
+            {
+                logger.Info("Disconnected from remote device");
+            }
+            else
+            {
+                logger.Info("Failed to disconnect from remote device");
+            }
+            return success;
         }
 
 
         public string[] DiscoverDevices()
         {
-            return new[] { "Directly Connected Device" };
+            logger.Debug("Discover Devices called. Port open? {}", serialPort.IsOpen);
+            scanForDevicesParser.Reset();
+            TransmitAndLog("F\n");
+
+            Status.KnownDevices.Clear();
+            Status.KnownDevices.AddRange(scanForDevicesParser.ScanForDevices().Select(x => x.BluetoothAddress));
+            logger.Info("Scan for devices completed. Found {0} devices", Status.KnownDevices.Count);
+
+            TransmitAndLog("X\n");
+            logger.Debug("Discover Devices finished. Port open? {}", serialPort.IsOpen);
+            return KnownDevices;
         }
 
         public bool IsDongleOK()
         {
-            logger.Debug("Dongle is OK!");
+            logger.Debug("IsDongleOK called. Port open? {}", serialPort.IsOpen);
+            TransmitAndLog("X\n");
+            bool success = okParser.OKFound(DataChunker.Timeout + 500);
 
-            return true;
+            if (success)
+            {
+                logger.Debug("Dongle is OK!");
 
+                return true;
+            }
+
+            logger.Debug("Dongle not OK :(");
+            return false;
         }
 
         private void ProcessData(string[] mostRecentlyRecievedData)
         {
             foreach (string s in mostRecentlyRecievedData)
             {
-                if (DataReceivedFromRemoteDevice != null)
-                    DataReceivedFromRemoteDevice(this, new DataRecievedEventArgs() { RecievedData = s });
+                //dataLoggerRX.Info(s);
+                if (s.Contains("%DISCONNECT%"))
+                {
+                    Dongle_ConnectionLost_WaitHandle.Set();
+                    logger.Info("Bluetooth disconnected");
+                    Status.DeviceState = DeviceState.Disconnected;
+                    Status.RemoteDeviceAddress = null;
+                    if (ConnectionLost != null)
+                        ConnectionLost(this, new DataRecievedEventArgs() { RecievedData = s });
 
+                }
+                if (s.Contains("%STREAM_OPEN%"))
+                {
+                    Dongle_ConnectionEstablished_WaitHandle.Set();
+                    Status.DeviceState = DeviceState.Connected;
+                    logger.Info("Connection established");
+                    if (ConnectionEstablished != null)
+                        ConnectionEstablished(this, new DataRecievedEventArgs { RecievedData = s });
+                }
+                else if (Status.DeviceState == DeviceState.Connected)
+                {
+                    //     logger.Debug("data received from remote device: {0}", s);
+                    if (DataReceivedFromRemoteDevice != null)
+                        DataReceivedFromRemoteDevice(this, new DataRecievedEventArgs() { RecievedData = s });
+                }
             }
         }
 

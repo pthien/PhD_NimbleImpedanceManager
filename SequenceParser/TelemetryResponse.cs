@@ -85,14 +85,22 @@ namespace Nimble.Sequences
                     var capparts = caps.Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (string s in capparts)
                     {
-
+                        int x;
+                        if (int.TryParse(s, out x) == false)
+                        {
+                            x = 5;
+                        }
                         Captures_ticks.Add(int.Parse(s));
                     }
+                }
+                catch(FormatException)
+                {
+                    logger.Error("Can't parse capture '{0}'. Ignoring all and any caps", caps);
+                    Captures_ticks.Clear();
                 }
                 catch (Exception ex)
                 {
                     logger.Error(ex);
-                    logger.Error("Ignoring all and any caps");
                     Captures_ticks.Clear();
                 }
                 

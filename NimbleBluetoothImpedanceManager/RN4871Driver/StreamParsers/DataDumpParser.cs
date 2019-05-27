@@ -102,7 +102,7 @@ namespace NimbleBluetoothImpedanceManager.RN4871Driver.StreamParsers
                 _state = ExpectedLine.BTA;
             }
 
-            //_logger.Debug("scanner state is now " + _state.ToString());
+            _logger.Debug("scanner state is now " + _state.ToString());
         }
 
         public DataDump? GetDataDump()
@@ -117,7 +117,9 @@ namespace NimbleBluetoothImpedanceManager.RN4871Driver.StreamParsers
 
             DongleCommandRequestDumpSettings.Reset();
 
-            if (DongleCommandRequestDumpSettings.WaitOne(500))
+            _logger.Debug("getting data dump");
+
+            if (DongleCommandRequestDumpSettings.WaitOne(2000))
                 return Results;
             return null;
         }

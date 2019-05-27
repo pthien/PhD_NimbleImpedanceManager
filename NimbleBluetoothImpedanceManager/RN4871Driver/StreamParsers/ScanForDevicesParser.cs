@@ -79,9 +79,9 @@ namespace NimbleBluetoothImpedanceManager.RN4871Driver.StreamParsers
         /// </summary>
         /// <param name="timeout"></param>
         /// <returns></returns>
-        public List<DeviceScanResult> ScanForDevices(int timeout = 2000)
+        public List<DeviceScanResult> ScanForDevices(int timeout = 5000)
         {
-            Thread.Sleep(2000);
+            Thread.Sleep(timeout);
             return Results;
         }
 

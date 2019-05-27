@@ -303,7 +303,7 @@ namespace NimbleBluetoothImpedanceManager
         private void btnStartScan_Click(object sender, EventArgs e)
         {
             ManualActionInProgress = true;
-
+            logger.Debug("btnStartScanClick: " + nimble.State);
             ThreadPool.QueueUserWorkItem(delegate
             {
 
